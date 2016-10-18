@@ -2,227 +2,227 @@
 // --------------------------------------------------
 
 // BLOCK SELECT BITS
-const COMMON_REGISTER = 0x00;
+const W5500_COMMON_REGISTER = 0x00;
 
-const S0_REGISTER = 0x08;
-const S0_TX_BUFFER = 0x10;
-const S0_RX_BUFFER = 0x18;
+const W5500_S0_REGISTER = 0x08;
+const W5500_S0_TX_BUFFER = 0x10;
+const W5500_S0_RX_BUFFER = 0x18;
 
-const S1_REGISTER = 0x28;
-const S1_TX_BUFFER = 0x30;
-const S1_RX_BUFFER = 0x38;
+const W5500_S1_REGISTER = 0x28;
+const W5500_S1_TX_BUFFER = 0x30;
+const W5500_S1_RX_BUFFER = 0x38;
 
-const S2_REGISTER = 0x48;
-const S2_TX_BUFFER = 0x50;
-const S2_RX_BUFFER = 0x58;
+const W5500_S2_REGISTER = 0x48;
+const W5500_S2_TX_BUFFER = 0x50;
+const W5500_S2_RX_BUFFER = 0x58;
 
-const S3_REGISTER = 0x68;
-const S3_TX_BUFFER = 0x70;
-const S3_RX_BUFFER = 0x78;
+const W5500_S3_REGISTER = 0x68;
+const W5500_S3_TX_BUFFER = 0x70;
+const W5500_S3_RX_BUFFER = 0x78;
 
-const S4_REGISTER = 0x88;
-const S4_TX_BUFFER = 0x90;
-const S4_RX_BUFFER = 0x98;
+const W5500_S4_REGISTER = 0x88;
+const W5500_S4_TX_BUFFER = 0x90;
+const W5500_S4_RX_BUFFER = 0x98;
 
-const S5_REGISTER = 0xA8;
-const S5_TX_BUFFER = 0xB0;
-const S5_RX_BUFFER = 0xB8;
+const W5500_S5_REGISTER = 0xA8;
+const W5500_S5_TX_BUFFER = 0xB0;
+const W5500_S5_RX_BUFFER = 0xB8;
 
-const S6_REGISTER = 0xC8;
-const S6_TX_BUFFER = 0xD0;
-const S6_RX_BUFFER = 0xD8;
+const W5500_S6_REGISTER = 0xC8;
+const W5500_S6_TX_BUFFER = 0xD0;
+const W5500_S6_RX_BUFFER = 0xD8;
 
-const S7_REGISTER = 0xE8;
-const S7_TX_BUFFER = 0xF0;
-const S7_RX_BUFFER = 0xF8;
+const W5500_S7_REGISTER = 0xE8;
+const W5500_S7_TX_BUFFER = 0xF0;
+const W5500_S7_RX_BUFFER = 0xF8;
 
 // READ/WRITE BIT
-const READ_COMMAND = 0x00;
-const WRITE_COMMAND = 0x04;
+const W5500_READ_COMMAND = 0x00;
+const W5500_WRITE_COMMAND = 0x04;
 
 // SPI OPPERATION MODE
-const VARIABLE_DATA_LENGTH = 0x00;
-const FIXED_DATA_LENGTH_1 = 0x01;
-const FIXED_DATA_LENGTH_2 = 0x02;
-const FIXED_DATA_LENGTH_4 = 0x03;
+const W5500_VARIABLE_DATA_LENGTH = 0x00;
+const W5500_FIXED_DATA_LENGTH_1 = 0x01;
+const W5500_FIXED_DATA_LENGTH_2 = 0x02;
+const W5500_FIXED_DATA_LENGTH_4 = 0x03;
 
 
 // COMMON REGISTERS OFFSET ADDRESSES
 // --------------------------------------------------
 // MR
-const MODE = 0x0000;
+const W5500_MODE = 0x0000;
 
 //GWR
-const GATEWAY_ADDR_0 = 0x0001;
-const GATEWAY_ADDR_1 = 0x0002;
-const GATEWAY_ADDR_2 = 0x0003;
-const GATEWAY_ADDR_3 = 0x0004;
+const W5500_GATEWAY_ADDR_0 = 0x0001;
+const W5500_GATEWAY_ADDR_1 = 0x0002;
+const W5500_GATEWAY_ADDR_2 = 0x0003;
+const W5500_GATEWAY_ADDR_3 = 0x0004;
 
 //SUBR
-const SUBNET_MASK_ADDR_0 = 0x0005;
-const SUBNET_MASK_ADDR_1 = 0x0006;
-const SUBNET_MASK_ADDR_2 = 0x0007;
-const SUBNET_MASK_ADDR_3 = 0x0008;
+const W5500_SUBNET_MASK_ADDR_0 = 0x0005;
+const W5500_SUBNET_MASK_ADDR_1 = 0x0006;
+const W5500_SUBNET_MASK_ADDR_2 = 0x0007;
+const W5500_SUBNET_MASK_ADDR_3 = 0x0008;
 
 //SHAR
-const SOURCE_HW_ADDR_0 = 0x0009;
-const SOURCE_HW_ADDR_1 = 0x000A;
-const SOURCE_HW_ADDR_2 = 0x000B;
-const SOURCE_HW_ADDR_3 = 0x000C;
-const SOURCE_HW_ADDR_4 = 0x000D;
-const SOURCE_HW_ADDR_5 = 0x000E;
+const W5500_SOURCE_HW_ADDR_0 = 0x0009;
+const W5500_SOURCE_HW_ADDR_1 = 0x000A;
+const W5500_SOURCE_HW_ADDR_2 = 0x000B;
+const W5500_SOURCE_HW_ADDR_3 = 0x000C;
+const W5500_SOURCE_HW_ADDR_4 = 0x000D;
+const W5500_SOURCE_HW_ADDR_5 = 0x000E;
 
 //SIPR
-const SOURCE_IP_ADDR_0 = 0x000F;
-const SOURCE_IP_ADDR_1 = 0x0010;
-const SOURCE_IP_ADDR_2 = 0x0011;
-const SOURCE_IP_ADDR_3 = 0x0012;
+const W5500_SOURCE_IP_ADDR_0 = 0x000F;
+const W5500_SOURCE_IP_ADDR_1 = 0x0010;
+const W5500_SOURCE_IP_ADDR_2 = 0x0011;
+const W5500_SOURCE_IP_ADDR_3 = 0x0012;
 
 // INTLEVEL
-const INTERRUPT_LOW_LEVEL_TIMER_0 = 0x0013;
-const INTERRUPT_LOW_LEVEL_TIMER_1 = 0x0014;
+const W5500_INTERRUPT_LOW_LEVEL_TIMER_0 = 0x0013;
+const W5500_INTERRUPT_LOW_LEVEL_TIMER_1 = 0x0014;
 
 //IR
-const INTERRUPT = 0x0015;
+const W5500_INTERRUPT = 0x0015;
 // IMR
-const INTERRUPT_MASK = 0x0016;
+const W5500_INTERRUPT_MASK = 0x0016;
 
 // SIR
-const SOCKET_INTERRUPT = 0x0017;
+const W5500_SOCKET_INTERRUPT = 0x0017;
 // SIMR
-const SOCKET_INTERRUPT_MASK = 0x0018;
+const W5500_SOCKET_INTERRUPT_MASK = 0x0018;
 
 // RTR
-const RETRY_TIME_0 = 0x0019;
-const RETRY_TIME_1 = 0x001A;
+const W5500_RETRY_TIME_0 = 0x0019;
+const W5500_RETRY_TIME_1 = 0x001A;
 // RCR
-const RETRY_COUNT = 0x001B;
+const W5500_RETRY_COUNT = 0x001B;
 
-const CHIP_VERSION = 0x0039;
+const W5500_CHIP_VERSION = 0x0039;
 
 
 // SOCKET REGISTER OFFSET ADDRESSES
 // --------------------------------------------------
 
-const SOCKET_MODE = 0x0000;
-const SOCKET_COMMAND = 0x0001;
-const SOCKET_N_INTERRUPT = 0x0002;
-const SOCKET_STATUS = 0x0003;
+const W5500_SOCKET_MODE = 0x0000;
+const W5500_SOCKET_COMMAND = 0x0001;
+const W5500_SOCKET_N_INTERRUPT = 0x0002;
+const W5500_SOCKET_STATUS = 0x0003;
 
-const SOCKET_SOURCE_PORT_0 = 0x0004;
-const SOCKET_SOURCE_PORT_1 = 0x0005;
+const W5500_SOCKET_SOURCE_PORT_0 = 0x0004;
+const W5500_SOCKET_SOURCE_PORT_1 = 0x0005;
 
-const SOCKET_DEST_HW_ADDR_0 = 0x0006;
-const SOCKET_DEST_HW_ADDR_1 = 0x0007;
-const SOCKET_DEST_HW_ADDR_2 = 0x0008;
-const SOCKET_DEST_HW_ADDR_3 = 0x0009;
-const SOCKET_DEST_HW_ADDR_4 = 0x000A;
-const SOCKET_DEST_HW_ADDR_5 = 0x000B;
+const W5500_SOCKET_DEST_HW_ADDR_0 = 0x0006;
+const W5500_SOCKET_DEST_HW_ADDR_1 = 0x0007;
+const W5500_SOCKET_DEST_HW_ADDR_2 = 0x0008;
+const W5500_SOCKET_DEST_HW_ADDR_3 = 0x0009;
+const W5500_SOCKET_DEST_HW_ADDR_4 = 0x000A;
+const W5500_SOCKET_DEST_HW_ADDR_5 = 0x000B;
 
-const SOCKET_DEST_IP_ADDR_0 = 0x000C;
-const SOCKET_DEST_IP_ADDR_1 = 0x000D;
-const SOCKET_DEST_IP_ADDR_2 = 0x000E;
-const SOCKET_DEST_IP_ADDR_3 = 0x000F;
+const W5500_SOCKET_DEST_IP_ADDR_0 = 0x000C;
+const W5500_SOCKET_DEST_IP_ADDR_1 = 0x000D;
+const W5500_SOCKET_DEST_IP_ADDR_2 = 0x000E;
+const W5500_SOCKET_DEST_IP_ADDR_3 = 0x000F;
 
-const SOCKET_DEST_PORT_0 = 0x0010;
-const SOCKET_DEST_PORT_1 = 0x0011;
+const W5500_SOCKET_DEST_PORT_0 = 0x0010;
+const W5500_SOCKET_DEST_PORT_1 = 0x0011;
 
-const SOCKET_RX_BUFFER_SIZE = 0x001E;
-const SOCKET_TX_BUFFER_SIZE = 0x001F;
+const W5500_SOCKET_RX_BUFFER_SIZE = 0x001E;
+const W5500_SOCKET_TX_BUFFER_SIZE = 0x001F;
 
 // SOCKET TX FREE SIZE REGISTER (Sn_TX_FREE_SIZE)
-const SOCKET_TX_SIZE_R1 = 0x0020;
-const SOCKET_TX_SIZE_R2 = 0x0021;
+const W5500_SOCKET_TX_SIZE_R1 = 0x0020;
+const W5500_SOCKET_TX_SIZE_R2 = 0x0021;
 
 // SOCKET TX READ POINTER
-const SOCKET_TX_RP_R1 = 0x0022;
-const SOCKET_TX_RP_R2 = 0x0023;
+const W5500_SOCKET_TX_RP_R1 = 0x0022;
+const W5500_SOCKET_TX_RP_R2 = 0x0023;
 
 // SOCKET TX WRITE POINTER
-const SOCKET_TX_WP_R1 = 0x0024;
-const SOCKET_TX_WP_R2 = 0x0025;
+const W5500_SOCKET_TX_WP_R1 = 0x0024;
+const W5500_SOCKET_TX_WP_R2 = 0x0025;
 
 // SOCKET RX RECEIVED SIZE REGISTER (Sn_RX_RSR)
-const SOCKET_RX_SIZE_R1 = 0x0026;
-const SOCKET_RX_SIZE_R2 = 0x0027;
+const W5500_SOCKET_RX_SIZE_R1 = 0x0026;
+const W5500_SOCKET_RX_SIZE_R2 = 0x0027;
 
 // SOCKET RX READ POINTER (Sn_RX_RD)
-const SOCKET_RX_RP_R1 = 0x0028;
-const SOCKET_RX_RP_R2 = 0x0029;
+const W5500_SOCKET_RX_RP_R1 = 0x0028;
+const W5500_SOCKET_RX_RP_R2 = 0x0029;
 
 // SOCKET N INTERRUPT MASK (Sn_IMR)
-const SOCKET_N_INTERRUPT_MASK = 0x002C;
+const W5500_SOCKET_N_INTERRUPT_MASK = 0x002C;
 
 // --------------------------------------------------
 
 // MODES
-const SW_RESET = 0x80;
-const WAKE_ON_LAN = 0x20;
-const PING_BLOCK = 0x10;
-const PPPoE = 0x08;
-const FORCE_ARP = 0x01;
-const DEFAULT_MODE = 0x00;
+const W5500_SW_RESET = 0x80;
+const W5500_WAKE_ON_LAN = 0x20;
+const W5500_PING_BLOCK = 0x10;
+const W5500_PPPoE = 0x08;
+const W5500_FORCE_ARP = 0x01;
+const W5500_DEFAULT_MODE = 0x00;
 
 // SOCKET MODES (Sn_MR)
-const SOCKET_MODE_MULTI = 0x80;
-const SOCKET_MODE_BROADCAST_BLOCKING = 0x40;
-const SOCKET_MODE_NO_DELAY_ACK = 0x20;
-const SOCKET_MODE_UNICAST_BLOCKING = 0x10;
-const SOCKET_MODE_CLOSED = 0x00;
-const SOCKET_MODE_TCP = 0x01;
-const SOCKET_MODE_UDP = 0x02;
-const SOCKET_MODE_MACRAW = 0x03;
+const W5500_SOCKET_MODE_MULTI = 0x80;
+const W5500_SOCKET_MODE_BROADCAST_BLOCKING = 0x40;
+const W5500_SOCKET_MODE_NO_DELAY_ACK = 0x20;
+const W5500_SOCKET_MODE_UNICAST_BLOCKING = 0x10;
+const W5500_SOCKET_MODE_CLOSED = 0x00;
+const W5500_SOCKET_MODE_TCP = 0x01;
+const W5500_SOCKET_MODE_UDP = 0x02;
+const W5500_SOCKET_MODE_MACRAW = 0x03;
 
 // SOCKET COMMANDS (Sn_CR)
-const SOCKET_OPEN = 0x01;
-const SOCKET_LISTEN = 0x02;
-const SOCKET_CONNECT = 0x04;
-const SOCKET_DISCONNECT = 0x08;
-const SOCKET_CLOSE = 0x10;
-const SOCKET_SEND = 0x20;
-const SOCKET_SEND_MAC = 0x21;
-const SOCKET_SEND_KEEP = 0x22;
-const SOCKET_RECEIVE = 0x40;
+const W5500_SOCKET_OPEN = 0x01;
+const W5500_SOCKET_LISTEN = 0x02;
+const W5500_SOCKET_CONNECT = 0x04;
+const W5500_SOCKET_DISCONNECT = 0x08;
+const W5500_SOCKET_CLOSE = 0x10;
+const W5500_SOCKET_SEND = 0x20;
+const W5500_SOCKET_SEND_MAC = 0x21;
+const W5500_SOCKET_SEND_KEEP = 0x22;
+const W5500_SOCKET_RECEIVE = 0x40;
 
 // SOCKET STATUS (Sn_SR)
-const SOCKET_STATUS_CLOSED = 0x00;
-const SOCKET_STATUS_INIT = 0x13;
-const SOCKET_STATUS_LISTEN = 0x14;
-const SOCKET_STATUS_ESTABLISHED = 0x17;
-const SOCKET_STATUS_CLOSE_WAIT = 0x1C;
-const SOCKET_STATUS_UDP = 0x22;
-const SOCKET_STATUS_MACRAW = 0x42;
-const SOCKET_STATUS_SYNSENT = 0x15;
-const SOCKET_STATUS_SYNRECV = 0x16;
-const SOCKET_STATUS_FIN_WAIT = 0x18;
-const SOCKET_STATUS_CLOSING = 0x1A;
-const SOCKET_STATUS_TIME_WAIT = 0x1B;
-const SOCKET_STATUS_LAST_ACK = 0x1D;
+const W5500_SOCKET_STATUS_CLOSED = 0x00;
+const W5500_SOCKET_STATUS_INIT = 0x13;
+const W5500_SOCKET_STATUS_LISTEN = 0x14;
+const W5500_SOCKET_STATUS_ESTABLISHED = 0x17;
+const W5500_SOCKET_STATUS_CLOSE_WAIT = 0x1C;
+const W5500_SOCKET_STATUS_UDP = 0x22;
+const W5500_SOCKET_STATUS_MACRAW = 0x42;
+const W5500_SOCKET_STATUS_SYNSENT = 0x15;
+const W5500_SOCKET_STATUS_SYNRECV = 0x16;
+const W5500_SOCKET_STATUS_FIN_WAIT = 0x18;
+const W5500_SOCKET_STATUS_CLOSING = 0x1A;
+const W5500_SOCKET_STATUS_TIME_WAIT = 0x1B;
+const W5500_SOCKET_STATUS_LAST_ACK = 0x1D;
 
 // INTERRUPT TYPES
-const CONFLICT_INT_TYPE = 0x80;
-const UNREACH_INT_TYPE = 0x40;
-const PPPoE_INT_TYPE = 0x20;
-const MAGIC_PACKET_TYPE = 0x10;
-const NONE_INT_TYPE = 0x00;
+const W5500_CONFLICT_INT_TYPE = 0x80;
+const W5500_UNREACH_INT_TYPE = 0x40;
+const W5500_PPPoE_INT_TYPE = 0x20;
+const W5500_MAGIC_PACKET_TYPE = 0x10;
+const W5500_NONE_INT_TYPE = 0x00;
 
 // SOCKET INTERRUPTS
-const S0_INTERRUPT = 0x01;
-const S1_INTERRUPT = 0x02;
-const S2_INTERRUPT = 0x04;
-const S3_INTERRUPT = 0x08;
-const S4_INTERRUPT = 0x10;
-const S5_INTERRUPT = 0x20;
-const S6_INTERRUPT = 0x40;
-const S7_INTERRUPT = 0x80;
-const DISABLE_SOCKET_INTERRUPTS = 0x00;
+const W5500_S0_INTERRUPT = 0x01;
+const W5500_S1_INTERRUPT = 0x02;
+const W5500_S2_INTERRUPT = 0x04;
+const W5500_S3_INTERRUPT = 0x08;
+const W5500_S4_INTERRUPT = 0x10;
+const W5500_S5_INTERRUPT = 0x20;
+const W5500_S6_INTERRUPT = 0x40;
+const W5500_S7_INTERRUPT = 0x80;
+const W5500_DISABLE_SOCKET_INTERRUPTS = 0x00;
 
 // SOCKET INTERRUPT TYPES
-const SEND_COMPLETE_INT_TYPE = 0x10;
-const TIMEOUT_INT_TYPE = 0x08;
-const DATA_RECEIVED_INT_TYPE = 0x04;
-const DISCONNECTED_INT_TYPE = 0x02;
-const CONNECTED_INT_TYPE = 0x01;
+const W5500_SEND_COMPLETE_INT_TYPE = 0x10;
+const W5500_TIMEOUT_INT_TYPE = 0x08;
+const W5500_DATA_RECEIVED_INT_TYPE = 0x04;
+const W5500_DISCONNECTED_INT_TYPE = 0x02;
+const W5500_CONNECTED_INT_TYPE = 0x01;
 
 /* --------------------------------------------------
  *  W5500 driver
@@ -372,7 +372,7 @@ class W5500.Driver {
      *      mode - select mode using MODE constants or-ed together
      **************************************************************************/
     function setMode(mode) {
-        writeReg(MODE, COMMON_REGISTER, mode);
+        writeReg(W5500_MODE, W5500_COMMON_REGISTER, mode);
         return this;
     }
 
@@ -381,11 +381,11 @@ class W5500.Driver {
      * Returns: this
      * Parameters:
      *      socket - select the socket using an integer 0-3
-     *      mode - select mode using SOCKET_MODE constant
+     *      mode - select mode using W5500_SOCKET_MODE constant
      **************************************************************************/
     function setSocketMode(socket, mode) {
         local bsb = _getSocketRegBlockSelectBit(socket)
-        writeReg(SOCKET_MODE, bsb, mode);
+        writeReg(W5500_SOCKET_MODE, bsb, mode);
         return this;
     }
 
@@ -400,7 +400,7 @@ class W5500.Driver {
      **************************************************************************/
     function setMemory(memory, dir) {
         local memoryBufferSize = 16;
-        local addr = (dir == "rx") ? SOCKET_RX_BUFFER_SIZE : SOCKET_TX_BUFFER_SIZE;
+        local addr = (dir == "rx") ? W5500_SOCKET_RX_BUFFER_SIZE : W5500_SOCKET_TX_BUFFER_SIZE;
 
         local bits = 0x00;
         local total = 0;
@@ -449,10 +449,10 @@ class W5500.Driver {
      *      addr - an array of four integers with the gateway IP address
      **************************************************************************/
     function setGatewayAddr(addr) {
-        writeReg(GATEWAY_ADDR_0, COMMON_REGISTER, addr[0]);
-        writeReg(GATEWAY_ADDR_1, COMMON_REGISTER, addr[1]);
-        writeReg(GATEWAY_ADDR_2, COMMON_REGISTER, addr[2]);
-        writeReg(GATEWAY_ADDR_3, COMMON_REGISTER, addr[3]);
+        writeReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
+        writeReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
+        writeReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
+        writeReg(W5500_GATEWAY_ADDR_3, W5500_COMMON_REGISTER, addr[3]);
         return this;
     }
 
@@ -463,10 +463,10 @@ class W5500.Driver {
      *      addr - an array of four integers with the subnet address
      **************************************************************************/
     function setSubnet(addr) {
-        writeReg(SUBNET_MASK_ADDR_0, COMMON_REGISTER, addr[0]);
-        writeReg(SUBNET_MASK_ADDR_1, COMMON_REGISTER, addr[1]);
-        writeReg(SUBNET_MASK_ADDR_2, COMMON_REGISTER, addr[2]);
-        writeReg(SUBNET_MASK_ADDR_3, COMMON_REGISTER, addr[3]);
+        writeReg(W5500_SUBNET_MASK_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
+        writeReg(W5500_SUBNET_MASK_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
+        writeReg(W5500_SUBNET_MASK_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
+        writeReg(W5500_SUBNET_MASK_ADDR_3, W5500_COMMON_REGISTER, addr[3]);
         return this;
     }
 
@@ -478,12 +478,12 @@ class W5500.Driver {
      *             source hardware
      **************************************************************************/
     function setSourceHWAddr(addr) {
-        writeReg(SOURCE_HW_ADDR_0, COMMON_REGISTER, addr[0]);
-        writeReg(SOURCE_HW_ADDR_1, COMMON_REGISTER, addr[1]);
-        writeReg(SOURCE_HW_ADDR_2, COMMON_REGISTER, addr[2]);
-        writeReg(SOURCE_HW_ADDR_3, COMMON_REGISTER, addr[3]);
-        writeReg(SOURCE_HW_ADDR_4, COMMON_REGISTER, addr[4]);
-        writeReg(SOURCE_HW_ADDR_5, COMMON_REGISTER, addr[5]);
+        writeReg(W5500_SOURCE_HW_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
+        writeReg(W5500_SOURCE_HW_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
+        writeReg(W5500_SOURCE_HW_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
+        writeReg(W5500_SOURCE_HW_ADDR_3, W5500_COMMON_REGISTER, addr[3]);
+        writeReg(W5500_SOURCE_HW_ADDR_4, W5500_COMMON_REGISTER, addr[4]);
+        writeReg(W5500_SOURCE_HW_ADDR_5, W5500_COMMON_REGISTER, addr[5]);
         return this;
     }
 
@@ -495,10 +495,10 @@ class W5500.Driver {
      *             source hardware
      **************************************************************************/
     function setSourceIP(addr) {
-        writeReg(SOURCE_IP_ADDR_0, COMMON_REGISTER, addr[0]);
-        writeReg(SOURCE_IP_ADDR_1, COMMON_REGISTER, addr[1]);
-        writeReg(SOURCE_IP_ADDR_2, COMMON_REGISTER, addr[2]);
-        writeReg(SOURCE_IP_ADDR_3, COMMON_REGISTER, addr[3]);
+        writeReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
+        writeReg(W5500_SOURCE_IP_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
+        writeReg(W5500_SOURCE_IP_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
+        writeReg(W5500_SOURCE_IP_ADDR_3, W5500_COMMON_REGISTER, addr[3]);
         return this;
     }
 
@@ -513,8 +513,8 @@ class W5500.Driver {
      **************************************************************************/
     function setSourcePort(socket, port) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_SOURCE_PORT_0, bsb, port[0]);
-        writeReg(SOCKET_SOURCE_PORT_1, bsb, port[1]);
+        writeReg(W5500_SOCKET_SOURCE_PORT_0, bsb, port[0]);
+        writeReg(W5500_SOCKET_SOURCE_PORT_1, bsb, port[1]);
         return this;
     }
 
@@ -528,12 +528,12 @@ class W5500.Driver {
      **************************************************************************/
     function setDestHWAddr(socket, addr) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_DEST_HW_ADDR_0, bsb, addr[0]);
-        writeReg(SOCKET_DEST_HW_ADDR_1, bsb, addr[1]);
-        writeReg(SOCKET_DEST_HW_ADDR_2, bsb, addr[2]);
-        writeReg(SOCKET_DEST_HW_ADDR_3, bsb, addr[3]);
-        writeReg(SOCKET_DEST_HW_ADDR_4, bsb, addr[4]);
-        writeReg(SOCKET_DEST_HW_ADDR_5, bsb, addr[5]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_0, bsb, addr[0]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_1, bsb, addr[1]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_2, bsb, addr[2]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_3, bsb, addr[3]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_4, bsb, addr[4]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_5, bsb, addr[5]);
         return this;
     }
 
@@ -547,10 +547,10 @@ class W5500.Driver {
      **************************************************************************/
     function setDestIP(socket, addr) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_DEST_IP_ADDR_0, bsb, addr[0]);
-        writeReg(SOCKET_DEST_IP_ADDR_1, bsb, addr[1]);
-        writeReg(SOCKET_DEST_IP_ADDR_2, bsb, addr[2]);
-        writeReg(SOCKET_DEST_IP_ADDR_3, bsb, addr[3]);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_0, bsb, addr[0]);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_1, bsb, addr[1]);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_2, bsb, addr[2]);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_3, bsb, addr[3]);
         return this;
     }
 
@@ -565,8 +565,8 @@ class W5500.Driver {
      **************************************************************************/
     function setDestPort(socket, port) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_DEST_PORT_0, bsb, port[0]);
-        writeReg(SOCKET_DEST_PORT_1, bsb, port[1]);
+        writeReg(W5500_SOCKET_DEST_PORT_0, bsb, port[0]);
+        writeReg(W5500_SOCKET_DEST_PORT_1, bsb, port[1]);
         return this;
     }
 
@@ -581,8 +581,8 @@ class W5500.Driver {
         local rx_pointer_r1 = (value & 0xFF00) >> 8;
         local rx_pointer_r2 = value & 0x00FF;
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_RX_RP_R1, bsb, rx_pointer_r1);
-        writeReg(SOCKET_RX_RP_R2, bsb, rx_pointer_r2);
+        writeReg(W5500_SOCKET_RX_RP_R1, bsb, rx_pointer_r1);
+        writeReg(W5500_SOCKET_RX_RP_R2, bsb, rx_pointer_r2);
         return this;
     }
 
@@ -597,8 +597,8 @@ class W5500.Driver {
         local tx_pointer_r1 = (value & 0xFF00) >> 8;
         local tx_pointer_r2 = value & 0x00FF;
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_TX_WP_R1, bsb, tx_pointer_r1);
-        writeReg(SOCKET_TX_WP_R2, bsb, tx_pointer_r2);
+        writeReg(W5500_SOCKET_TX_WP_R1, bsb, tx_pointer_r1);
+        writeReg(W5500_SOCKET_TX_WP_R2, bsb, tx_pointer_r2);
         return this;
     }
 
@@ -610,7 +610,7 @@ class W5500.Driver {
      **************************************************************************/
     function getSocketStatus(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        return readReg(SOCKET_STATUS, bsb);
+        return readReg(W5500_SOCKET_STATUS, bsb);
     }
 
     /***************************************************************************
@@ -621,8 +621,8 @@ class W5500.Driver {
      **************************************************************************/
     function getRxReadPointer(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        local rx_pointer_pt1 = readReg(SOCKET_RX_RP_R1, bsb) << 8;
-        local rx_pointer_pt2 = readReg(SOCKET_RX_RP_R2, bsb);
+        local rx_pointer_pt1 = readReg(W5500_SOCKET_RX_RP_R1, bsb) << 8;
+        local rx_pointer_pt2 = readReg(W5500_SOCKET_RX_RP_R2, bsb);
 
         return rx_pointer_pt1 | rx_pointer_pt2;
     }
@@ -635,8 +635,8 @@ class W5500.Driver {
      **************************************************************************/
     function getTxReadPointer(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        local tx_pointer_pt1 = readReg(SOCKET_TX_RP_R1, bsb) << 8;
-        local tx_pointer_pt2 = readReg(SOCKET_TX_RP_R2, bsb);
+        local tx_pointer_pt1 = readReg(W5500_SOCKET_TX_RP_R1, bsb) << 8;
+        local tx_pointer_pt2 = readReg(W5500_SOCKET_TX_RP_R2, bsb);
 
         return tx_pointer_pt1 | tx_pointer_pt2;
     }
@@ -649,8 +649,8 @@ class W5500.Driver {
      **************************************************************************/
     function getRxDataSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        local rx_pt1 = readReg(SOCKET_RX_SIZE_R1, bsb) << 8;
-        local rx_pt2 = readReg(SOCKET_RX_SIZE_R2, bsb);
+        local rx_pt1 = readReg(W5500_SOCKET_RX_SIZE_R1, bsb) << 8;
+        local rx_pt2 = readReg(W5500_SOCKET_RX_SIZE_R2, bsb);
 
         return rx_pt1 | rx_pt2;
     }
@@ -663,8 +663,8 @@ class W5500.Driver {
      **************************************************************************/
     function getFreeTxDataSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        local tx_fd_pt1 = readReg(SOCKET_TX_SIZE_R1, bsb) << 8;
-        local tx_fd_pt2 = readReg(SOCKET_TX_SIZE_R2, bsb);
+        local tx_fd_pt1 = readReg(W5500_SOCKET_TX_SIZE_R1, bsb) << 8;
+        local tx_fd_pt2 = readReg(W5500_SOCKET_TX_SIZE_R2, bsb);
 
         return tx_fd_pt1 | tx_fd_pt2;
     }
@@ -677,7 +677,7 @@ class W5500.Driver {
      **************************************************************************/
     function getSocketRXBufferSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        return readReg(SOCKET_RX_BUFFER_SIZE, bsb);
+        return readReg(W5500_SOCKET_RX_BUFFER_SIZE, bsb);
     }
 
     /***************************************************************************
@@ -688,7 +688,7 @@ class W5500.Driver {
      **************************************************************************/
     function getSocketTXBufferSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        return readReg(SOCKET_TX_BUFFER_SIZE, bsb);
+        return readReg(W5500_SOCKET_TX_BUFFER_SIZE, bsb);
     }
 
     /***************************************************************************
@@ -698,7 +698,7 @@ class W5500.Driver {
      **************************************************************************/
     function getChipVersion() {
         server.log("getting chip version");
-        return readReg(CHIP_VERSION, COMMON_REGISTER);
+        return readReg(W5500_CHIP_VERSION, W5500_COMMON_REGISTER);
     }
 
     /***************************************************************************
@@ -733,7 +733,7 @@ class W5500.Driver {
      **************************************************************************/
     function sendSocketCommand(socket, command) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_COMMAND, bsb, command);
+        writeReg(W5500_SOCKET_COMMAND, bsb, command);
         return this;
     }
 
@@ -764,7 +764,7 @@ class W5500.Driver {
         setRxReadPointer(socket, src_ptr);
 
         // set RECV command
-        sendSocketCommand(socket, SOCKET_RECEIVE);
+        sendSocketCommand(socket, W5500_SOCKET_RECEIVE);
 
         return data;
     }
@@ -801,7 +801,7 @@ class W5500.Driver {
         setTxWritePointer(socket, dst_ptr);
 
         // set SEND command
-        sendSocketCommand(socket, SOCKET_SEND);
+        sendSocketCommand(socket, W5500_SOCKET_SEND);
 
         return tx_length;
     }
@@ -818,7 +818,7 @@ class W5500.Driver {
      *             constants or-ed together
      **************************************************************************/
     function setInterrupt(type) {
-        writeReg(INTERRUPT_MASK, COMMON_REGISTER, type);
+        writeReg(W5500_INTERRUPT_MASK, W5500_COMMON_REGISTER, type);
         return this;
     }
 
@@ -830,7 +830,7 @@ class W5500.Driver {
      *                               if nothing passed in clears all interrupts
      **************************************************************************/
     function clearInterrupt(type = 0xF0) {
-        writeReg(INTERRUPT, COMMON_REGISTER, type);
+        writeReg(W5500_INTERRUPT, W5500_COMMON_REGISTER, type);
         return this;
     }
 
@@ -845,9 +845,9 @@ class W5500.Driver {
      *              will be cleared.
      **************************************************************************/
     function setSocketInterrupt(socketInt, type = 0x1F) {
-        writeReg(SOCKET_INTERRUPT_MASK, COMMON_REGISTER, socketInt);
+        writeReg(W5500_SOCKET_INTERRUPT_MASK, W5500_COMMON_REGISTER, socketInt);
         // default enables all socket interrupt types
-        writeReg(SOCKET_N_INTERRUPT_MASK, COMMON_REGISTER, type);
+        writeReg(W5500_SOCKET_N_INTERRUPT_MASK, W5500_COMMON_REGISTER, type);
         return this;
     }
 
@@ -862,7 +862,7 @@ class W5500.Driver {
      **************************************************************************/
     function clearSocketInterrupt(socket, type = 0x1F) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(SOCKET_N_INTERRUPT, bsb, type);
+        writeReg(W5500_SOCKET_N_INTERRUPT, bsb, type);
         return this;
     }
 
@@ -872,12 +872,12 @@ class W5500.Driver {
      * Parameters: none
      **************************************************************************/
     function getInterruptStatus() {
-        local status = readReg(INTERRUPT, COMMON_REGISTER);
+        local status = readReg(INTERRUPT, W5500_COMMON_REGISTER);
         local intStatus = {
-            "CONFLICT" : status & CONFLICT_INT_TYPE ? true : false,
-            "UNREACH" : status & UNREACH_INT_TYPE ? true : false,
-            "PPPoE" : status & PPPoE_INT_TYPE ? true : false,
-            "MAGIC_PACKET" : status & MAGIC_PACKET_TYPE ? true : false,
+            "CONFLICT" : status & W5500_CONFLICT_INT_TYPE ? true : false,
+            "UNREACH" : status & W5500_UNREACH_INT_TYPE ? true : false,
+            "PPPoE" : status & W5500_PPPoE_INT_TYPE ? true : false,
+            "MAGIC_PACKET" : status & W5500_MAGIC_PACKET_TYPE ? true : false,
             "REGISTER_VALUE" : status
         };
         return intStatus;
@@ -889,16 +889,16 @@ class W5500.Driver {
      * Parameters: none
      **************************************************************************/
     function getSocketInterruptStatus() {
-        local status = readReg(SOCKET_INTERRUPT, COMMON_REGISTER);
+        local status = readReg(W5500_SOCKET_INTERRUPT, W5500_COMMON_REGISTER);
         local intStatus = {
-            "SOCKET_7" : status & S7_INTERRUPT ? true : false,
-            "SOCKET_6" : status & S6_INTERRUPT ? true : false,
-            "SOCKET_5" : status & S5_INTERRUPT ? true : false,
-            "SOCKET_4" : status & S4_INTERRUPT ? true : false,
-            "SOCKET_3" : status & S3_INTERRUPT ? true : false,
-            "SOCKET_2" : status & S2_INTERRUPT ? true : false,
-            "SOCKET_1" : status & S1_INTERRUPT ? true : false,
-            "SOCKET_0" : status & S0_INTERRUPT ? true : false,
+            "SOCKET_7" : status & W5500_S7_INTERRUPT ? true : false,
+            "SOCKET_6" : status & W5500_S6_INTERRUPT ? true : false,
+            "SOCKET_5" : status & W5500_S5_INTERRUPT ? true : false,
+            "SOCKET_4" : status & W5500_S4_INTERRUPT ? true : false,
+            "SOCKET_3" : status & W5500_S3_INTERRUPT ? true : false,
+            "SOCKET_2" : status & W5500_S2_INTERRUPT ? true : false,
+            "SOCKET_1" : status & W5500_S1_INTERRUPT ? true : false,
+            "SOCKET_0" : status & W5500_S0_INTERRUPT ? true : false,
             "REGISTER_VALUE" : status
         };
         return intStatus;
@@ -912,13 +912,13 @@ class W5500.Driver {
      **************************************************************************/
     function getSocketInterruptTypeStatus(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
-        local status = readReg(SOCKET_N_INTERRUPT,  bsb);
+        local status = readReg(W5500_SOCKET_N_INTERRUPT,  bsb);
         local intStatus = {
-            "SEND_COMPLETE" : status & SEND_COMPLETE_INT_TYPE ? true : false,
-            "TIMEOUT" : status & TIMEOUT_INT_TYPE ? true : false,
-            "DATA_RECEIVED" : status & DATA_RECEIVED_INT_TYPE ? true : false,
-            "DISCONNECTED" : status & DISCONNECTED_INT_TYPE ? true : false,
-            "CONNECTED" : status & CONNECTED_INT_TYPE ? true : false,
+            "SEND_COMPLETE" : status & W5500_SEND_COMPLETE_INT_TYPE ? true : false,
+            "TIMEOUT" : status & W5500_TIMEOUT_INT_TYPE ? true : false,
+            "DATA_RECEIVED" : status & W5500_DATA_RECEIVED_INT_TYPE ? true : false,
+            "DISCONNECTED" : status & W5500_DISCONNECTED_INT_TYPE ? true : false,
+            "CONNECTED" : status & W5500_CONNECTED_INT_TYPE ? true : false,
             "REGISTER_VALUE" : status
         };
         return intStatus;
@@ -936,7 +936,7 @@ class W5500.Driver {
      **************************************************************************/
     function readReg(addr, bsb) {
         local b = blob();
-        local cp = bsb | READ_COMMAND | VARIABLE_DATA_LENGTH;
+        local cp = bsb | W5500_READ_COMMAND | W5500_VARIABLE_DATA_LENGTH;
         local res = blob();
 
         (_cs) ? _cs.write(0) : _spi.chipselect(1);
@@ -962,7 +962,7 @@ class W5500.Driver {
      **************************************************************************/
     function writeReg(addr, bsb, value) {
         local b = blob();
-        local cp = bsb | WRITE_COMMAND | VARIABLE_DATA_LENGTH;
+        local cp = bsb | W5500_WRITE_COMMAND | W5500_VARIABLE_DATA_LENGTH;
 
         (_cs) ? _cs.write(0) : _spi.chipselect(1);
 
@@ -990,7 +990,7 @@ class W5500.Driver {
      **************************************************************************/
     function reset(sw = false) {
         if (sw || _resetPin == null) {
-            setMode(SW_RESET);
+            setMode(W5500_SW_RESET);
             imp.sleep(0.2);
         } else {
             _resetPin.write(0);
@@ -1016,16 +1016,16 @@ class W5500.Driver {
         local bsb = null;
         switch(socket) {
             case 0:
-                bsb = S0_REGISTER;
+                bsb = W5500_S0_REGISTER;
                 break;
             case 1:
-                bsb = S1_REGISTER;
+                bsb = W5500_S1_REGISTER;
                 break;
             case 2:
-                bsb = S2_REGISTER;
+                bsb = W5500_S2_REGISTER;
                 break;
             case 3:
-                bsb = S3_REGISTER;
+                bsb = W5500_S3_REGISTER;
                 break;
         }
         return bsb;
@@ -1041,16 +1041,16 @@ class W5500.Driver {
         local bsb = null;
         switch(socket) {
             case 0:
-                bsb = S0_RX_BUFFER;
+                bsb = W5500_S0_RX_BUFFER;
                 break;
             case 1:
-                bsb = S1_RX_BUFFER;
+                bsb = W5500_S1_RX_BUFFER;
                 break;
             case 2:
-                bsb = S2_RX_BUFFER;
+                bsb = W5500_S2_RX_BUFFER;
                 break;
             case 3:
-                bsb = S3_RX_BUFFER;
+                bsb = W5500_S3_RX_BUFFER;
                 break;
         }
         return bsb;
@@ -1066,16 +1066,16 @@ class W5500.Driver {
         local bsb = null;
         switch(socket) {
             case 0:
-                bsb = S0_TX_BUFFER;
+                bsb = W5500_S0_TX_BUFFER;
                 break;
             case 1:
-                bsb = S1_TX_BUFFER;
+                bsb = W5500_S1_TX_BUFFER;
                 break;
             case 2:
-                bsb = S2_TX_BUFFER;
+                bsb = W5500_S2_TX_BUFFER;
                 break;
             case 3:
-                bsb = S3_TX_BUFFER;
+                bsb = W5500_S3_TX_BUFFER;
                 break;
         }
         return bsb;
@@ -1140,32 +1140,32 @@ class W5500.Driver {
 
     function _logGatewayIP() {
         server.log("----------------------------------")
-        server.log( format("Gateway IP: %i.%i.%i.%i", readReg(GATEWAY_ADDR_0, COMMON_REGISTER), readReg(GATEWAY_ADDR_1, COMMON_REGISTER), readReg(GATEWAY_ADDR_2, COMMON_REGISTER), readReg(GATEWAY_ADDR_3, COMMON_REGISTER)) )
+        server.log( format("Gateway IP: %i.%i.%i.%i", readReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER), readReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER), readReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER), readReg(W5500_GATEWAY_ADDR_3, W5500_COMMON_REGISTER)) )
         server.log("----------------------------------")
     }
 
     function _logSourceAddr() {
         server.log("----------------------------------")
-        server.log( format("Source Mac Addr: %02X %02X %02X %02X %02X %02X", readReg(SOURCE_HW_ADDR_0, COMMON_REGISTER), readReg(SOURCE_HW_ADDR_1, COMMON_REGISTER), readReg(SOURCE_HW_ADDR_2, COMMON_REGISTER), readReg(SOURCE_HW_ADDR_3, COMMON_REGISTER), readReg(SOURCE_HW_ADDR_4, COMMON_REGISTER), readReg(SOURCE_HW_ADDR_5, COMMON_REGISTER)) )
+        server.log( format("Source Mac Addr: %02X %02X %02X %02X %02X %02X", readReg(W5500_SOURCE_HW_ADDR_0, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_HW_ADDR_1, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_HW_ADDR_2, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_HW_ADDR_3, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_HW_ADDR_4, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_HW_ADDR_5, W5500_COMMON_REGISTER)) )
         server.log("----------------------------------")
     }
 
     function _logSubnet() {
         server.log("----------------------------------")
-        server.log( format("Subnet Addr: %i.%i.%i.%i", readReg(SUBNET_MASK_ADDR_0, COMMON_REGISTER), readReg(SUBNET_MASK_ADDR_1, COMMON_REGISTER), readReg(SUBNET_MASK_ADDR_2, COMMON_REGISTER), readReg(SUBNET_MASK_ADDR_3, COMMON_REGISTER)) )
+        server.log( format("Subnet Addr: %i.%i.%i.%i", readReg(W5500_SUBNET_MASK_ADDR_0, W5500_COMMON_REGISTER), readReg(W5500_SUBNET_MASK_ADDR_1, W5500_COMMON_REGISTER), readReg(W5500_SUBNET_MASK_ADDR_2, W5500_COMMON_REGISTER), readReg(W5500_SUBNET_MASK_ADDR_3, W5500_COMMON_REGISTER)) )
         server.log("----------------------------------")
     }
 
     function _logSourceIP() {
         server.log("----------------------------------")
-        server.log( format("Source IP: %i.%i.%i.%i", readReg(SOURCE_IP_ADDR_0, COMMON_REGISTER), readReg(SOURCE_IP_ADDR_1, COMMON_REGISTER), readReg(SOURCE_IP_ADDR_2, COMMON_REGISTER), readReg(SOURCE_IP_ADDR_3, COMMON_REGISTER)) )
+        server.log( format("Source IP: %i.%i.%i.%i", readReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_IP_ADDR_1, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_IP_ADDR_2, W5500_COMMON_REGISTER), readReg(W5500_SOURCE_IP_ADDR_3, W5500_COMMON_REGISTER)) )
         server.log("----------------------------------")
     }
 
     function _logS0SourcePort() {
         local bsb = _getSocketRegBlockSelectBit(0);
-        local p1 = readReg(SOCKET_SOURCE_PORT_0, bsb);
-        local p2 = readReg(SOCKET_SOURCE_PORT_1, bsb);
+        local p1 = readReg(W5500_SOCKET_SOURCE_PORT_0, bsb);
+        local p2 = readReg(W5500_SOCKET_SOURCE_PORT_1, bsb);
         local port = (p1 * 256) + p2;
         server.log("----------------------------------")
         server.log( format("Source Port: %i", port) )
@@ -1174,8 +1174,8 @@ class W5500.Driver {
 
     function _logS0DestPort() {
         local bsb = _getSocketRegBlockSelectBit(0);
-        local p1 = readReg(SOCKET_DEST_PORT_0, bsb);
-        local p2 = readReg(SOCKET_DEST_PORT_1, bsb);
+        local p1 = readReg(W5500_SOCKET_DEST_PORT_0, bsb);
+        local p2 = readReg(W5500_SOCKET_DEST_PORT_1, bsb);
         local port = (p1 * 256) + p2;
         server.log("----------------------------------")
         server.log( format("Destination Port: %i", port) )
@@ -1185,7 +1185,7 @@ class W5500.Driver {
     function _logS0DestIP() {
         local bsb = _getSocketRegBlockSelectBit(0);
         server.log("----------------------------------")
-        server.log( format("Destination IP: %i.%i.%i.%i", readReg(SOCKET_DEST_IP_ADDR_0, bsb), readReg(SOCKET_DEST_IP_ADDR_1, bsb), readReg(SOCKET_DEST_IP_ADDR_2, bsb), readReg(SOCKET_DEST_IP_ADDR_3, bsb)) )
+        server.log( format("Destination IP: %i.%i.%i.%i", readReg(W5500_SOCKET_DEST_IP_ADDR_0, bsb), readReg(W5500_SOCKET_DEST_IP_ADDR_1, bsb), readReg(W5500_SOCKET_DEST_IP_ADDR_2, bsb), readReg(W5500_SOCKET_DEST_IP_ADDR_3, bsb)) )
         server.log("----------------------------------")
     }
 }
@@ -1310,22 +1310,22 @@ class W5500.API {
         switch (numConnections) {
             case 1:
                 _avaiableConnections = [0];
-                _wiz.setSocketInterrupt(S0_INTERRUPT);
+                _wiz.setSocketInterrupt(W5500_S0_INTERRUPT);
                 _configureSocketMemory([tx_mem, 0, 0, 0], [rx_mem, 0, 0, 0]);
                 break;
             case 2:
                 _avaiableConnections = [1, 0];
-                _wiz.setSocketInterrupt(S0_INTERRUPT | S1_INTERRUPT);
+                _wiz.setSocketInterrupt(W5500_S0_INTERRUPT | W5500_S1_INTERRUPT);
                 _configureSocketMemory([tx_mem, tx_mem, 0, 0], [rx_mem, rx_mem, 0, 0]);
                 break;
             case 3:
                 _avaiableConnections = [2, 1, 0];
-                _wiz.setSocketInterrupt(S0_INTERRUPT | S1_INTERRUPT | S2_INTERRUPT);
+                _wiz.setSocketInterrupt(W5500_S0_INTERRUPT | W5500_S1_INTERRUPT | W5500_S2_INTERRUPT);
                 _configureSocketMemory([tx_mem, tx_mem, tx_mem, 0], [rx_mem, rx_mem, rx_mem, 0]);
                 break;
             case 4:
                 _avaiableConnections = [3, 2, 1, 0];
-                _wiz.setSocketInterrupt(S0_INTERRUPT | S1_INTERRUPT | S2_INTERRUPT | S3_INTERRUPT);
+                _wiz.setSocketInterrupt(W5500_S0_INTERRUPT | W5500_S1_INTERRUPT | W5500_S2_INTERRUPT | W5500_S3_INTERRUPT);
                 _configureSocketMemory([tx_mem, tx_mem, tx_mem, tx_mem], [rx_mem, rx_mem, rx_mem, rx_mem]);
                 break;
         }
@@ -1357,19 +1357,19 @@ class W5500.API {
         if ("socketMode" in connectionSettings) {
             _wiz.setSocketMode(socket, connectionSettings.socketMode);
         }  else {
-            _wiz.setSocketMode(socket, SOCKET_MODE_TCP);
+            _wiz.setSocketMode(socket, W5500_SOCKET_MODE_TCP);
         }
 
         // Open socket connection
         _socketConnectionState[socket] = "CONNECTING";
         _wiz.setSourcePort(socket, connectionSettings.sourcePort);
-        _wiz.sendSocketCommand(socket, SOCKET_OPEN);
+        _wiz.sendSocketCommand(socket, W5500_SOCKET_OPEN);
 
         // Connect
         _wiz.setDestIP(socket, connectionSettings.destIP);
         _wiz.setDestPort(socket, connectionSettings.destPort);
         imp.sleep(1);
-        _wiz.sendSocketCommand(socket, SOCKET_CONNECT);
+        _wiz.sendSocketCommand(socket, W5500_SOCKET_CONNECT);
 
         // Create connection object & handler
         local connection = W5500.Connection(socket, _socketConnectionState[socket], connectionSettings);
@@ -1387,7 +1387,7 @@ class W5500.API {
      *      connection - connection instance to close the connection on
      **************************************************************************/
     function closeConnection(connection) {
-        _wiz.sendSocketCommand(connection.socket, SOCKET_DISCONNECT);
+        _wiz.sendSocketCommand(connection.socket, W5500_SOCKET_DISCONNECT);
         _updateConnectionState(connection, "DISCONNECTING");
         return this;
     }
@@ -1498,7 +1498,7 @@ class W5500.API {
      *      socket - connection socket
      **************************************************************************/
     function connectionEstablished(socket) {
-        return (_wiz.getSocketStatus(socket) == SOCKET_STATUS_ESTABLISHED) ? true : false;
+        return (_wiz.getSocketStatus(socket) == W5500_SOCKET_STATUS_ESTABLISHED) ? true : false;
     }
 
 
@@ -1511,7 +1511,7 @@ class W5500.API {
      * Parameters: NONE
      **************************************************************************/
     function _setDefaultInterrupts() {
-        _wiz.setInterrupt(CONFLICT_INT_TYPE);
+        _wiz.setInterrupt(W5500_CONFLICT_INT_TYPE);
         return this;
     }
 
@@ -1595,7 +1595,7 @@ class W5500.API {
         // close any sockets that have open connections
         for (local socket = 0; socket < _totalSockets ; socket++) {
             if( connectionEstablished(socket) ) {
-                _wiz.sendSocketCommand(socket, SOCKET_DISCONNECT);
+                _wiz.sendSocketCommand(socket, W5500_SOCKET_DISCONNECT);
                 imp.sleep(0.01);
                 _closeSocket(socket);
             } else {
@@ -1614,11 +1614,11 @@ class W5500.API {
      *      socket - connection socket to close connection on
      **************************************************************************/
     function _closeSocket(socket) {
-        if ( _wiz.getSocketStatus(socket) != SOCKET_STATUS_CLOSED) {
+        if ( _wiz.getSocketStatus(socket) != W5500_SOCKET_STATUS_CLOSED) {
             imp.sleep(0.01);
             _closeSocket(socket);
         } else {
-            _wiz.sendSocketCommand(socket, SOCKET_CLOSE);
+            _wiz.sendSocketCommand(socket, W5500_SOCKET_CLOSE);
             _socketConnectionState[socket] = "CLOSED";
             _cleanupCounter++;
         }
@@ -1681,7 +1681,7 @@ class W5500.API {
      * Parameters: none
      **************************************************************************/
     function _handleConflictInt() {
-        _wiz.clearInterrupt(CONFLICT_INT_TYPE);
+        _wiz.clearInterrupt(W5500_CONFLICT_INT_TYPE);
         server.error("Conflict Interrupt Occured.  Please check IP Source and Destination addressess.");
     }
 
@@ -1696,7 +1696,7 @@ class W5500.API {
 
         if (status.CONNECTED) {
             server.log("Connection established on socket " + socket);
-            _wiz.clearSocketInterrupt(socket, CONNECTED_INT_TYPE);
+            _wiz.clearSocketInterrupt(socket, W5500_CONNECTED_INT_TYPE);
 
             _updateConnectionState(connection, "ESTABLISHED");
 
@@ -1711,9 +1711,9 @@ class W5500.API {
         }
         if (status.DISCONNECTED) {
             server.log("Connection disconnected on socket " + socket);
-            _wiz.clearSocketInterrupt(socket, DISCONNECTED_INT_TYPE);
+            _wiz.clearSocketInterrupt(socket, W5500_DISCONNECTED_INT_TYPE);
 
-            _wiz.sendSocketCommand(socket, SOCKET_CLOSE);
+            _wiz.sendSocketCommand(socket, W5500_SOCKET_CLOSE);
             _updateConnectionState(connection, "CLOSED");
             _connections.rawdelete(connection.socket);
             _avaiableConnections.push(socket);
@@ -1732,7 +1732,7 @@ class W5500.API {
         }
         if (status.SEND_COMPLETE) {
             server.log("Send complete on socket " + socket);
-            _wiz.clearSocketInterrupt(socket, SEND_COMPLETE_INT_TYPE);
+            _wiz.clearSocketInterrupt(socket, W5500_SEND_COMPLETE_INT_TYPE);
 
             // call transmitting callback
             local _transmitCallback = connection.getHandler("transmit");
@@ -1746,10 +1746,10 @@ class W5500.API {
         }
         if (status.TIMEOUT) {
             server.log("Timeout occurred on socket " + socket);
-            _wiz.clearSocketInterrupt(socket, TIMEOUT_INT_TYPE);
+            _wiz.clearSocketInterrupt(socket, W5500_TIMEOUT_INT_TYPE);
 
             if (_socketConnectionState[socket] == "CONNECTING") {
-                _wiz.sendSocketCommand(socket, SOCKET_CLOSE);
+                _wiz.sendSocketCommand(socket, W5500_SOCKET_CLOSE);
                 _updateConnectionState(connection, "CLOSED");
                 _connections.rawdelete(connection.socket);
                 _avaiableConnections.push(socket);
@@ -1775,7 +1775,7 @@ class W5500.API {
         }
         if (status.DATA_RECEIVED) {
             server.log("Data received on socket " + socket);
-            _wiz.clearSocketInterrupt(socket, DATA_RECEIVED_INT_TYPE);
+            _wiz.clearSocketInterrupt(socket, W5500_DATA_RECEIVED_INT_TYPE);
             receive(connection); // process incoming data
         }
     }
@@ -1819,17 +1819,17 @@ class W5500.API {
         local status = _wiz.getSocketStatus(socket);
 
         switch(status) {
-            case SOCKET_STATUS_ESTABLISHED:
-                server.log("SOCKET_STATUS_ESTABLISHED");
+            case W5500_SOCKET_STATUS_ESTABLISHED:
+                server.log("W5500_SOCKET_STATUS_ESTABLISHED");
                 break;
-            case SOCKET_STATUS_SYNSENT:
-                server.log("SOCKET_STATUS_SYNSENT");
+            case W5500_SOCKET_STATUS_SYNSENT:
+                server.log("W5500_SOCKET_STATUS_SYNSENT");
                 break;
-            case SOCKET_STATUS_SYNRECV:
-                server.log("SOCKET_STATUS_SYNRECV");
+            case W5500_SOCKET_STATUS_SYNRECV:
+                server.log("W5500_SOCKET_STATUS_SYNRECV");
                 break;
-            case SOCKET_STATUS_CLOSED:
-                server.log("SOCKET_STATUS_CLOSED");
+            case W5500_SOCKET_STATUS_CLOSED:
+                server.log("W5500_SOCKET_STATUS_CLOSED");
                 break;
             default :
                 server.log(status);
@@ -1843,10 +1843,10 @@ class W5500.API {
      * Parameters: none
      **************************************************************************/
     function _debugLogging_Interruprts() {
-        server.log(format("Interrupt reg: 0x%02X", _wiz.readReg(INTERRUPT, COMMON_REGISTER)));
-        server.log(format("Interrupt Mask: 0x%02X", _wiz.readReg(INTERRUPT_MASK, COMMON_REGISTER)));
-        server.log(format("Socket Interrupt reg: 0x%02X", _wiz.readReg(SOCKET_INTERRUPT, COMMON_REGISTER)));
-        server.log(format("Socket Interrupt Mask: 0x%02X", _wiz.readReg(SOCKET_INTERRUPT_MASK, COMMON_REGISTER)));
+        server.log(format("Interrupt reg: 0x%02X", _wiz.readReg(W5500_INTERRUPT, W5500_COMMON_REGISTER)));
+        server.log(format("Interrupt Mask: 0x%02X", _wiz.readReg(W5500_INTERRUPT_MASK, W5500_COMMON_REGISTER)));
+        server.log(format("Socket Interrupt reg: 0x%02X", _wiz.readReg(W5500_SOCKET_INTERRUPT, W5500_COMMON_REGISTER)));
+        server.log(format("Socket Interrupt Mask: 0x%02X", _wiz.readReg(W5500_SOCKET_INTERRUPT_MASK, W5500_COMMON_REGISTER)));
     }
 
      /***************************************************************************
