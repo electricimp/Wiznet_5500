@@ -872,7 +872,7 @@ class W5500.Driver {
      * Parameters: none
      **************************************************************************/
     function getInterruptStatus() {
-        local status = readReg(INTERRUPT, W5500_COMMON_REGISTER);
+        local status = readReg(W5500_INTERRUPT, W5500_COMMON_REGISTER);
         local intStatus = {
             "CONFLICT" : status & W5500_CONFLICT_INT_TYPE ? true : false,
             "UNREACH" : status & W5500_UNREACH_INT_TYPE ? true : false,
