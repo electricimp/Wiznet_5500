@@ -3,11 +3,7 @@
 // http://opensource.org/licenses/MIT
 
 
-
-
-// DHCP
-// --------------------------------------------------
-//DHCP SETTINGS
+// DHCP SETTINGS
 const W5500_DHCP_SEND_PORT = 68
 const W5500_DHCP_DEST_PORT = 67 
 const W5500_DHCP_DEST_IP = "255.255.255.255"
@@ -58,6 +54,7 @@ const W5500_DHCP_MAX_INT = 2147483647;
 const W5500_DHCP_MAX_RESEND = 5;
 const W5500_DHCP_LEASEOFFSET = 1800;
 
+// Options
 enum W5500_DHCP_OPTIONS {
     padOption = 0,
     subnetMask = 1,
@@ -131,6 +128,9 @@ enum W5500_DHCP_OPTIONS {
 // ==============================================================================
 
 class W5500.DHCP {
+
+	static VERSION = "1.0.0";
+
     _driver = null;
     _wiz = null;
     _connection = null;
@@ -331,7 +331,7 @@ class W5500.DHCP {
 
             case W5500_DHCP_SENDING_DISCOVERY:
                 if (_resendCount > 0) {
-                    if (_leasedCb) _leasedCb("DHCP Offer Timeout");
+                    if (_leasedCb) _leasedCb("Offer Timeout");
                 }
                 // Increment Time Exponentially
                 if (_resendTime < 60) {
@@ -352,12 +352,11 @@ class W5500.DHCP {
                 break;
             case W5500_DHCP_SENDING_REQUEST:
                 if (_resendCount < W5500_DHCP_MAX_RESEND) {
-                    //if (_leasedCb) _leasedCb("DHCP Ack Timeout"); 
                     _resendCount++;
                     // Send the DHCP Request Packet    
                     _sendDHCP(W5500_DHCP_REQUEST, _offeredIP, _serverID);   
                 } else {
-                    if (_leasedCb) _leasedCb("DHCP Renewal Timeout");  
+                    if (_leasedCb) _leasedCb("Renewal Timeout");  
                     _state = W5500_DHCP_INITIALIZE;
                     _isLeased = false;
                 }               

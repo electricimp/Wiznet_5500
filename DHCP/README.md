@@ -1,9 +1,9 @@
-#Wiznet_5500_DHCP
+#W5500.DHCP
 
 This library class enables Dynamic Host Configuration Protocol (*DHCP*) functionality for the Wiznet W5500 chip [W5500](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It also requires the Wiznet W5500 driver.  
-**To add this code to your project, add ** `#require W5500.DHCP.class.nut` **and**  `#require W5500.class.nut` **to the top of your device code.**
+**To add this code to your project, add `#require W5500.DHCP.device.nut:1.0.0` after `#require W5500.device.nut:1.0.0` to the top of your device code.**
 
-## Class Wiznet_5500_DHCP
+## Class W5500.DHCP
 
 ### Constructor: W5500.DHCP(*wiz*)
 Instantiates a new W5500.DHCP object and passes in the wiznet main driver.
@@ -19,8 +19,8 @@ spi          <- hardware.spi0;
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
 
 // Initialise Wiznet and DHCP
-wiz <- W5500(interruptPin, spi, null, resetPin);
-dhcp<- W5500.DHCP(wiz);
+wiz  <- W5500(interruptPin, spi, null, resetPin);
+dhcp <- W5500.DHCP(wiz);
 ```
 
 ## Class Methods
@@ -41,9 +41,9 @@ The *onLease()* method sets the function to be called when an IP address is leas
 #### Error Messages
 |Error Message                  | Description                                 |
 |-------------------------------|---------------------------------------------|
-|DHCP Offer Timeout             |Discovery message sent with no response      |
-|DHCP Ack Timeout               |Request message sent with no response        |
-|DHCP Renewal Timeout           |Max Renewal attempts reached. Restart.       |
+|Offer Timeout             		|Discovery message sent with no response      |
+|Ack Timeout               		|Request message sent with no response        |
+|Renewal Timeout           		|Max Renewal attempts reached. Restart.       |
 |Renewal Failed                 |Lease renewal failed                         |
 |Request Declined               |Requested IP not able to be leased           |
 |IP Invalid                     |Offered IP is currently in use               |
@@ -53,15 +53,10 @@ The *onLease()* method sets the function to be called when an IP address is leas
 
 ####Example Code:
 ```squirrel
-function leaseCallback(error) {
-    if (error) {
-        server.log(error);
-        return;
-    }
-
+dhcp.onLease(function leaseCallback(error) {
+    if (error) return server.error(error);
     // Run this code when IP address is obtained
-}
-dhcp.onLease(leaseCallback);
+});
 ```
 
 ###renewLease()
@@ -78,7 +73,7 @@ The *getIP()* method returns the leased IP as an array of four integers.
 
 ####Example Code:
 ```squirrel
-dhcp.getIP();
+local ip = dhcp.getIP();
 ```
 
 
@@ -87,7 +82,7 @@ The *getDNS()* method returns the DNS as an array of four integers.
 
 ####Example Code:
 ```squirrel
-dhcp.getDNS();
+local dns = dhcp.getDNS();
 ```
 
 
@@ -96,7 +91,7 @@ The *getSubnetMask()* method returns the DNS as an array of four integers.
 
 ####Example Code:
 ```squirrel
-dhcp.getSubnetMask();
+local subnetmask = dhcp.getSubnetMask();
 ```
 
 
@@ -105,7 +100,7 @@ The *getIP()* method returns the lease duration as an integer.
 
 ####Example Code:
 ```squirrel
-dhcp.getLeaseTime();
+local leasetime = dhcp.getLeaseTime();
 ```
 
 
@@ -113,7 +108,7 @@ dhcp.getLeaseTime();
 The *getRouterAddress()* method returns the gateway address as an array of four integers. 
 ####Example Code:
 ```squirrel
-dhcp.getRouterAddress();
+local router = dhcp.getRouterAddress();
 ```
 
 
