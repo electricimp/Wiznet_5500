@@ -2,40 +2,29 @@
 // This file is licensed under the MIT License
 // http://opensource.org/licenses/MIT
 
-// CONTROL PHASE
-// --------------------------------------------------
-
 // BLOCK SELECT BITS
 const W5500_COMMON_REGISTER = 0x00;
-
 const W5500_S0_REGISTER = 0x08;
 const W5500_S0_TX_BUFFER = 0x10;
 const W5500_S0_RX_BUFFER = 0x18;
-
 const W5500_S1_REGISTER = 0x28;
 const W5500_S1_TX_BUFFER = 0x30;
 const W5500_S1_RX_BUFFER = 0x38;
-
 const W5500_S2_REGISTER = 0x48;
 const W5500_S2_TX_BUFFER = 0x50;
 const W5500_S2_RX_BUFFER = 0x58;
-
 const W5500_S3_REGISTER = 0x68;
 const W5500_S3_TX_BUFFER = 0x70;
 const W5500_S3_RX_BUFFER = 0x78;
-
 const W5500_S4_REGISTER = 0x88;
 const W5500_S4_TX_BUFFER = 0x90;
 const W5500_S4_RX_BUFFER = 0x98;
-
 const W5500_S5_REGISTER = 0xA8;
 const W5500_S5_TX_BUFFER = 0xB0;
 const W5500_S5_RX_BUFFER = 0xB8;
-
 const W5500_S6_REGISTER = 0xC8;
 const W5500_S6_TX_BUFFER = 0xD0;
 const W5500_S6_RX_BUFFER = 0xD8;
-
 const W5500_S7_REGISTER = 0xE8;
 const W5500_S7_TX_BUFFER = 0xF0;
 const W5500_S7_RX_BUFFER = 0xF8;
@@ -50,9 +39,7 @@ const W5500_FIXED_DATA_LENGTH_1 = 0x01;
 const W5500_FIXED_DATA_LENGTH_2 = 0x02;
 const W5500_FIXED_DATA_LENGTH_4 = 0x03;
 
-
 // COMMON REGISTERS OFFSET ADDRESSES
-// --------------------------------------------------
 // MR
 const W5500_MODE = 0x0000;
 
@@ -102,12 +89,11 @@ const W5500_RETRY_TIME_1 = 0x001A;
 // RCR
 const W5500_RETRY_COUNT = 0x001B;
 
+// VERSION
 const W5500_CHIP_VERSION = 0x0039;
 
 
 // SOCKET REGISTER OFFSET ADDRESSES
-// --------------------------------------------------
-
 const W5500_SOCKET_MODE = 0x0000;
 const W5500_SOCKET_COMMAND = 0x0001;
 const W5500_SOCKET_N_INTERRUPT = 0x0002;
@@ -156,8 +142,6 @@ const W5500_SOCKET_RX_RP_R2 = 0x0029;
 
 // SOCKET N INTERRUPT MASK (Sn_IMR)
 const W5500_SOCKET_N_INTERRUPT_MASK = 0x002C;
-
-// --------------------------------------------------
 
 // MODES
 const W5500_SW_RESET = 0x80;
@@ -228,8 +212,7 @@ const W5500_DATA_RECEIVED_INT_TYPE = 0x04;
 const W5500_DISCONNECTED_INT_TYPE = 0x02;
 const W5500_CONNECTED_INT_TYPE = 0x01;
 
-// --------------------------------------------------
-
+// Socket states
 enum W5500_SOCKET_STATES {
     CLOSED,
     INIT,
@@ -238,12 +221,15 @@ enum W5500_SOCKET_STATES {
     DISCONNECTING
 }
 
-// OPEN CONNECTION ERROR MESSAGES
+// Error messages
 const W5500_INVALID_PARAMETERS = "Provide 'ip', 'port', 'mode' and a callback.";
 const W5500_CANNOT_CONNECT_STILL_CLEANING = "Cannot open a connection. Still cleaning up.";
 const W5500_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All connection sockets in use.";
-const W5500_CANNOT_CONNECT_TIMEOUT = "Connection Timeout";
+const W5500_CANNOT_CONNECT_TIMEOUT = "Connection timeout";
+const W5500_TRANSMIT_TIMEOUT = "Transmit timeout";
 
+// Miscellaneous constants
+const W5500_TRANSMIT_TIMEOUT = 8;
 
 // ==============================================================================
 // CLASS: W5500
@@ -1005,9 +991,6 @@ class W5500.Driver {
         return { "tx_max": MAX_TX_MEM_BUFFER, "rx_max": MAX_RX_MEM_BUFFER, "mem_block_sizes": [16, 8, 4, 2, 1, 0] }
     }
 
-    // TRANSMISSION FUNCTIONS
-    // ---------------------------------------------
-
     /***************************************************************************
      * getSocketStatus
      * Returns: integer with the connection status for the socket passed in
@@ -1157,9 +1140,6 @@ class W5500.Driver {
     }
 
 
-    // INTERRUPT FUNCTIONS
-    // ---------------------------------------------
-
     /***************************************************************************
      * setInterrupt
      * Returns: this
@@ -1284,10 +1264,6 @@ class W5500.Driver {
         return intStatus;
     }
 
-
-    // SPI FUNCTIONS
-    // ---------------------------------------------
-
     /***************************************************************************
      * readReg
      * Returns: data stored at the specified register
@@ -1336,9 +1312,6 @@ class W5500.Driver {
         (_cs) ? _cs.write(1): _spi.chipselect(0);
     }
 
-
-    // RESET FUNCTION
-    // ---------------------------------------------
 
     /***************************************************************************
      * reset, note this is blocking for 0.2s
@@ -1538,8 +1511,6 @@ class W5500.Driver {
     }
 
 
-    // MEMORY FUNCTIONS
-
     /***************************************************************************
      * _setMemDefaults, sets locally stored default socket memory info
      * Returns: null
@@ -1552,8 +1523,6 @@ class W5500.Driver {
         }
     }
 
-
-    // TRANSMITION FUNCTIONS
 
     /***************************************************************************
      * _writeData, writes data to transmit memory buffer
@@ -1633,6 +1602,8 @@ class W5500.Connection {
     _port = null;
     _mode = null;
     _sourceport = null;
+    _transmitQueue = null;
+	_transmitting = false;
 
     /***************************************************************************
      * Constructor
@@ -1654,6 +1625,7 @@ class W5500.Connection {
         _port = port;
         _mode = mode;
         _handlers = handlers;
+        _transmitQueue = [];
     }
 
 
@@ -1817,10 +1789,6 @@ class W5500.Connection {
         return (_driver.getSocketStatus(_socket) == W5500_SOCKET_STATUS_ESTABLISHED) ? true : false;
     }
 
-    //PRIVATE function
-    //not sure if we should change it (to avoid confusion) as it
-    // is called within the driver where a _interruptHandler exists
-    //where
     /***************************************************************************
      * _handleSocketInt, handles/clears the specified socket interrupt
      * Returns: null
@@ -1951,6 +1919,26 @@ class W5500.Connection {
      *                      sent or timeout has occurred
      **************************************************************************/
     function transmit(transmitData, cb = null) {
+
+		local _doTransmit, _transmit;
+
+		_transmit = function(transmitData, _cb = null) {
+
+			local cb;
+			local cbTimeout = imp.wakeup(W5500_TRANSMIT_TIMEOUT, function () {
+				cb(W5500_TRANSMIT_TIMEOUT)
+			}.bindenv(this));
+
+			if (_cb != null) {
+				cb = function(err=null) {
+					if (cbTimeout) {
+						imp.cancelwakeup(cbTimeout);
+						cbTimeout = null;
+					}
+					_cb(err);
+				}.bindenv(this);
+			}
+
         if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
             if (cb) {
                 imp.wakeup(0, function() {
@@ -1961,11 +1949,12 @@ class W5500.Connection {
         }
         local txBufferSize = _driver.getMemory("tx", _socket);
 
-        if (transmitData == null ) {
-            throw ("data type is of type null");
+			if (transmitData == null) {
+				throw "transmit() requires a string or blob";
         }
         local tx_length = transmitData.len();
         local chunks = [];
+
         // Convert blob to string
         if (typeof transmitData != "string") {
             transmitData = transmitData.tostring();
@@ -2026,6 +2015,27 @@ class W5500.Connection {
 
         return this;
     }
+
+		_transmitNext = function() {
+			if (_transmitting) {
+				return;
+			}
+			if (_transmitQueue.len() > 0) {
+				_transmitting = true;
+				local task = _transmitQueue.remove(0);
+				_transmit(task.data, function(err) {
+					_transmitting = false;
+					imp.wakeup(0, _transmitNext.bindenv(this));
+					task.cb(err);
+				}.bindenv(this));
+			} else {
+			}
+		}
+
+
+        _transmitQueue.push({ "data": transmitData, "cb": cb });
+        _transmitNext();
+	}
 
 
     /***************************************************************************
