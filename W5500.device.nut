@@ -89,6 +89,9 @@ const W5500_RETRY_TIME_1 = 0x001A;
 // RCR
 const W5500_RETRY_COUNT = 0x001B;
 
+// PHYSICAL CONFIG
+const W5500_PHYSICAL_CONFIG=0x002E;
+
 // VERSION
 const W5500_CHIP_VERSION = 0x0039;
 
@@ -514,28 +517,45 @@ class W5500.Driver {
     }
 
 
+    /***************************************************************************
+     * getPhysicalLinkStatus
+     * Returns: true or false
+     * Parameters:
+     *      none
+     **************************************************************************/
+    function getPhysicalLinkStatus(){
+        local status = readReg(W5500_PHYSICAL_CONFIG, W5500_COMMON_REGISTER);
+        return (status & 0x01);   
+    }
 
     /***************************************************************************
      * openConnection
      * Returns: this
      * Parameters:
-     *      ip - the ip address of the destination
-     *      port - the port of the destination
+     *      destIP - the ip address of the destination
+     *      destPort - the port of the destination 
      *      mode - TCP or UDP
+     *      sendPort(optional) - the port to send from
+     *      cb - function to be called when connection successfully established 
      *      cbConnect - function to be called when connection successfully established
-     *      cbDisconnect - function to be called when connectiontimeout has occurred
-     **************************************************************************/
-    function openConnection(ip, port, mode, cbConnect = null) {
-
+     ***************************************************************************/
+    function openConnection(destIP, destPort, mode, sendPort=null, cb = null) {
         // check for required parameters
         if (_availableSockets.len() == 0) {
-            if (cbConnect) return cbConnect(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
+            if (cb) return cb(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
             else throw W5500_CANNOT_CONNECT_SOCKETS_IN_USE;
         }
 
         local socket = _availableSockets.pop();
-        _connections[socket] <- W5500.Connection(this, socket, ip, port, mode);
-        _connections[socket].open(cbConnect);
+        _connections[socket] <- W5500.Connection(this, socket, destIP, destPort, mode);
+
+        if (typeof(sendPort) == "function") {
+            cb = sendPort;            
+        }
+
+        if (typeof(sendPort) == "integer") _connections[socket].setSourcePort(sendPort);
+
+        _connections[socket].open(cb);
 
     }
 
@@ -701,6 +721,22 @@ class W5500.Driver {
     }
 
     /***************************************************************************
+     * getGatewayAddr
+     * Returns:  an array of four integers with the gateway IP address
+     * Parameters:
+     *        none
+     **************************************************************************/
+    function getGatewayAddr() {
+        local addr = array(4);
+        // server.log((hardware.millis() - started) + ": DBG setGatewayAddr: " + pformat(addr));
+        addr[0] = readReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER);
+        addr[0] = readReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER);
+        addr[0] = readReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER);
+        addr[0] = readReg(W5500_GATEWAY_ADDR_3, W5500_COMMON_REGISTER);
+        return addr;
+    }
+
+     /***************************************************************************
      * setSubnetMask
      * Returns: this
      * Parameters:
@@ -713,6 +749,22 @@ class W5500.Driver {
         writeReg(W5500_SUBNET_MASK_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
         writeReg(W5500_SUBNET_MASK_ADDR_3, W5500_COMMON_REGISTER, addr[3]);
         return this;
+    }
+
+    /***************************************************************************
+     * getSubnet
+     * Returns: an array of four integers with the subnet address
+     * Parameters:
+     *         none 
+     **************************************************************************/
+    function getSubnetMask() {
+        local addr = array(4);
+        // server.log((hardware.millis() - started) + ": DBG setSubnet: " + pformat(addr));
+        addr[0] = readReg(W5500_SUBNET_MASK_ADDR_0, W5500_COMMON_REGISTER);
+        addr[1] = readReg(W5500_SUBNET_MASK_ADDR_1, W5500_COMMON_REGISTER);
+        addr[2] = readReg(W5500_SUBNET_MASK_ADDR_2, W5500_COMMON_REGISTER);
+        addr[3] = readReg(W5500_SUBNET_MASK_ADDR_3, W5500_COMMON_REGISTER);
+        return addr;
     }
 
     /***************************************************************************
@@ -744,6 +796,26 @@ class W5500.Driver {
     }
 
     /***************************************************************************
+     * getSourceHWAddr
+     * Returns: addr - an array of 6 integers with the mac address for the
+     *             source hardware
+     * Parameters:
+     *      none
+     **************************************************************************/
+    function getSourceHWAddr() {
+        // server.log((hardware.millis() - started) + ": DBG setSourceHWAddr: " + pformat(addr));
+        local addr=array(6);
+        addr[0]=readReg(W5500_SOURCE_HW_ADDR_0, W5500_COMMON_REGISTER);
+        addr[1]=readReg(W5500_SOURCE_HW_ADDR_1, W5500_COMMON_REGISTER);
+        addr[2]=readReg(W5500_SOURCE_HW_ADDR_2, W5500_COMMON_REGISTER);
+        addr[3]=readReg(W5500_SOURCE_HW_ADDR_3, W5500_COMMON_REGISTER);
+        addr[4]=readReg(W5500_SOURCE_HW_ADDR_4, W5500_COMMON_REGISTER);
+        addr[5]=readReg(W5500_SOURCE_HW_ADDR_5, W5500_COMMON_REGISTER);
+
+        return addr;
+    }
+
+    /***************************************************************************
      * setSourceIP
      * Returns: this
      * Parameters:
@@ -760,13 +832,29 @@ class W5500.Driver {
     }
 
     /***************************************************************************
+     * getSourceIP
+     * Returns: addr - an array of 4 integers with the IP address for the
+     *                 source hardware
+     * Parameters:
+     *          none    
+     **************************************************************************/
+    function getSourceIP() {
+        local addr = array(4);
+        // server.log((hardware.millis() - started) + ": DBG setSourceIP: " + pformat(addr));
+        addr[0] = readReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER);
+        addr[1] = readReg(W5500_SOURCE_IP_ADDR_1, W5500_COMMON_REGISTER);
+        addr[2] = readReg(W5500_SOURCE_IP_ADDR_2, W5500_COMMON_REGISTER);
+        addr[3] = readReg(W5500_SOURCE_IP_ADDR_3, W5500_COMMON_REGISTER);
+        return addr;
+    }
+
+    /***************************************************************************
      * setSourcePort
      * Returns: this
      * Parameters:
      *      socket - select the socket using an integer 0-3
-     *      addr - an array of 2 integers with the port for the
-     *             source hardware
-     *             (ex: for port 4242, addr = [0x10, 0x92])
+     *      addr   - an array of 2 integers with the port for the
+     *               source hardware (ex: for port 4242, addr = [0x10, 0x92])
      **************************************************************************/
     function setSourcePort(socket, port) {
         // Convert the type
@@ -1025,6 +1113,18 @@ class W5500.Driver {
     }
 
     /***************************************************************************
+    * getSocketMode
+    * Returns: socketMode
+    * Parameters:
+    *      socket - select the socket using an integer 0-3
+    **************************************************************************/
+    function getSocketMode(socket) {
+        local bsb = _getSocketRegBlockSelectBit(socket)
+        local mode= readReg(W5500_SOCKET_MODE, bsb);
+        return mode;
+    }
+
+    /***************************************************************************
      * sendSocketCommand
      * Returns: this
      * Parameters:
@@ -1139,6 +1239,9 @@ class W5500.Driver {
         return tx_length;
     }
 
+
+    // INTERRUPT FUNCTIONS
+    // ---------------------------------------------
 
     /***************************************************************************
      * setInterrupt
@@ -1263,6 +1366,30 @@ class W5500.Driver {
         };
         return intStatus;
     }
+
+    /***************************************************************************
+     * getTimeoutCount
+     * Returns: Connection timeout count
+     * Parameters:
+     *      none
+     **************************************************************************/
+    function getTimeoutCount() {
+        return readReg(W5500_RETRY_COUNT, 0x00);
+    }
+
+    /***************************************************************************
+     * setTimeoutCount
+     * Returns: none
+     * Parameters:
+     *      count - number of times to retry on timeout
+     **************************************************************************/
+    function setTimeoutCount(count) {
+        writeReg(W5500_RETRY_COUNT, 0x00, count);
+    }
+
+
+    // SPI FUNCTIONS
+    // ---------------------------------------------
 
     /***************************************************************************
      * readReg
@@ -1594,14 +1721,14 @@ class W5500.Driver {
 
 class W5500.Connection {
 
-    _driver = null;
-    _socket = null;
-    _state = null;
-    _handlers = null;
-    _ip = null;
-    _port = null;
-    _mode = null;
-    _sourceport = null;
+     _driver = null;
+     _socket = null;
+     _state = null;
+     _handlers = null;
+     _ip = null;
+     _port = null;
+     _mode = null;
+    _sourcePort = null;
     _transmitQueue = null;
 	_transmitting = false;
 
@@ -1633,15 +1760,20 @@ class W5500.Connection {
      * open
      * Returns: this
      * Parameters:
-     *      none
+     *      cbConnect - callback to be called when the connection is opened
      **************************************************************************/
     function open(cbConnect = null) {
 
-        local sourcePort = _returnRandomPort(1024, 65535); // creates a random port between 1024-65535
-
         // Open socket connection
         _driver.setSocketMode(_socket, _mode);
-        _driver.setSourcePort(_socket, sourcePort);
+
+        if (_sourcePort == null) {
+            local sourcePort = _returnRandomPort(1024, 65535); // creates a random port between 1024-65535
+            _driver.setSourcePort(_socket, sourcePort);
+        } else {
+            _driver.setSourcePort(_socket, _sourcePort);
+        }
+        
         _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
         _state = W5500_SOCKET_STATES.INIT;
 
@@ -1651,7 +1783,14 @@ class W5500.Connection {
         _driver.sendSocketCommand(_socket, W5500_SOCKET_CONNECT);
         _state = W5500_SOCKET_STATES.CONNECTING;
 
-        if (cbConnect) onConnect(cbConnect);
+        if (cbConnect) {
+            if (_mode == W5500_SOCKET_MODE_UDP) {
+                _state = W5500_SOCKET_STATES.ESTABLISHED 
+                cbConnect(null, this);
+            } else {
+                 onConnect(cbConnect);
+            }
+        }
 
         return this;
     }
@@ -1744,7 +1883,7 @@ class W5500.Connection {
      *      port - source port
      **************************************************************************/
     function setSourcePort(port) {
-        _sourceport = port;
+        _sourcePort = port;
         return this;
     }
 
@@ -1798,7 +1937,7 @@ class W5500.Connection {
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
         if (status.CONNECTED) {
-            // server.log("Connection established on socket " + _socket);
+             // server.log("Connection established on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_CONNECTED_INT_TYPE);
 
             _state = W5500_SOCKET_STATES.ESTABLISHED;
@@ -1939,87 +2078,85 @@ class W5500.Connection {
 				}.bindenv(this);
 			}
 
-        if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
-            if (cb) {
-                imp.wakeup(0, function() {
-                    cb("Connection not established");
-                }.bindenv(this));
-            }
-            return this;
-        }
-        local txBufferSize = _driver.getMemory("tx", _socket);
+			if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
+				if (cb) {
+					imp.wakeup(0, function() {
+						cb("Connection not established");
+					}.bindenv(this));
+				}
+				return this;
+			}
+			local txBufferSize = _driver.getMemory("tx", _socket);
 
 			if (transmitData == null) {
 				throw "transmit() requires a string or blob";
-        }
-        local tx_length = transmitData.len();
-        local chunks = [];
+			}
+			local tx_length = transmitData.len();
+			local chunks = [];
 
-        // Convert blob to string
-        if (typeof transmitData != "string") {
-            transmitData = transmitData.tostring();
-        }
-        if (typeof transmitData != "string") {
-            throw "transmit() requires a string or blob";
-        }
+			// Convert blob to string
+			if (typeof transmitData != "string") {
+				transmitData = transmitData.tostring();
+			}
+			if (typeof transmitData != "string") {
+				throw "transmit() requires a string or blob";
+			}
 
-        // Chunking data that is greater than buffer size. check transmission data size.
-        // If larger than socket transmit bufffer, break data into chunks before sending.
-        if ((tx_length * 8) > txBufferSize) {
-            local startPointer = 0;
-            local endPointer = txBufferSize / 8;
+			// Chunking data that is greater than buffer size. check transmission data size.
+			// If larger than socket transmit bufffer, break data into chunks before sending.
+			if ((tx_length * 8) > txBufferSize) {
+				local startPointer = 0;
+				local endPointer = txBufferSize / 8;
 
-            // Loop over data and create chunks
-            while (endPointer < tx_length) {
+				// Loop over data and create chunks
+				while (endPointer < tx_length) {
 
-                chunks.push(transmitData.slice(startPointer, endPointer));
-                startPointer = endPointer;
-                endPointer += (txBufferSize / 8);
+					chunks.push(transmitData.slice(startPointer, endPointer));
+					startPointer = endPointer;
+					endPointer += (txBufferSize / 8);
 
-            }
+				}
 
-            // Create final, partially full chunk
-            if (startPointer < tx_length) {
-                chunks.push(transmitData.slice(startPointer));
-            }
-        } else {
-            chunks.push(transmitData);
-        }
+				// Create final, partially full chunk
+				if (startPointer < tx_length) {
+					chunks.push(transmitData.slice(startPointer));
+				}
+			} else {
+				chunks.push(transmitData);
+			}
 
-        // Send data first
-        local receiveHandler = _getHandler("receive");
-        if (receiveHandler && _dataWaiting()) {
-            receiveHandler(null, _driver.readRxData(_socket));
-        }
+			// Send data first
+			local receiveHandler = _getHandler("receive");
+			if (receiveHandler && _dataWaiting()) {
+				receiveHandler(null, _driver.readRxData(_socket));
+			}
 
-        // Send data next
-        local sendChunk;
-        sendChunk = function(chunk) {
-            // Setup the temporary callback
-            onTransmitted(function(err) {
-                if (!err && chunks.len() > 0) {
-                    // Send the next chunk
-                    return sendChunk(chunks.remove(0));
-                } else {
-                    // All done.
-                    if (cb) imp.wakeup(0, function() { cb(err); });
-                }
-            });
+			// Send data next
+			local sendChunk;
+			sendChunk = function(chunk) {
+				// Setup the temporary callback
+				onTransmitted(function(err) {
+					if (!err && chunks.len() > 0) {
+						// Send the next chunk
+						return sendChunk(chunks.remove(0));
+					} else {
+						// All done.
+						if (cb) imp.wakeup(0, function() { cb(err); });
+					}
+				});
 
-            // Send the chunk
-            _driver.sendTxData(_socket, chunk);
-        }
+				// Send the chunk
+				_driver.sendTxData(_socket, chunk);
+			}
 
-        // Send the first chunk
-        sendChunk(chunks.remove(0));
+			// Send the first chunk
+			sendChunk(chunks.remove(0));
 
-        return this;
-    }
+			return this;
+		}
 
 		_transmitNext = function() {
-			if (_transmitting) {
-				return;
-			}
+			if (_transmitting) return;
 			if (_transmitQueue.len() > 0) {
 				_transmitting = true;
 				local task = _transmitQueue.remove(0);
@@ -2033,6 +2170,7 @@ class W5500.Connection {
 		}
 
 
+		// Append to the queue and start the transmission.
         _transmitQueue.push({ "data": transmitData, "cb": cb });
         _transmitNext();
 	}
