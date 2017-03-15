@@ -284,7 +284,7 @@ class W5500 {
     // onReady
     // Returns: this
     // Parameters:
-    // cb -  function to be called in the even _isReady is true
+    //      cb - function to be called when the Wiznet device is initialised
     // ***************************************************************************
     function onReady(cb) {
         local _cb = cb;
@@ -1689,7 +1689,7 @@ class W5500.Driver {
     // Parameters:
     //      addr - offset address to start the read
     //      bsb - block select bit for the socket rx buffer
-    //      size - size of data to be written
+    //      size - size of data to be read
     // **************************************************************************
     function _readData(addr, bsb, size) {
         local b = blob();

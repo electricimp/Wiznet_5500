@@ -216,16 +216,14 @@ class W5500_TestCase extends ImpTestCase {
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
-                        return reject("error");
+                        return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     }
                     try {
                         connection.transmit(ECHO_MESSAGE, function(err) {
-                            if (err) {
-                                return reject("error");
-                            } else {}
+                            if (err) return reject("Error transmitting: " + err);
                         }.bindenv(this));
-                    } catch (error) {
-                        return reject("transmission error");
+                    } catch (err) {
+                        return reject("Exception while transmitting: " + err);
                     }
                     connection.receive(function(err, data) {
                         // check that the data type received was expected and that the data was what we sent
@@ -252,8 +250,9 @@ class W5500_TestCase extends ImpTestCase {
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err != null || connection == null) {
-                        return reject("openConnection failed: " + err);
+                        return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     }
+
                     // define the callback for receiving data in the connection
                     connection.onReceive(function(err, data) {
                         // ensuring data received is what we expected
@@ -262,18 +261,12 @@ class W5500_TestCase extends ImpTestCase {
                         return resolve();
                     }.bindenv(this));
 
-                    if (err) {
-                        return reject("error");
-                    }
                     try {
                         connection.transmit(ECHO_MESSAGE, function(err) {
-                            if (err) {
-                                server.error("Send failed, closing: " + err);
-                                return reject("error");
-                            }
+                            if (err) return reject("Error transmitting: " + err);
                         }.bindenv(this));
-                    } catch (error) {
-                        return reject("transmission error");
+                    } catch (err) {
+                        return reject("Exception while transmitting: " + err);
                     }
                 }.bindenv(this));
             }
@@ -294,14 +287,14 @@ class W5500_TestCase extends ImpTestCase {
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
-                        return reject("openConnection failed: " + err);
+                        return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     }
                     // Send data over the connection
                     try {
                         connection.transmit(null, function(err) {
                             if (err) {
                                 connection.close();
-                                return reject("error transmission failed");
+                                return reject("Error transmitting: " + err);
                             }
                         }.bindenv(this));
                     } catch (error) {
@@ -327,7 +320,7 @@ class W5500_TestCase extends ImpTestCase {
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
-                        return reject("openConnection failed: " + err);
+                        return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     }
                 }.bindenv(this));
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
@@ -355,7 +348,7 @@ class W5500_TestCase extends ImpTestCase {
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
-                        return reject("openConnection failed: " + err);
+                        return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     } else {
                         connection.close(function() {
                             // check that the number of sockets is back what is needed
@@ -385,13 +378,13 @@ class W5500_TestCase extends ImpTestCase {
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
-                        return reject("openConnection failed: " + err);
+                        return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     } else {
                         connection.close(function() {
                             // open a connection once it is closed
                             _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                                 if (err) {
-                                    return reject("openConnection failed: " + err);
+                                    return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                                 } else {
                                     this.assertTrue(true);
                                     return resolve();
