@@ -301,7 +301,7 @@ class DeviceTestCase extends ImpTestCase {
 						}.bindenv(this));
 					} catch (error) {
 						connection.close();
-						this.assertTrue(error == "data type is of type null", "the data was not null");
+						this.assertTrue(error == "transmit() requires a string or blob", "transmit didn't reject a null data packet");
 						resolve();
 					}
 				}.bindenv(this));
