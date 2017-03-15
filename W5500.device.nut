@@ -537,9 +537,14 @@ class W5500.Driver {
      *      mode - TCP or UDP
      *      sendPort(optional) - the port to send from
      *      cb - function to be called when connection successfully established 
-     *      cbConnect - function to be called when connection successfully established
      ***************************************************************************/
     function openConnection(destIP, destPort, mode, sendPort = null, cb = null) {
+
+        if (typeof sendPort == "function") {
+            cb = sendPort;
+            sendPort = null;
+        }
+
         // check for required parameters
         if (_availableSockets.len() == 0) {
             if (cb) return cb(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
@@ -549,11 +554,7 @@ class W5500.Driver {
         local socket = _availableSockets.pop();
         _connections[socket] <- W5500.Connection(this, socket, destIP, destPort, mode);
 
-        if (typeof(sendPort) == "function") {
-            cb = sendPort;
-        }
-
-        if (typeof(sendPort) == "integer") _connections[socket].setSourcePort(sendPort);
+        if (typeof sendPort == "integer") _connections[socket].setSourcePort(sendPort);
 
         _connections[socket].open(cb);
 
@@ -1760,9 +1761,9 @@ class W5500.Connection {
      * open
      * Returns: this
      * Parameters:
-     *      cbConnect - callback to be called when the connection is opened
+     *      cb - callback to be called when the connection is opened
      **************************************************************************/
-    function open(cbConnect = null) {
+    function open(cb = null) {
 
         // Open socket connection
         _driver.setSocketMode(_socket, _mode);
@@ -1783,12 +1784,12 @@ class W5500.Connection {
         _driver.sendSocketCommand(_socket, W5500_SOCKET_CONNECT);
         _state = W5500_SOCKET_STATES.CONNECTING;
 
-        if (cbConnect) {
+        if (cb) {
             if (_mode == W5500_SOCKET_MODE_UDP) {
                 _state = W5500_SOCKET_STATES.ESTABLISHED
-                cbConnect(null, this);
+                cb(null, this);
             } else {
-                onConnect(cbConnect);
+                onConnect(cb);
             }
         }
 
