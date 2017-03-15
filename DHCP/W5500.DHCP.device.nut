@@ -306,8 +306,10 @@ class W5500.DHCP {
                     dns.push(_blobtoArray(dnse));
                 }
                 return dns;
-            } else return "DNS not available yet";
-        }
+			} else {
+				return "DNS data corrupted";
+			}
+		} else return "DNS not available yet";
     }
 
     // ***************************************************************************
