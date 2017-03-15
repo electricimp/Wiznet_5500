@@ -89,6 +89,9 @@ const W5500_RETRY_TIME_1 = 0x001A;
 // RCR
 const W5500_RETRY_COUNT = 0x001B;
 
+// PHYSICAL CONFIG
+const W5500_PHYSICAL_CONFIG = 0x002E;
+
 // VERSION
 const W5500_CHIP_VERSION = 0x0039;
 
@@ -249,15 +252,15 @@ class W5500 {
     _autoRetry = false;
 
 
-    /***************************************************************************
-     * Constructor
-     * Returns: null
-     * Parameters:
-     *      spi - configured spi bus, chip supports spi mode 0 or 3
-     *      cs(optional) -  chip select pin, pass in if not using imp005
-     *      interruptPin - inerrupt pin
-     *      reset(optional) - reset pin
-     **************************************************************************/
+    // ***************************************************************************
+    // Constructor
+    // Returns: null
+    // Parameters:
+    //      spi - configured spi bus, chip supports spi mode 0 or 3
+    //      cs(optional) -  chip select pin, pass in if not using imp005
+    //      interruptPin - inerrupt pin
+    //      reset(optional) - reset pin
+    // ***************************************************************************
     constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false) {
 
         // Initialise the driver and close any stale connections
@@ -276,12 +279,12 @@ class W5500 {
         }.bindenv(this));
     }
 
-    /***************************************************************************
-     * onReady
-     * Returns: this
-     * Parameters:
-     cb -  function to be called in the even _isReady is true
-     **************************************************************************/
+    // ***************************************************************************
+    // onReady
+    // Returns: this
+    // Parameters:
+    // cb -  function to be called in the even _isReady is true
+    // ***************************************************************************
     function onReady(cb) {
         local callback = cb;
         if (_networkSettings != null) {
@@ -297,15 +300,15 @@ class W5500 {
         return this;
     }
 
-    /***************************************************************************
-     * configureNetworkSettings
-     * Returns: this
-     * Parameters:
-     *      sourceIP    -   ip adress of the Wiznet
-     *      subnetMask  -   subnetMask for the Wiznet
-     *      gatewayIP   -   gatewayIP for the Wiznet
-     *      mac         -   mac adress for the wiznet
-     **************************************************************************/
+    // ***************************************************************************
+    // configureNetworkSettings
+    // Returns: this
+    // Parameters:
+    //      sourceIP    -   ip adress of the Wiznet
+    //      subnetMask  -   subnetMask for the Wiznet
+    //      gatewayIP   -   gatewayIP for the Wiznet
+    //      mac         -   mac adress for the wiznet
+    // ***************************************************************************
     function configureNetworkSettings(sourceIP, subnetMask = null, gatewayIP = null, mac = null) {
         if (_isReady) {
             if (gatewayIP) _driver.setGatewayAddr(gatewayIP);
@@ -325,16 +328,16 @@ class W5500 {
         return this;
     }
 
-    /***************************************************************************
-     * openConnection
-     * Returns: connection instance
-     * Parameters:
-     *      ip - the ip address of the destination
-     *      port - the port of the destination
-     *      mode - TCP or UDP
-     *      cb - function to be called when connection successfully
-     *                     established or a timeout has occurred
-     **************************************************************************/
+    // ***************************************************************************
+    // openConnection
+    // Returns: connection instance
+    // Parameters:
+    //      ip - the ip address of the destination
+    //      port - the port of the destination
+    //      mode - TCP or UDP
+    //      cb - function to be called when connection successfully
+    //                     established or a timeout has occurred
+    // ****************************************************************************
     function openConnection(ip, port, mode = W5500_SOCKET_MODE_TCP, cb = null) {
         if (!_isReady) throw "Wiznet driver not ready";
 
@@ -351,14 +354,14 @@ class W5500 {
         _driver.openConnection(ip, port, mode, cb);
     }
 
-    /***************************************************************************
-     * reset, note this is blocking for 0.2s
-     * Returns: this
-     * Parameters:
-     *          sw(optional) - boolean if true forces a software reset
-     *          Note: Datasheet states that SW reset should not be used
-     *                 on the W5500.
-     **************************************************************************/
+    // ***************************************************************************
+    // reset, note this is blocking for 0.2s
+    // Returns: this
+    // Parameters:
+    //          sw(optional) - boolean if true forces a software reset
+    //          Note: Datasheet states that SW reset should not be used
+    //                 on the W5500.
+    // ***************************************************************************
     function reset(sw = false) {
         _driver.reset(sw);
     }
@@ -367,12 +370,11 @@ class W5500 {
     // PRIVATE FUNCTIONS
     // ---------------------------------------------
 
-    /***************************************************************************
-     * _interruptHandler, checks interrupt registers and calls appropriate
-     *                    handlers
-     * Returns: null
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // _interruptHandler, checks interrupt registers and calls appropriate handlers
+    // Returns: null
+    // Parameters: none
+    // ***************************************************************************
     function _interruptHandler() {
         // Handle the main interrupt
         local interrupt = _driver.getInterruptStatus();
@@ -382,11 +384,11 @@ class W5500 {
         _driver.socketInterruptHandler();
     }
 
-    /***************************************************************************
-     * _handleConflictInt, logs conflict error message & clears interrupt
-     * Returns: null
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // _handleConflictInt, logs conflict error message & clears interrupt
+    // Returns: null
+    // Parameters: none
+    // ***************************************************************************
     function _handleConflictInt() {
         _driver.clearInterrupt(W5500_CONFLICT_INT_TYPE);
         server.error("Conflict interrupt occured. Please check IP source and destination addresses");
@@ -411,20 +413,20 @@ class W5500.Driver {
     _cs = null;
     _resetPin = null;
 
-    _connections = null;        // open connections
-    _availableSockets = null;   // array of sockets available
-    _maxNoOfSockets = 0;        // max number of sockets wiznet may use
-    _noOfSockets = 0;           // number of sockets
-    _socketMemory = null;       // amount of memeory each socket has
+    _connections = null; // open connections
+    _availableSockets = null; // array of sockets available
+    _maxNoOfSockets = 0; // max number of sockets wiznet may use
+    _noOfSockets = 0; // number of sockets
+    _socketMemory = null; // amount of memeory each socket has
 
-    /***************************************************************************
-     * Constructor
-     * Returns: null
-     * Parameters:
-     *      spi - configured spi, W5500 supports spi mode 0 or 3
-     *      cs(optional) - configured chip select pin
-     *      reset(optional) - configured reset pin
-     **************************************************************************/
+    // ***************************************************************************
+    // Constructor
+    // Returns: null
+    // Parameters:
+    //      spi - configured spi, W5500 supports spi mode 0 or 3
+    //      cs(optional) - configured chip select pin
+    //      reset(optional) - configured reset pin
+    // ***************************************************************************
     constructor(spi, cs = null, resetPin = null) {
         _spi = spi;
         _cs = cs;
@@ -449,15 +451,15 @@ class W5500.Driver {
 
     }
 
-    /***************************************************************************
-     * init(cb)
-     * Returns: nothing
-     * Parameters:
-              cb                        - callback function
-              remaining(optional)       - for first time Initialise == null
-                                        - subseuqent goes to to else
-     *        closes all sockets and fires the callback when complete
-     **************************************************************************/
+    // ***************************************************************************
+    // init(cb)
+    // Returns: nothing
+    // Parameters:
+    //        cb                        - callback function
+    //        remaining(optional)       - for first time Initialise == null
+    //                                  - subseuqent goes to to else
+    //        closes all sockets and fires the callback when complete
+    // ***************************************************************************
     function init(cb, remaining = null) {
 
         if (remaining == null) {
@@ -514,39 +516,57 @@ class W5500.Driver {
     }
 
 
+    // ***************************************************************************
+    // getPhysicalLinkStatus
+    // Returns: true or false
+    // Parameters:
+    //      none
+    // ***************************************************************************
+    function getPhysicalLinkStatus() {
+        local status = readReg(W5500_PHYSICAL_CONFIG, W5500_COMMON_REGISTER);
+        return (status & 0x01);
+    }
 
-    /***************************************************************************
-     * openConnection
-     * Returns: this
-     * Parameters:
-     *      ip - the ip address of the destination
-     *      port - the port of the destination
-     *      mode - TCP or UDP
-     *      cbConnect - function to be called when connection successfully established
-     *      cbDisconnect - function to be called when connectiontimeout has occurred
-     **************************************************************************/
-    function openConnection(ip, port, mode, cbConnect = null) {
+    // ***************************************************************************
+    // openConnection
+    // Returns: this
+    // Parameters:
+    //      destIP - the ip address of the destination
+    //      destPort - the port of the destination 
+    //      mode - TCP or UDP
+    //      sendPort(optional) - the port to send from
+    //      cb - function to be called when connection successfully established 
+    // ****************************************************************************
+    function openConnection(destIP, destPort, mode, sendPort = null, cb = null) {
+
+        if (typeof sendPort == "function") {
+            cb = sendPort;
+            sendPort = null;
+        }
 
         // check for required parameters
         if (_availableSockets.len() == 0) {
-            if (cbConnect) return cbConnect(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
+            if (cb) return cb(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
             else throw W5500_CANNOT_CONNECT_SOCKETS_IN_USE;
         }
 
         local socket = _availableSockets.pop();
-        _connections[socket] <- W5500.Connection(this, socket, ip, port, mode);
-        _connections[socket].open(cbConnect);
+        _connections[socket] <- W5500.Connection(this, socket, destIP, destPort, mode);
+
+        if (typeof sendPort == "integer") _connections[socket].setSourcePort(sendPort);
+
+        _connections[socket].open(cb);
 
     }
 
 
-    /***************************************************************************
-     * closeConnection
-     * Returns: this
-     * Parameters:
-     *      socket              - the socket of the connection to close
-     *      cb(optional)        - function
-     **************************************************************************/
+    // ***************************************************************************
+    // closeConnection
+    // Returns: this
+    // Parameters:
+    //      socket              - the socket of the connection to close
+    //      cb(optional)        - function
+    // ***************************************************************************
     function closeConnection(socket, cb = null) {
 
         if (getSocketStatus(socket) == W5500_SOCKET_STATUS_ESTABLISHED) {
@@ -575,12 +595,12 @@ class W5500.Driver {
     }
 
 
-    /***************************************************************************
-     * deregisterSocket
-     * Returns:
-     * Parameters:
-     *      socket - the socket of the connection to deregister
-     **************************************************************************/
+    // ***************************************************************************
+    // deregisterSocket
+    // Returns:
+    // Parameters:
+    //      socket - the socket of the connection to deregister
+    // ***************************************************************************
     function deregisterSocket(socket) {
         // Return this to the available pool
         if (_availableSockets.find(socket) == null) {
@@ -596,15 +616,15 @@ class W5500.Driver {
     // GETTERS AND SETTERS
     // ---------------------------------------------
 
-    /***************************************************************************
-     * setMemory
-     * Returns: this
-     * Parameters:
-     *      memory - an array of four integers with the desired transmit memory
-     *               allotment for each socket (supported values are 0, 1, 2, 4, 8, 16)
-     *      dir - a string containing the transmition direction, accepted values
-     *            are "tx" or "rx"
-     **************************************************************************/
+    // ***************************************************************************
+    // setMemory
+    // Returns: this
+    // Parameters:
+    //      memory - an array of four integers with the desired transmit memory
+    //               allotment for each socket (supported values are 0, 1, 2, 4, 8, 16)
+    //      dir - a string containing the transmition direction, accepted values
+    //            are "tx" or "rx"
+    // ***************************************************************************
     function setMemory(memory, dir) {
         local memoryBufferSize = 16;
         local addr = (dir == "rx") ? W5500_SOCKET_RX_BUFFER_SIZE : W5500_SOCKET_TX_BUFFER_SIZE;
@@ -650,47 +670,47 @@ class W5500.Driver {
     }
 
 
-    /***************************************************************************
-     * getMemory
-     * Returns: the buffer size
-     * Parameters:
-     *      dir - a string containing the transmition direction, accepted values
-     *            are "tx" or "rx"
-     **************************************************************************/
+    // ***************************************************************************
+    // getMemory
+    // Returns: the buffer size
+    // Parameters:
+    //      dir - a string containing the transmition direction, accepted values
+    //            are "tx" or "rx"
+    // ***************************************************************************
     function getMemory(dir, socket) {
         return _socketMemory[dir][socket];
     }
 
-    /***************************************************************************
-     * setMode
-     * Returns: this
-     * Parameters:
-     *      mode - select mode using MODE constants or-ed together
-     **************************************************************************/
+    // ***************************************************************************
+    // setMode
+    // Returns: this
+    // Parameters:
+    //      mode - select mode using MODE constants or-ed together
+    // ***************************************************************************
     function setMode(mode) {
         writeReg(W5500_MODE, W5500_COMMON_REGISTER, mode);
         return this;
     }
 
-    /***************************************************************************
-     * setSocketMode
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      mode - select mode using W5500_SOCKET_MODE constant
-     **************************************************************************/
+    // ***************************************************************************
+    // setSocketMode
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      mode - select mode using W5500_SOCKET_MODE constant
+    // ***************************************************************************
     function setSocketMode(socket, mode) {
         local bsb = _getSocketRegBlockSelectBit(socket)
         writeReg(W5500_SOCKET_MODE, bsb, mode);
         return this;
     }
 
-    /***************************************************************************
-     * setGatewayAddr
-     * Returns: this
-     * Parameters:
-     *      addr - an array of four integers with the gateway IP address
-     **************************************************************************/
+    // ***************************************************************************
+    // setGatewayAddr
+    // Returns: this
+    // Parameters:
+    //      addr - an array of four integers with the gateway IP address
+    // ***************************************************************************
     function setGatewayAddr(addr) {
         local addr = _addrToIP(addr);
         writeReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
@@ -700,12 +720,28 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setSubnetMask
-     * Returns: this
-     * Parameters:
-     *      addr - an array of four integers with the subnet mask 
-     **************************************************************************/
+    // ***************************************************************************
+    // getGatewayAddr
+    // Returns:  an array of four integers with the gateway IP address
+    // Parameters:
+    //        none
+    // **************************************************************************
+    function getGatewayAddr() {
+        local addr = array(4);
+        // server.log((hardware.millis() - started) + ": DBG setGatewayAddr: " + pformat(addr));
+        addr[0] = readReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER);
+        addr[0] = readReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER);
+        addr[0] = readReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER);
+        addr[0] = readReg(W5500_GATEWAY_ADDR_3, W5500_COMMON_REGISTER);
+        return addr;
+    }
+
+    // ***************************************************************************
+    // setSubnetMask
+    // Returns: this
+    // Parameters:
+    //      addr - an array of four integers with the subnet mask 
+    // **************************************************************************
     function setSubnetMask(addr) {
         local addr = _addrToIP(addr);
         writeReg(W5500_SUBNET_MASK_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
@@ -715,13 +751,29 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setSourceHWAddr
-     * Returns: this
-     * Parameters:
-     *      addr - an array of 6 integers with the mac address for the
-     *             source hardware
-     **************************************************************************/
+    // ***************************************************************************
+    // getSubnet
+    // Returns: an array of four integers with the subnet address
+    // Parameters:
+    //         none 
+    // **************************************************************************
+    function getSubnetMask() {
+        local addr = array(4);
+        // server.log((hardware.millis() - started) + ": DBG setSubnet: " + pformat(addr));
+        addr[0] = readReg(W5500_SUBNET_MASK_ADDR_0, W5500_COMMON_REGISTER);
+        addr[1] = readReg(W5500_SUBNET_MASK_ADDR_1, W5500_COMMON_REGISTER);
+        addr[2] = readReg(W5500_SUBNET_MASK_ADDR_2, W5500_COMMON_REGISTER);
+        addr[3] = readReg(W5500_SUBNET_MASK_ADDR_3, W5500_COMMON_REGISTER);
+        return addr;
+    }
+
+    // ***************************************************************************
+    // setSourceHWAddr
+    // Returns: this
+    // Parameters:
+    //      addr - an array of 6 integers with the mac address for the
+    //             source hardware
+    // **************************************************************************
     function setSourceHWAddr(addr, flip_public_bit = false) {
 
         if (typeof addr == "string") {
@@ -743,13 +795,33 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setSourceIP
-     * Returns: this
-     * Parameters:
-     *      addr - an array of 4 integers with the IP address for the
-     *             source hardware
-     **************************************************************************/
+    // ***************************************************************************
+    // getSourceHWAddr
+    // Returns: addr - an array of 6 integers with the mac address for the
+    //             source hardware
+    // Parameters:
+    //      none
+    // **************************************************************************
+    function getSourceHWAddr() {
+        // server.log((hardware.millis() - started) + ": DBG setSourceHWAddr: " + pformat(addr));
+        local addr = array(6);
+        addr[0] = readReg(W5500_SOURCE_HW_ADDR_0, W5500_COMMON_REGISTER);
+        addr[1] = readReg(W5500_SOURCE_HW_ADDR_1, W5500_COMMON_REGISTER);
+        addr[2] = readReg(W5500_SOURCE_HW_ADDR_2, W5500_COMMON_REGISTER);
+        addr[3] = readReg(W5500_SOURCE_HW_ADDR_3, W5500_COMMON_REGISTER);
+        addr[4] = readReg(W5500_SOURCE_HW_ADDR_4, W5500_COMMON_REGISTER);
+        addr[5] = readReg(W5500_SOURCE_HW_ADDR_5, W5500_COMMON_REGISTER);
+
+        return addr;
+    }
+
+    // ***************************************************************************
+    // setSourceIP
+    // Returns: this
+    // Parameters:
+    //      addr - an array of 4 integers with the IP address for the
+    //             source hardware
+    // **************************************************************************
     function setSourceIP(addr) {
         local addr = _addrToIP(addr);
         writeReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
@@ -759,15 +831,31 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setSourcePort
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      addr - an array of 2 integers with the port for the
-     *             source hardware
-     *             (ex: for port 4242, addr = [0x10, 0x92])
-     **************************************************************************/
+    // ***************************************************************************
+    // getSourceIP
+    // Returns: addr - an array of 4 integers with the IP address for the
+    //                 source hardware
+    // Parameters:
+    //          none    
+    // **************************************************************************
+    function getSourceIP() {
+        local addr = array(4);
+        // server.log((hardware.millis() - started) + ": DBG setSourceIP: " + pformat(addr));
+        addr[0] = readReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER);
+        addr[1] = readReg(W5500_SOURCE_IP_ADDR_1, W5500_COMMON_REGISTER);
+        addr[2] = readReg(W5500_SOURCE_IP_ADDR_2, W5500_COMMON_REGISTER);
+        addr[3] = readReg(W5500_SOURCE_IP_ADDR_3, W5500_COMMON_REGISTER);
+        return addr;
+    }
+
+    // ***************************************************************************
+    // setSourcePort
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      addr   - an array of 2 integers with the port for the
+    //               source hardware (ex: for port 4242, addr = [0x10, 0x92])
+    // **************************************************************************
     function setSourcePort(socket, port) {
         // Convert the type
         if (typeof port == "integer") {
@@ -783,14 +871,14 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setDestHWAddr
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      addr - an array of 6 integers with the mac address for the
-     *             destination hardware
-     **************************************************************************/
+    // ***************************************************************************
+    // setDestHWAddr
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      addr - an array of 6 integers with the mac address for the
+    //             destination hardware
+    // **************************************************************************
     function setDestHWAddr(socket, addr) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         writeReg(W5500_SOCKET_DEST_HW_ADDR_0, bsb, addr[0]);
@@ -802,14 +890,14 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setDestIP
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      addr - an array of 4 integers with the IP address for the
-     *             destination hardware
-     **************************************************************************/
+    // ***************************************************************************
+    // setDestIP
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      addr - an array of 4 integers with the IP address for the
+    //             destination hardware
+    // **************************************************************************
     function setDestIP(socket, addr) {
 
         // Convert the type
@@ -828,15 +916,15 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setDestPort
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      addr - an array of 2 integers with the port for the
-     *             destination hardware
-     *             (ex: for port 4242, addr = [0x10, 0x92])
-     **************************************************************************/
+    // ***************************************************************************
+    // setDestPort
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      addr - an array of 2 integers with the port for the
+    //             destination hardware
+    //             (ex: for port 4242, addr = [0x10, 0x92])
+    // **************************************************************************
     function setDestPort(socket, port) {
 
         // Convert the type
@@ -853,13 +941,13 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setRxReadPointer
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      value - new RX read pointer value
-     **************************************************************************/
+    // ***************************************************************************
+    // setRxReadPointer
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      value - new RX read pointer value
+    // **************************************************************************
     function setRxReadPointer(socket, value) {
         local rx_pointer_r1 = (value & 0xFF00) >> 8;
         local rx_pointer_r2 = value & 0x00FF;
@@ -869,13 +957,13 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * setTxWritePointer
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      value - new TX write pointer value
-     **************************************************************************/
+    // ***************************************************************************
+    // setTxWritePointer
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      value - new TX write pointer value
+    // **************************************************************************
     function setTxWritePointer(socket, value) {
         local tx_pointer_r1 = (value & 0xFF00) >> 8;
         local tx_pointer_r2 = value & 0x00FF;
@@ -885,12 +973,12 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * getRxReadPointer
-     * Returns: value of read pointer
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getRxReadPointer
+    // Returns: value of read pointer
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getRxReadPointer(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         local rx_pointer_pt1 = readReg(W5500_SOCKET_RX_RP_R1, bsb) << 8;
@@ -899,12 +987,12 @@ class W5500.Driver {
         return rx_pointer_pt1 | rx_pointer_pt2;
     }
 
-    /***************************************************************************
-     * getTxReadPointer
-     * Returns: value of read pointer
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getTxReadPointer
+    // Returns: value of read pointer
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getTxReadPointer(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         local tx_pointer_pt1 = readReg(W5500_SOCKET_TX_RP_R1, bsb) << 8;
@@ -913,12 +1001,12 @@ class W5500.Driver {
         return tx_pointer_pt1 | tx_pointer_pt2;
     }
 
-    /***************************************************************************
-     * getRxDataSize
-     * Returns: value of received data size register
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getRxDataSize
+    // Returns: value of received data size register
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getRxDataSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         local rx_pt1 = readReg(W5500_SOCKET_RX_SIZE_R1, bsb) << 8;
@@ -927,12 +1015,12 @@ class W5500.Driver {
         return rx_pt1 | rx_pt2;
     }
 
-    /***************************************************************************
-     * getFreeTxDataSize
-     * Returns: value of TX data free size register
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getFreeTxDataSize
+    // Returns: value of TX data free size register
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getFreeTxDataSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         local tx_fd_pt1 = readReg(W5500_SOCKET_TX_SIZE_R1, bsb) << 8;
@@ -941,77 +1029,77 @@ class W5500.Driver {
         return tx_fd_pt1 | tx_fd_pt2;
     }
 
-    /***************************************************************************
-     * getSocketRXBufferSize
-     * Returns: value of RX data buffer size register
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getSocketRXBufferSize
+    // Returns: value of RX data buffer size register
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getSocketRXBufferSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         return readReg(W5500_SOCKET_RX_BUFFER_SIZE, bsb);
     }
 
-    /***************************************************************************
-     * getSocketTXBufferSize
-     * Returns: value of TX data buffer size register
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getSocketTXBufferSize
+    // Returns: value of TX data buffer size register
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getSocketTXBufferSize(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         return readReg(W5500_SOCKET_TX_BUFFER_SIZE, bsb);
     }
 
-    /***************************************************************************
-     * getChipVersion
-     * Returns: chip version (should be 0x04 for the W5500)
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // getChipVersion
+    // Returns: chip version (should be 0x04 for the W5500)
+    // Parameters: none
+    // **************************************************************************
     function getChipVersion() {
         return readReg(W5500_CHIP_VERSION, W5500_COMMON_REGISTER);
     }
 
-    /***************************************************************************
-     * getTotalSupportedSockets
-     * Returns: number of sockets the driver code currently supports
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // getTotalSupportedSockets
+    // Returns: number of sockets the driver code currently supports
+    // Parameters: none
+    // **************************************************************************
     function getTotalSupportedSockets() {
         return TOTAL_SUPPORTED_SOCKETS;
     }
 
-    /***************************************************************************
-     * getMemoryInfo
-     * Returns: table with memory maximums and supported memory block sizes
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // getMemoryInfo
+    // Returns: table with memory maximums and supported memory block sizes
+    // Parameters: none
+    // **************************************************************************
     function getMemoryInfo() {
         // mem_block_sizes - an array with supported values highest to lowest
         return { "tx_max": MAX_TX_MEM_BUFFER, "rx_max": MAX_RX_MEM_BUFFER, "mem_block_sizes": [16, 8, 4, 2, 1, 0] }
     }
 
-    /***************************************************************************
-     * getSocketStatus
-     * Returns: integer with the connection status for the socket passed in
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getSocketStatus
+    // Returns: integer with the connection status for the socket passed in
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getSocketStatus(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         local status = readReg(W5500_SOCKET_STATUS, bsb);
         return status;
     }
 
-    /***************************************************************************
-     * waitForSocketStatus
-     * Returns: nothing
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      state - the state we are waiting for
-     *      callback - the callback to execute when the state is reached
-     *      timeout - the number of seconds after which we will give up
-     **************************************************************************/
+    // ***************************************************************************
+    // waitForSocketStatus
+    // Returns: nothing
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      state - the state we are waiting for
+    //      callback - the callback to execute when the state is reached
+    //      timeout - the number of seconds after which we will give up
+    // **************************************************************************
     function waitForSocketStatus(socket, state, callback, timeout = 10) {
         if (getSocketStatus(socket) == state) {
             return callback(true);
@@ -1024,25 +1112,37 @@ class W5500.Driver {
         }
     }
 
-    /***************************************************************************
-     * sendSocketCommand
-     * Returns: this
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      command - select command using SOCKET_COMMANDS constant
-     **************************************************************************/
+    // ***************************************************************************
+    // getSocketMode
+    // Returns: socketMode
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
+    function getSocketMode(socket) {
+        local bsb = _getSocketRegBlockSelectBit(socket)
+        local mode = readReg(W5500_SOCKET_MODE, bsb);
+        return mode;
+    }
+
+    // ***************************************************************************
+    // sendSocketCommand
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      command - select command using SOCKET_COMMANDS constant
+    // **************************************************************************
     function sendSocketCommand(socket, command) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         writeReg(W5500_SOCKET_COMMAND, bsb, command);
         return this;
     }
 
-    /***************************************************************************
-     * setNumSockets - configures interrupts and memory for each connection
-     * Returns: number of actual connections configured
-     * Parameters:
-     *      numSockets - number of desired connections
-     **************************************************************************/
+    // ***************************************************************************
+    // setNumSockets - configures interrupts and memory for each connection
+    // Returns: number of actual connections configured
+    // Parameters:
+    //      numSockets - number of desired connections
+    // **************************************************************************
     function setNumberOfAvailableSockets(numSockets = null) {
 
         // limit number of sockets to what driver can support
@@ -1075,12 +1175,12 @@ class W5500.Driver {
         return sockets;
     }
 
-    /***************************************************************************
-     * readRxData
-     * Returns: data from received data register
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // readRxData
+    // Returns: data from received data register
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function readRxData(socket) {
 
         // get the received data size
@@ -1108,13 +1208,13 @@ class W5500.Driver {
         return data;
     }
 
-    /***************************************************************************
-     * sendTxData
-     * Returns: length of data to transmit
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     *      transmitData - data to be sent
-     **************************************************************************/
+    // ***************************************************************************
+    // sendTxData
+    // Returns: length of data to transmit
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      transmitData - data to be sent
+    // **************************************************************************
     function sendTxData(socket, transmitData) {
 
         local tx_length = transmitData.len();
@@ -1140,40 +1240,43 @@ class W5500.Driver {
     }
 
 
-    /***************************************************************************
-     * setInterrupt
-     * Returns: this
-     * Parameters:
-     *      type - select interrupt type using interrupt type
-     *             constants or-ed together
-     **************************************************************************/
+    // INTERRUPT FUNCTIONS
+    // ---------------------------------------------
+
+    // ***************************************************************************
+    // setInterrupt
+    // Returns: this
+    // Parameters:
+    //      type - select interrupt type using interrupt type
+    //             constants or-ed together
+    // **************************************************************************
     function setInterrupt(type) {
         writeReg(W5500_INTERRUPT_MASK, W5500_COMMON_REGISTER, type);
         return this;
     }
 
-    /***************************************************************************
-     * clearInterrupt
-     * Returns: this
-     * Parameters:
-     *      type(optional) - clear specified interrupt type
-     *                               if nothing passed in clears all interrupts
-     **************************************************************************/
+    // ***************************************************************************
+    // clearInterrupt
+    // Returns: this
+    // Parameters:
+    //      type(optional) - clear specified interrupt type
+    //                               if nothing passed in clears all interrupts
+    // **************************************************************************
     function clearInterrupt(type = 0xF0) {
         writeReg(W5500_INTERRUPT, W5500_COMMON_REGISTER, type);
         return this;
     }
 
-    /***************************************************************************
-     * setSocketInterrupt
-     * Returns: this
-     * Parameters:
-     *      socketInt - select the sockets to enable interrupts on using
-     *                  SOCKET INTERRUPTS constants or-ed together
-     *      type(optional) - select SOCKET INTERRUPT TYPES using constants
-     *              or-ed together, if type not passed in all type interrupts
-     *              will be cleared.
-     **************************************************************************/
+    // ***************************************************************************
+    // setSocketInterrupt
+    // Returns: this
+    // Parameters:
+    //      socketInt - select the sockets to enable interrupts on using
+    //                  SOCKET INTERRUPTS constants or-ed together
+    //      type(optional) - select SOCKET INTERRUPT TYPES using constants
+    //              or-ed together, if type not passed in all type interrupts
+    //              will be cleared.
+    // **************************************************************************
     function setSocketInterrupt(socketInt, type = 0x1F) {
         writeReg(W5500_SOCKET_INTERRUPT_MASK, W5500_COMMON_REGISTER, socketInt);
         // default enables all socket interrupt types
@@ -1181,37 +1284,37 @@ class W5500.Driver {
         return this;
     }
 
-    /***************************************************************************
-     * clearSocketInterrupt
-     * Returns: this
-     * Parameters:
-     *      socket : socket (selected by integer) to clear interrupt on
-     *      type(optional) - clear specified interrupt type
-     *                       if nothing passed in clears all interrupts
-     **************************************************************************/
+    // ***************************************************************************
+    // clearSocketInterrupt
+    // Returns: this
+    // Parameters:
+    //      socket : socket (selected by integer) to clear interrupt on
+    //      type(optional) - clear specified interrupt type
+    //                       if nothing passed in clears all interrupts
+    // **************************************************************************
     function clearSocketInterrupt(socket, type = 0x1F) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         writeReg(W5500_SOCKET_N_INTERRUPT, bsb, type);
         return this;
     }
 
-    /***************************************************************************
-     * clearSocketInterrupts
-     * Returns: clears the Sockets Interrupt
-     * Parameters:
-     *      none
-     **************************************************************************/
+    // ***************************************************************************
+    // clearSocketInterrupts
+    // Returns: clears the Sockets Interrupt
+    // Parameters:
+    //      none
+    // **************************************************************************
     function clearSocketInterrupts() {
         for (local socket = 0; socket < _noOfSockets; socket++) {
             clearSocketInterrupt(socket);
         }
     }
 
-    /***************************************************************************
-     * getInterruptStatus
-     * Returns: interrupt status table
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // getInterruptStatus
+    // Returns: interrupt status table
+    // Parameters: none
+    // **************************************************************************
     function getInterruptStatus() {
         local status = readReg(W5500_INTERRUPT, W5500_COMMON_REGISTER);
         local intStatus = {
@@ -1224,11 +1327,11 @@ class W5500.Driver {
         return intStatus;
     }
 
-    /***************************************************************************
-     * socketInterruptHandler
-     * Returns: processes a socket interrupt
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // socketInterruptHandler
+    // Returns: processes a socket interrupt
+    // Parameters: none
+    // **************************************************************************
     function socketInterruptHandler() {
         local status = readReg(W5500_SOCKET_INTERRUPT, W5500_COMMON_REGISTER);
         local intStatus = array(8, false);
@@ -1244,12 +1347,12 @@ class W5500.Driver {
         }
     }
 
-    /***************************************************************************
-     * getSocketInterruptTypeStatus
-     * Returns: socket interrupt status table
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // getSocketInterruptTypeStatus
+    // Returns: socket interrupt status table
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function getSocketInterruptTypeStatus(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         local status = readReg(W5500_SOCKET_N_INTERRUPT, bsb);
@@ -1264,12 +1367,36 @@ class W5500.Driver {
         return intStatus;
     }
 
-    /***************************************************************************
-     * readReg
-     * Returns: data stored at the specified register
-     * Parameters:
-     *      reg - register to read
-     **************************************************************************/
+    // ***************************************************************************
+    // getTimeoutCount
+    // Returns: Connection timeout count
+    // Parameters:
+    //      none
+    // **************************************************************************
+    function getTimeoutCount() {
+        return readReg(W5500_RETRY_COUNT, 0x00);
+    }
+
+    // ***************************************************************************
+    // setTimeoutCount
+    // Returns: none
+    // Parameters:
+    //      count - number of times to retry on timeout
+    // **************************************************************************
+    function setTimeoutCount(count) {
+        writeReg(W5500_RETRY_COUNT, 0x00, count);
+    }
+
+
+    // SPI FUNCTIONS
+    // ---------------------------------------------
+
+    // ***************************************************************************
+    // readReg
+    // Returns: data stored at the specified register
+    // Parameters:
+    //      reg - register to read
+    // **************************************************************************
     function readReg(addr, bsb) {
         local b = blob();
         local cp = bsb | W5500_READ_COMMAND | W5500_VARIABLE_DATA_LENGTH;
@@ -1289,13 +1416,13 @@ class W5500.Driver {
         return res[3];
     }
 
-    /***************************************************************************
-     * writeReg
-     * Returns: null
-     * Parameters:
-     *      reg - register to write to
-     *      value - data to write to register
-     **************************************************************************/
+    // ***************************************************************************
+    // writeReg
+    // Returns: null
+    // Parameters:
+    //      reg - register to write to
+    //      value - data to write to register
+    // **************************************************************************
     function writeReg(addr, bsb, value) {
         local b = blob();
         local cp = bsb | W5500_WRITE_COMMAND | W5500_VARIABLE_DATA_LENGTH;
@@ -1313,14 +1440,14 @@ class W5500.Driver {
     }
 
 
-    /***************************************************************************
-     * reset, note this is blocking for 0.2s
-     * Returns: this
-     * Parameters:
-     *          sw(optional) - boolean if true forces a software reset
-     *          Note: datasheet for W5500 states that software reset is
-     *                unreliable - don't use
-     **************************************************************************/
+    // ***************************************************************************
+    // reset, note this is blocking for 0.2s
+    // Returns: this
+    // Parameters:
+    //          sw(optional) - boolean if true forces a software reset
+    //          Note: datasheet for W5500 states that software reset is
+    //                unreliable - don't use
+    // **************************************************************************
     function reset(sw = false) {
         // Reset chip to default state, blocks for 0.2s
         // Note: Datasheet states that W5500 software reset
@@ -1344,12 +1471,12 @@ class W5500.Driver {
     // PRIVATE FUNCTIONS
     // ---------------------------------------------
 
-    /***************************************************************************
-     * _hexToInt
-     * Returns: an integer representation of the string passed in
-     * Parameters:
-     *      hexString - A string representing a hexadecimal number
-     **************************************************************************/
+    // ***************************************************************************
+    // _hexToInt
+    // Returns: an integer representation of the string passed in
+    // Parameters:
+    //      hexString - A string representing a hexadecimal number
+    // **************************************************************************
     function _hexToInt(hexString) {
         // Does the string start with '0x'? If so, remove it
         if (hexString.slice(0, 2) == "0x") hexString = hexString.slice(2);
@@ -1366,12 +1493,12 @@ class W5500.Driver {
         return intValue;
     }
 
-    /***************************************************************************
-     * _addrToIP
-     * Returns: an array of four numbers representing an ip address or false if it is a string for the DNS
-     * Parameters:
-     *      addr - a string or array representing an IP address
-     **************************************************************************/
+    // ***************************************************************************
+    // _addrToIP
+    // Returns: an array of four numbers representing an ip address or false if it is a string for the DNS
+    // Parameters:
+    //      addr - a string or array representing an IP address
+    // **************************************************************************
     function _addrToIP(addr) {
 
         if (typeof addr == "string" && addr.len() > 0) {
@@ -1403,12 +1530,12 @@ class W5500.Driver {
     }
 
 
-    /***************************************************************************
-     * _addrToIP
-     * Returns: an array of four numbers representing an ip address or false if it is a string for the DNS
-     * Parameters:
-     *      addr - a string or array representing an IP address
-     **************************************************************************/
+    // ***************************************************************************
+    // _addrToIP
+    // Returns: an array of four numbers representing an ip address or false if it is a string for the DNS
+    // Parameters:
+    //      addr - a string or array representing an IP address
+    // **************************************************************************
     function _addrToMac(addr) {
 
         if (typeof addr == "string" && addr.len() == 12) {
@@ -1426,12 +1553,12 @@ class W5500.Driver {
         }
     }
 
-    /***************************************************************************
-     * _getSocketRegBlockSelectBit
-     * Returns: the socket register Control Phase Block Select Bit for the socket passed in
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // _getSocketRegBlockSelectBit
+    // Returns: the socket register Control Phase Block Select Bit for the socket passed in
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function _getSocketRegBlockSelectBit(socket) {
         switch (socket) {
             case 0:
@@ -1454,12 +1581,12 @@ class W5500.Driver {
         return null;
     }
 
-    /***************************************************************************
-     * _getSocketRXBufferBlockSelectBit
-     * Returns: the socket RX buffer Control Phase Block Select Bit for the socket passed in
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // _getSocketRXBufferBlockSelectBit
+    // Returns: the socket RX buffer Control Phase Block Select Bit for the socket passed in
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function _getSocketRXBufferBlockSelectBit(socket) {
         switch (socket) {
             case 0:
@@ -1482,12 +1609,12 @@ class W5500.Driver {
         return null;
     }
 
-    /***************************************************************************
-     * _getSocketRXBufferBlockSelectBit
-     * Returns: the socket TX buffer Control Phase Block Select Bit for the socket passed in
-     * Parameters:
-     *      socket - select the socket using an integer 0-3
-     **************************************************************************/
+    // ***************************************************************************
+    // _getSocketRXBufferBlockSelectBit
+    // Returns: the socket TX buffer Control Phase Block Select Bit for the socket passed in
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
     function _getSocketTXBufferBlockSelectBit(socket) {
         switch (socket) {
             case 0:
@@ -1511,11 +1638,11 @@ class W5500.Driver {
     }
 
 
-    /***************************************************************************
-     * _setMemDefaults, sets locally stored default socket memory info
-     * Returns: null
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // _setMemDefaults, sets locally stored default socket memory info
+    // Returns: null
+    // Parameters: none
+    // **************************************************************************
     function _setMemDefaults() {
         _socketMemory = {
             "rx": [2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048],
@@ -1524,14 +1651,14 @@ class W5500.Driver {
     }
 
 
-    /***************************************************************************
-     * _writeData, writes data to transmit memory buffer
-     * Returns: size of data written
-     * Parameters:
-     *      addr - offset address to start the data write
-     *      bsb - socket tx buffer block select bit
-     *      data - data to be written
-     **************************************************************************/
+    // ***************************************************************************
+    // _writeData, writes data to transmit memory buffer
+    // Returns: size of data written
+    // Parameters:
+    //      addr - offset address to start the data write
+    //      bsb - socket tx buffer block select bit
+    //      data - data to be written
+    // **************************************************************************
     function _writeData(addr, bsb, data) {
         foreach (item in data) {
             writeReg(addr, bsb, item);
@@ -1541,14 +1668,14 @@ class W5500.Driver {
         return data.len();
     }
 
-    /***************************************************************************
-     * _readData
-     * Returns: blob containing data from memory buffer
-     * Parameters:
-     *      addr - offset address to start the read
-     *      bsb - block select bit for the socket rx buffer
-     *      size - size of data to be written
-     **************************************************************************/
+    // ***************************************************************************
+    // _readData
+    // Returns: blob containing data from memory buffer
+    // Parameters:
+    //      addr - offset address to start the read
+    //      bsb - block select bit for the socket rx buffer
+    //      size - size of data to be written
+    // **************************************************************************
     function _readData(addr, bsb, size) {
         local b = blob();
 
@@ -1561,14 +1688,14 @@ class W5500.Driver {
         return b
     }
 
-    /***************************************************************************
-     * _getMaxMemValue
-     * Returns: max memory value
-     * Parameters:
-     *      numValues - number of memory slots
-     *      max - max memory available
-     *      blockSizes - array of supported memory sizes
-     **************************************************************************/
+    // ***************************************************************************
+    // _getMaxMemValue
+    // Returns: max memory value
+    // Parameters:
+    //      numValues - number of memory slots
+    //      max - max memory available
+    //      blockSizes - array of supported memory sizes
+    // **************************************************************************
     function _getMaxMemValue(numValues, max, blockSizes) {
         // make sure memory values are in desending order
         blockSizes.sort();
@@ -1601,22 +1728,22 @@ class W5500.Connection {
     _ip = null;
     _port = null;
     _mode = null;
-    _sourceport = null;
+    _sourcePort = null;
     _transmitQueue = null;
-	_transmitting = false;
+    _transmitting = false;
 
-    /***************************************************************************
-     * Constructor
-     * Returns: null
-     * Parameters:
-     *      driver  - the instance of the W5500.driver class
-     *      socket  - socket number of the connection (integer)
-     *      ip      - the ip address of the destination
-     *      port    - the port of the destination
-     *      mode    - TCP or UDP
-     *      handlers(optional) - table of callback functions
-     *                              (connect, disconnect, transmit, receive)
-     **************************************************************************/
+    // ***************************************************************************
+    // Constructor
+    // Returns: null
+    // Parameters:
+    //      driver  - the instance of the W5500.driver class
+    //      socket  - socket number of the connection (integer)
+    //      ip      - the ip address of the destination
+    //      port    - the port of the destination
+    //      mode    - TCP or UDP
+    //      handlers(optional) - table of callback functions
+    //                              (connect, disconnect, transmit, receive)
+    // **************************************************************************
     constructor(driver, socket, ip, port, mode, handlers = {}) {
         _driver = driver;
         _socket = socket;
@@ -1629,19 +1756,24 @@ class W5500.Connection {
     }
 
 
-    /***************************************************************************
-     * open
-     * Returns: this
-     * Parameters:
-     *      none
-     **************************************************************************/
-    function open(cbConnect = null) {
-
-        local sourcePort = _returnRandomPort(1024, 65535); // creates a random port between 1024-65535
+    // ***************************************************************************
+    // open
+    // Returns: this
+    // Parameters:
+    //      cb - callback to be called when the connection is opened
+    // **************************************************************************
+    function open(cb = null) {
 
         // Open socket connection
         _driver.setSocketMode(_socket, _mode);
-        _driver.setSourcePort(_socket, sourcePort);
+
+        if (_sourcePort == null) {
+            local sourcePort = _returnRandomPort(1024, 65535); // creates a random port between 1024-65535
+            _driver.setSourcePort(_socket, sourcePort);
+        } else {
+            _driver.setSourcePort(_socket, _sourcePort);
+        }
+
         _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
         _state = W5500_SOCKET_STATES.INIT;
 
@@ -1651,18 +1783,25 @@ class W5500.Connection {
         _driver.sendSocketCommand(_socket, W5500_SOCKET_CONNECT);
         _state = W5500_SOCKET_STATES.CONNECTING;
 
-        if (cbConnect) onConnect(cbConnect);
+        if (cb) {
+            if (_mode == W5500_SOCKET_MODE_UDP) {
+                _state = W5500_SOCKET_STATES.ESTABLISHED
+                cb(null, this);
+            } else {
+                onConnect(cb);
+            }
+        }
 
         return this;
     }
 
 
-    /***************************************************************************
-     * close
-     * Returns: close connection
-     * Parameters:
-     *      none
-     **************************************************************************/
+    // ***************************************************************************
+    // close
+    // Returns: close connection
+    // Parameters:
+    //      none
+    // **************************************************************************
     function close(cb = null) {
         if (_state == W5500_SOCKET_STATES.DISCONNECTING) {
             if (cb) imp.wakeup(1, cb);
@@ -1673,127 +1812,127 @@ class W5500.Connection {
     }
 
 
-    /***************************************************************************
-     * getIP
-     * Returns: the destination ip address
-     * Parameters:
-     *      none
-     **************************************************************************/
+    // ***************************************************************************
+    // getIP
+    // Returns: the destination ip address
+    // Parameters:
+    //      none
+    // **************************************************************************
     function getIP() {
         return _ip;
     }
 
-    /***************************************************************************
-     * getPort
-     * Returns: the destination port
-     * Parameters:
-     *      none
-     **************************************************************************/
+    // ***************************************************************************
+    // getPort
+    // Returns: the destination port
+    // Parameters:
+    //      none
+    // **************************************************************************
     function getPort() {
         return _port;
     }
 
-    /***************************************************************************
-     * onConnect
-     * Returns: this
-     * Parameters:
-     *      cb - function to called when connect/timeout interrupt triggered
-     **************************************************************************/
+    // ***************************************************************************
+    // onConnect
+    // Returns: this
+    // Parameters:
+    //      cb - function to called when connect/timeout interrupt triggered
+    // **************************************************************************
     function onConnect(cb) {
         _handlers["connect"] <- cb;
         return this;
     }
 
-    /***************************************************************************
-     * onDisconnect
-     * Returns: this
-     * Parameters:
-     *      cb - function to called when disconnect interrupt triggered
-     **************************************************************************/
+    // ***************************************************************************
+    // onDisconnect
+    // Returns: this
+    // Parameters:
+    //      cb - function to called when disconnect interrupt triggered
+    // **************************************************************************
     function onDisconnect(cb) {
         _handlers["disconnect"] <- cb;
         return this;
     }
 
-    /***************************************************************************
-     * onReceive
-     * Returns: this
-     * Parameters:
-     *      cb - function to called when data received interrupt triggered
-     **************************************************************************/
+    // ***************************************************************************
+    // onReceive
+    // Returns: this
+    // Parameters:
+    //      cb - function to called when data received interrupt triggered
+    // **************************************************************************
     function onReceive(cb) {
         _handlers["receive"] <- cb;
         return this;
     }
 
-    /***************************************************************************
-     * onTransmitted
-     * Returns: this
-     * Parameters:
-     *      cb - function to called when transmit/timeout interrupt triggered
-     **************************************************************************/
+    // ***************************************************************************
+    // onTransmitted
+    // Returns: this
+    // Parameters:
+    //      cb - function to called when transmit/timeout interrupt triggered
+    // **************************************************************************
     function onTransmitted(cb) {
         _handlers["transmit"] <- cb;
         return this;
     }
 
-    /***************************************************************************
-     * setSourcePort
-     * Returns: this
-     * Parameters:
-     *      port - source port
-     **************************************************************************/
+    // ***************************************************************************
+    // setSourcePort
+    // Returns: this
+    // Parameters:
+    //      port - source port
+    // **************************************************************************
     function setSourcePort(port) {
-        _sourceport = port;
+        _sourcePort = port;
         return this;
     }
 
-    /***************************************************************************
-     * _getHandler
-     * Returns: handler function or null
-     * Parameters:
-     *      handlerName - name of handler
-     **************************************************************************/
+    // ***************************************************************************
+    // _getHandler
+    // Returns: handler function or null
+    // Parameters:
+    //      handlerName - name of handler
+    // **************************************************************************
     function _getHandler(handlerName) {
         return (handlerName in _handlers) ? _handlers[handlerName] : null;
     }
 
 
-    /***************************************************************************
-     * getSocket
-     * Returns: the socket id
-     * Parameters: none
-     **************************************************************************/
+    // ***************************************************************************
+    // getSocket
+    // Returns: the socket id
+    // Parameters: none
+    // **************************************************************************
     function getSocket() {
         return _socket;
     }
 
 
-    /***************************************************************************
-     * _dataWaiting
-     * Returns: boolean
-     * Parameters:
-     *      socket - connection socket
-     **************************************************************************/
+    // ***************************************************************************
+    // _dataWaiting
+    // Returns: boolean
+    // Parameters:
+    //      socket - connection socket
+    // **************************************************************************
     function _dataWaiting() {
         return (_driver.getRxDataSize(_socket) == 0x00) ? false : true;
     }
 
-    /***************************************************************************
-     * isEstablished
-     * Returns: boolean
-     * Parameters:
-     *      none
-     **************************************************************************/
+    // ***************************************************************************
+    // isEstablished
+    // Returns: boolean
+    // Parameters:
+    //      none
+    // **************************************************************************
     function isEstablished() {
         return (_driver.getSocketStatus(_socket) == W5500_SOCKET_STATUS_ESTABLISHED) ? true : false;
     }
 
-    /***************************************************************************
-     * _handleSocketInt, handles/clears the specified socket interrupt
-     * Returns: null
-     * Parameters: socket the interrupt occurred on
-     **************************************************************************/
+    // ***************************************************************************
+    // _handleSocketInt, handles/clears the specified socket interrupt
+    // Returns: null
+    // Parameters: socket the interrupt occurred on
+    // **************************************************************************
     function interruptHandler() {
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
@@ -1910,143 +2049,141 @@ class W5500.Connection {
 
 
 
-    /***************************************************************************
-     * transmit
-     * Returns: this
-     * Parameters:
-     *      transmitData - blob/string of data to transmit
-     *      cb(optional) - function to be called when data successfully
-     *                      sent or timeout has occurred
-     **************************************************************************/
+    // ***************************************************************************
+    // transmit
+    // Returns: this
+    // Parameters:
+    //      transmitData - blob/string of data to transmit
+    //      cb(optional) - function to be called when data successfully
+    //                      sent or timeout has occurred
+    // **************************************************************************
     function transmit(transmitData, cb = null) {
 
 		local _transmitNext, _transmit;
 
-		_transmit = function(transmitData, _cb = null) {
+        _transmit = function(transmitData, _cb = null) {
 
-			local cb;
-			local cbTimeout = imp.wakeup(W5500_TRANSMIT_TIMEOUT, function () {
-				cb(W5500_TRANSMIT_TIMEOUT)
-			}.bindenv(this));
+            local cb;
+            local cbTimeout = imp.wakeup(W5500_TRANSMIT_TIMEOUT, function() {
+                cb(W5500_TRANSMIT_TIMEOUT)
+            }.bindenv(this));
 
-			if (_cb != null) {
-				cb = function(err=null) {
-					if (cbTimeout) {
-						imp.cancelwakeup(cbTimeout);
-						cbTimeout = null;
-					}
-					_cb(err);
-				}.bindenv(this);
-			}
-
-        if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
-            if (cb) {
-                imp.wakeup(0, function() {
-                    cb("Connection not established");
-                }.bindenv(this));
+            if (_cb != null) {
+                cb = function(err = null) {
+                    if (cbTimeout) {
+                        imp.cancelwakeup(cbTimeout);
+                        cbTimeout = null;
+                    }
+                    _cb(err);
+                }.bindenv(this);
             }
+
+            if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
+                if (cb) {
+                    imp.wakeup(0, function() {
+                        cb("Connection not established");
+                    }.bindenv(this));
+                }
+                return this;
+            }
+            local txBufferSize = _driver.getMemory("tx", _socket);
+
+            if (transmitData == null) {
+                throw "transmit() requires a string or blob";
+            }
+            local tx_length = transmitData.len();
+            local chunks = [];
+
+            // Convert blob to string
+            if (typeof transmitData != "string") {
+                transmitData = transmitData.tostring();
+            }
+            if (typeof transmitData != "string") {
+                throw "transmit() requires a string or blob";
+            }
+
+            // Chunking data that is greater than buffer size. check transmission data size.
+            // If larger than socket transmit bufffer, break data into chunks before sending.
+            if ((tx_length * 8) > txBufferSize) {
+                local startPointer = 0;
+                local endPointer = txBufferSize / 8;
+
+                // Loop over data and create chunks
+                while (endPointer < tx_length) {
+
+                    chunks.push(transmitData.slice(startPointer, endPointer));
+                    startPointer = endPointer;
+                    endPointer += (txBufferSize / 8);
+
+                }
+
+                // Create final, partially full chunk
+                if (startPointer < tx_length) {
+                    chunks.push(transmitData.slice(startPointer));
+                }
+            } else {
+                chunks.push(transmitData);
+            }
+
+            // Send data first
+            local receiveHandler = _getHandler("receive");
+            if (receiveHandler && _dataWaiting()) {
+                receiveHandler(null, _driver.readRxData(_socket));
+            }
+
+            // Send data next
+            local sendChunk;
+            sendChunk = function(chunk) {
+                // Setup the temporary callback
+                onTransmitted(function(err) {
+                    if (!err && chunks.len() > 0) {
+                        // Send the next chunk
+                        return sendChunk(chunks.remove(0));
+                    } else {
+                        // All done.
+                        if (cb) imp.wakeup(0, function() { cb(err); });
+                    }
+                });
+
+                // Send the chunk
+                _driver.sendTxData(_socket, chunk);
+            }
+
+            // Send the first chunk
+            sendChunk(chunks.remove(0));
+
             return this;
         }
-        local txBufferSize = _driver.getMemory("tx", _socket);
 
-			if (transmitData == null) {
-				throw "transmit() requires a string or blob";
-        }
-        local tx_length = transmitData.len();
-        local chunks = [];
-
-        // Convert blob to string
-        if (typeof transmitData != "string") {
-            transmitData = transmitData.tostring();
-        }
-        if (typeof transmitData != "string") {
-            throw "transmit() requires a string or blob";
+        _transmitNext = function() {
+            if (_transmitting) return;
+            if (_transmitQueue.len() > 0) {
+                _transmitting = true;
+                local task = _transmitQueue.remove(0);
+                _transmit(task.data, function(err) {
+                    _transmitting = false;
+                    imp.wakeup(0, _transmitNext.bindenv(this));
+                    task.cb(err);
+                }.bindenv(this));
+            } else {}
         }
 
-        // Chunking data that is greater than buffer size. check transmission data size.
-        // If larger than socket transmit bufffer, break data into chunks before sending.
-        if ((tx_length * 8) > txBufferSize) {
-            local startPointer = 0;
-            local endPointer = txBufferSize / 8;
 
-            // Loop over data and create chunks
-            while (endPointer < tx_length) {
-
-                chunks.push(transmitData.slice(startPointer, endPointer));
-                startPointer = endPointer;
-                endPointer += (txBufferSize / 8);
-
-            }
-
-            // Create final, partially full chunk
-            if (startPointer < tx_length) {
-                chunks.push(transmitData.slice(startPointer));
-            }
-        } else {
-            chunks.push(transmitData);
-        }
-
-        // Send data first
-        local receiveHandler = _getHandler("receive");
-        if (receiveHandler && _dataWaiting()) {
-            receiveHandler(null, _driver.readRxData(_socket));
-        }
-
-        // Send data next
-        local sendChunk;
-        sendChunk = function(chunk) {
-            // Setup the temporary callback
-            onTransmitted(function(err) {
-                if (!err && chunks.len() > 0) {
-                    // Send the next chunk
-                    return sendChunk(chunks.remove(0));
-                } else {
-                    // All done.
-                    if (cb) imp.wakeup(0, function() { cb(err); });
-                }
-            });
-
-            // Send the chunk
-            _driver.sendTxData(_socket, chunk);
-        }
-
-        // Send the first chunk
-        sendChunk(chunks.remove(0));
-
-        return this;
-    }
-
-		_transmitNext = function() {
-			if (_transmitting) {
-				return;
-			}
-			if (_transmitQueue.len() > 0) {
-				_transmitting = true;
-				local task = _transmitQueue.remove(0);
-				_transmit(task.data, function(err) {
-					_transmitting = false;
-					imp.wakeup(0, _transmitNext.bindenv(this));
-					task.cb(err);
-				}.bindenv(this));
-			} else {
-			}
-		}
-
-
+        // Append to the queue and start the transmission.
         _transmitQueue.push({ "data": transmitData, "cb": cb });
         _transmitNext();
-	}
+    }
 
 
-    /***************************************************************************
-     * receive
-     * Returns: this
-     * Parameters:
-     *      cb(optional) - callback to pass receive data to
-     *                     (note: if callback is passed in it will superceede
-     *                     the callback set by setReceiveCallback, and will be
-     *                     used only for during this check for data)
-     **************************************************************************/
+    // ***************************************************************************
+    // receive
+    // Returns: this
+    // Parameters:
+    //      cb(optional) - callback to pass receive data to
+    //                     (note: if callback is passed in it will superceede
+    //                     the callback set by setReceiveCallback, and will be
+    //                     used only for during this check for data)
+    // **************************************************************************
     function receive(cb = null) {
 
         local receiveHandler = _getHandler("receive");
@@ -2064,7 +2201,7 @@ class W5500.Connection {
         } else {
             // Handle a normal callback here
             if (_state == W5500_SOCKET_STATES.ESTABLISHED) {
-                if ( _dataWaiting() ) {
+                if (_dataWaiting()) {
                     data = _driver.readRxData(_socket);
                 }
             } else {
@@ -2084,13 +2221,13 @@ class W5500.Connection {
     }
 
 
-    /***************************************************************************
-     * _returnRandomPort
-     * Returns: an array with a random port between min and max
-     * Parameters:
-     *      min - lowest possible port number
-     *      max - highest possible port number
-     **************************************************************************/
+    // ***************************************************************************
+    // _returnRandomPort
+    // Returns: an array with a random port between min and max
+    // Parameters:
+    //      min - lowest possible port number
+    //      max - highest possible port number
+    // **************************************************************************
     function _returnRandomPort(min, max) {
         local port = (1.0 * math.rand() / RAND_MAX) * (max + 1 - min);
         port = port.tointeger() + min;
