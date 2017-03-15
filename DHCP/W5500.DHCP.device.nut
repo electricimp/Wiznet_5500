@@ -504,7 +504,7 @@ class W5500.DHCP {
 
                     // Give 60 second margin on DHCP lease  
                     _leaseTime = _parseLeaseTime(options[W5500_DHCP_OPTIONS.dhcpIPaddrLeaseTime]) - W5500_DHCP_LEASEOFFSET;
-                    _resendTime = _leaseTime;
+                    _resendTime = _leaseTime >= 60 ? _leaseTime : 60; // at least 60 seconds
                     _resendCount = 0;
 
                     // Restore Network Settings
