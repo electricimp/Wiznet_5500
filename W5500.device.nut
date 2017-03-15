@@ -286,17 +286,17 @@ class W5500 {
     // cb -  function to be called in the even _isReady is true
     // ***************************************************************************
     function onReady(cb) {
-        local callback = cb;
+        local _cb = cb;
         if (_networkSettings != null) {
-            // Slip the network settings into the callback
-            callback = function() {
+            // Slip the network settings into the _cb
+            _cb = function() {
                 configureNetworkSettings(_networkSettings.sourceIP, _networkSettings.subnetMask, _networkSettings.gatewayIP, _networkSettings.mac);
                 _networkSettings = null;
                 cb();
             }.bindenv(this);
         }
-        if (_isReady) callback();
-        else _readyCb = callback;
+        if (_isReady) _cb();
+        else _readyCb = _cb;
         return this;
     }
 
@@ -447,7 +447,7 @@ class W5500.Driver {
         // Reset the hardware
         reset();
 
-        server.log("Wiznet chip version: " + getChipVersion());
+        // server.log("Wiznet chip version: " + getChipVersion());
 
     }
 
@@ -1521,6 +1521,13 @@ class W5500.Driver {
                 return false;
             }
 
+        } else if (typeof addr == "blob" && addr.len() == 4) {
+            local parts = array();
+            addr.seek(0, 'b');
+            while (!addr.eos()) {
+                parts.push(addr.readn('b'))
+            }
+            return parts;
         } else if (typeof addr == "array" && addr.len() == 4) {
             return addr;
         } else {
@@ -1546,6 +1553,13 @@ class W5500.Driver {
                 mac.push(_hexToInt(byte));
             }
             return mac;
+        } else if (typeof addr == "blob" && addr.len() == 6) {
+            local parts = array();
+            addr.seek(0, 'b');
+            while (!addr.eos()) {
+                parts.push(addr.readn('b'))
+            }
+            return parts;
         } else if (typeof addr == "array" && addr.len() == 6) {
             return addr;
         } else {
@@ -2059,51 +2073,38 @@ class W5500.Connection {
     // **************************************************************************
     function transmit(transmitData, cb = null) {
 
-		local _transmitNext, _transmit;
+        local _transmitNextInQueue, _transmit;
 
+        // Function to perform the transmission of one data packet broken into chunks
         _transmit = function(transmitData, _cb = null) {
 
-            local cb;
-            local cbTimeout = imp.wakeup(W5500_TRANSMIT_TIMEOUT, function() {
-                cb(W5500_TRANSMIT_TIMEOUT)
+            local __cb, transmit_timer, _transmitNextChunk;
+
+            // Prepare for a timeout
+            transmit_timer = imp.wakeup(W5500_TRANSMIT_TIMEOUT, function() {
+                __cb(W5500_TRANSMIT_TIMEOUT)
             }.bindenv(this));
 
-            if (_cb != null) {
-                cb = function(err = null) {
-                    if (cbTimeout) {
-                        imp.cancelwakeup(cbTimeout);
-                        cbTimeout = null;
-                    }
-                    _cb(err);
-                }.bindenv(this);
-            }
-
-            if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
-                if (cb) {
+            // Prepare a dummy callback to clear the timer before calling the real callback
+            __cb = function(err = null) {
+                if (transmit_timer) {
+                    imp.cancelwakeup(transmit_timer);
+                    transmit_timer = null;
+                }
+                if (_cb) {
                     imp.wakeup(0, function() {
-                        cb("Connection not established");
+                        _cb(err);
                     }.bindenv(this));
                 }
-                return this;
-            }
-            local txBufferSize = _driver.getMemory("tx", _socket);
+            }.bindenv(this);
 
-            if (transmitData == null) {
-                throw "transmit() requires a string or blob";
-            }
-            local tx_length = transmitData.len();
-            local chunks = [];
-
-            // Convert blob to string
-            if (typeof transmitData != "string") {
-                transmitData = transmitData.tostring();
-            }
-            if (typeof transmitData != "string") {
-                throw "transmit() requires a string or blob";
-            }
 
             // Chunking data that is greater than buffer size. check transmission data size.
             // If larger than socket transmit bufffer, break data into chunks before sending.
+            local txBufferSize = _driver.getMemory("tx", _socket);
+            local tx_length = transmitData.len();
+            local chunks = [];
+
             if ((tx_length * 8) > txBufferSize) {
                 local startPointer = 0;
                 local endPointer = txBufferSize / 8;
@@ -2125,53 +2126,71 @@ class W5500.Connection {
                 chunks.push(transmitData);
             }
 
-            // Send data first
+
+            // Receive any waiting data first
             local receiveHandler = _getHandler("receive");
             if (receiveHandler && _dataWaiting()) {
                 receiveHandler(null, _driver.readRxData(_socket));
             }
 
-            // Send data next
-            local sendChunk;
-            sendChunk = function(chunk) {
+
+            // Finally, loop thru a queue of chunks
+            _transmitNextChunk = function(chunk) {
+
                 // Setup the temporary callback
                 onTransmitted(function(err) {
                     if (!err && chunks.len() > 0) {
                         // Send the next chunk
-                        return sendChunk(chunks.remove(0));
+                        _transmitNextChunk(chunks.remove(0));
                     } else {
                         // All done.
-                        if (cb) imp.wakeup(0, function() { cb(err); });
+                        __cb(err);
                     }
-                });
+                }.bindenv(this));
 
                 // Send the chunk
                 _driver.sendTxData(_socket, chunk);
             }
 
             // Send the first chunk
-            sendChunk(chunks.remove(0));
-
-            return this;
+            _transmitNextChunk(chunks.remove(0));
         }
 
-        _transmitNext = function() {
-            if (_transmitting) return;
-            if (_transmitQueue.len() > 0) {
+
+        // Function to loop thru a queue of transmissions
+        _transmitNextInQueue = function() {
+            if (!_transmitting && _transmitQueue.len() > 0) {
                 _transmitting = true;
                 local task = _transmitQueue.remove(0);
                 _transmit(task.data, function(err) {
                     _transmitting = false;
-                    imp.wakeup(0, _transmitNext.bindenv(this));
-                    task.cb(err);
+                    imp.wakeup(0, _transmitNextInQueue.bindenv(this));
+                    if (task.cb) task.cb(err);
                 }.bindenv(this));
-            } else {}
+            }
         }
 
 
+        // Check types are valid and convert otherwise
+        if (transmitData == null) {
+            throw "transmit() requires a string or blob";
+        } else if (typeof transmitData != "string") {
+            transmitData = transmitData.tostring();
+        }
+        if (typeof transmitData != "string") {
+            throw "transmit() requires a string or blob";
+        }
+
+        // Check the socket is ready
+        if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
+            throw "Connection not established";
+        }
+
         // Append to the queue and start the transmission.
         _transmitQueue.push({ "data": transmitData, "cb": cb });
-        _transmitNext();
+        _transmitNextInQueue();
+
+        return this;
     }
 
 

@@ -1,19 +1,24 @@
+// Copyright (c) 2017 Electric Imp
+// This file is licensed under the MIT License
+// http://opensource.org/licenses/MIT
+
+// #require "W5500.device.nut:1.0.0"
 
 // echo server address and port
-const SOURCE_IP = "192.168.1.37";
+const SOURCE_IP = "192.168.201.254";
 const SUBNET_MASK = "255.255.255.0";
-const GATEWAY_IP = "192.168.1.1";
-const ECHO_SERVER_IP = "192.168.1.38";
-const ECHO_SERVER_PORT = 60000;
+const GATEWAY_IP = "192.168.201.1";
+const ECHO_SERVER_IP = "173.255.197.142";
+const ECHO_SERVER_PORT = 17294;
 const ECHO_MESSAGE = "Hello, world!";
 
-class DeviceTestCase extends ImpTestCase {
+class W5500_TestCase extends ImpTestCase {
 
     _wiz = null;
-	_resetPin = hardware.pinXA;
-	_interruptPin = hardware.pinXC;
-	_spiSpeed = 1000;
-	_spi = hardware.spi0;
+    _resetPin = hardware.pinXA;
+    _interruptPin = hardware.pinXC;
+    _spiSpeed = 1000;
+    _spi = hardware.spi0;
 
     // setup function needed to run others. Instantiates the wiznet driver.
     function setUp() {
@@ -57,21 +62,21 @@ class DeviceTestCase extends ImpTestCase {
         // checking all the registers are changed.
 
         // source ip
-		local source = split(SOURCE_IP, ".");
+        local source = split(SOURCE_IP, ".");
         this.assertTrue(source[0].tointeger() == _wiz._driver.readReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER), "incorrect register source ip[0]");
         this.assertTrue(source[1].tointeger() == _wiz._driver.readReg(W5500_SOURCE_IP_ADDR_1, W5500_COMMON_REGISTER), "incorrect register source ip[1]");
         this.assertTrue(source[2].tointeger() == _wiz._driver.readReg(W5500_SOURCE_IP_ADDR_2, W5500_COMMON_REGISTER), "incorrect register source ip[2]");
         this.assertTrue(source[3].tointeger() == _wiz._driver.readReg(W5500_SOURCE_IP_ADDR_3, W5500_COMMON_REGISTER), "incorrect register source ip[3]");
 
         // subnet
-		local subnet_mask = split(SUBNET_MASK, ".");
+        local subnet_mask = split(SUBNET_MASK, ".");
         this.assertTrue(subnet_mask[0].tointeger() == _wiz._driver.readReg(W5500_SUBNET_MASK_ADDR_0, W5500_COMMON_REGISTER), "incorrect register subnet[0]");
         this.assertTrue(subnet_mask[1].tointeger() == _wiz._driver.readReg(W5500_SUBNET_MASK_ADDR_1, W5500_COMMON_REGISTER), "incorrect register subnet[1]");
         this.assertTrue(subnet_mask[2].tointeger() == _wiz._driver.readReg(W5500_SUBNET_MASK_ADDR_2, W5500_COMMON_REGISTER), "incorrect register subnet[2]");
         this.assertTrue(subnet_mask[3].tointeger() == _wiz._driver.readReg(W5500_SUBNET_MASK_ADDR_3, W5500_COMMON_REGISTER), "incorrect register subnet[3]");
 
         // gatewayIP
-		local gateway = split(GATEWAY_IP, ".");
+        local gateway = split(GATEWAY_IP, ".");
         this.assertTrue(gateway[0].tointeger() == _wiz._driver.readReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER), "incorrect register gateway ip[0]");
         this.assertTrue(gateway[1].tointeger() == _wiz._driver.readReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER), "incorrect register gateway ip[1]");
         this.assertTrue(gateway[2].tointeger() == _wiz._driver.readReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER), "incorrect register gateway ip[2]");
@@ -110,25 +115,25 @@ class DeviceTestCase extends ImpTestCase {
     }
 
     // tests openConnection conditions so that it opens after the wiznet has been setup
-	// sending to an INVALID port so that it will not connect
+    // sending to an INVALID port so that it will not connect
     function testOpenConnection() {
-		// check for _isReady
+        // check for _isReady
         _wiz._isReady = false;
         try {
-			_wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT+5);
+            _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5);
         } catch (error) {
             this.assertTrue(error == "Wiznet driver not ready", "openConnection ran with an unready wiznet");
         }
         // check for too few inputs
         _wiz._isReady = true;
         try {
-			_wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT+5);
+            _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5);
         } catch (error) {
             this.assertTrue(error == W5500_INVALID_PARAMETERS, "openConnection ran with incorrect number of parameters");
         }
         // test a sucessful case
         _wiz._isReady = true;
-		_wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT+5, function(err, connection) {
+        _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5, function(err, connection) {
             server.log("connection" + connection);
         });
 
@@ -242,36 +247,36 @@ class DeviceTestCase extends ImpTestCase {
     function testTransmitOnReceive() {
         return Promise(function(resolve, reject) {
             local readyCb = function() {
-				// making sure that the callback is not called unless wiznet is ready
-				this.assertTrue(_wiz._isReady == true, "wiznet not ready when the callback began");
+                // making sure that the callback is not called unless wiznet is ready
+                this.assertTrue(_wiz._isReady == true, "wiznet not ready when the callback began");
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
-				_wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
-					if (err != null || connection == null) {
-						return reject("openConnection failed: " + err);
-					}
-					// define the callback for receiving data in the connection
-					connection.onReceive(function(err, data) {
-						// ensuring data received is what we expected
-						this.assertEqual(typeof(data), "blob", "data type was not a blob");
-						this.assertEqual(ECHO_MESSAGE, data.tostring(), "data received was not the same that was transmitted");
-						return resolve();
-					}.bindenv(this));
+                _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
+                    if (err != null || connection == null) {
+                        return reject("openConnection failed: " + err);
+                    }
+                    // define the callback for receiving data in the connection
+                    connection.onReceive(function(err, data) {
+                        // ensuring data received is what we expected
+                        this.assertEqual(typeof(data), "blob", "data type was not a blob");
+                        this.assertEqual(ECHO_MESSAGE, data.tostring(), "data received was not the same that was transmitted");
+                        return resolve();
+                    }.bindenv(this));
 
-					if (err) {
-						return reject("error");
-					}
-					try {
-						connection.transmit(ECHO_MESSAGE, function(err) {
-							if (err) {
-								server.error("Send failed, closing: " + err);
-								return reject("error");
-							}
-						}.bindenv(this));
-					} catch (error) {
-						return reject("transmission error");
-					}
-				}.bindenv(this));
-			}
+                    if (err) {
+                        return reject("error");
+                    }
+                    try {
+                        connection.transmit(ECHO_MESSAGE, function(err) {
+                            if (err) {
+                                server.error("Send failed, closing: " + err);
+                                return reject("error");
+                            }
+                        }.bindenv(this));
+                    } catch (error) {
+                        return reject("transmission error");
+                    }
+                }.bindenv(this));
+            }
 
             // Initialise Wiznet
             _wiz = W5500(_interruptPin, _spi, null, _resetPin);
@@ -284,28 +289,28 @@ class DeviceTestCase extends ImpTestCase {
     function testTransmitNull() {
         return Promise(function(resolve, reject) {
             local readyCb = function() {
-				// making sure that the callback is not called unless wiznet is ready
-				this.assertTrue(_wiz._isReady == true, "wiznet not ready when the callback began");
+                // making sure that the callback is not called unless wiznet is ready
+                this.assertTrue(_wiz._isReady == true, "wiznet not ready when the callback began");
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
-				_wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
-					if (err) {
-						return reject("openConnection failed: " + err);
-					}
-					// Send data over the connection
-					try {
-						connection.transmit(null, function(err) {
-							if (err) {
-								connection.close();
-								return reject("error transmission failed");
-							}
-						}.bindenv(this));
-					} catch (error) {
-						connection.close();
-						this.assertTrue(error == "transmit() requires a string or blob", "transmit didn't reject a null data packet");
-						resolve();
-					}
-				}.bindenv(this));
-			}
+                _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
+                    if (err) {
+                        return reject("openConnection failed: " + err);
+                    }
+                    // Send data over the connection
+                    try {
+                        connection.transmit(null, function(err) {
+                            if (err) {
+                                connection.close();
+                                return reject("error transmission failed");
+                            }
+                        }.bindenv(this));
+                    } catch (error) {
+                        connection.close();
+                        this.assertTrue(error == "transmit() requires a string or blob", "transmit didn't reject a null data packet");
+                        resolve();
+                    }
+                }.bindenv(this));
+            }
 
             // Initialise Wiznet
             _wiz = W5500(_interruptPin, _spi, null, _resetPin);
@@ -383,7 +388,7 @@ class DeviceTestCase extends ImpTestCase {
                         return reject("openConnection failed: " + err);
                     } else {
                         connection.close(function() {
-                            //open a connection once it is closed
+                            // open a connection once it is closed
                             _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                                 if (err) {
                                     return reject("openConnection failed: " + err);

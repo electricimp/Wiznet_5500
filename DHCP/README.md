@@ -12,8 +12,8 @@ Instantiates a new W5500.DHCP object and passes in the wiznet main driver.
 ```squirrel
 // Setup for an Imp 005
 // Initialise SPI port
-interruptPin <- hardware.pinXA;
-resetPin     <- hardware.pinN;
+interruptPin <- hardware.pinXC;
+resetPin     <- hardware.pinXA;
 spiSpeed     <- 1000;
 spi          <- hardware.spi0;
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
@@ -46,24 +46,27 @@ The *onLease()* method sets the function to be called when an IP address is leas
 |Renewal Timeout           		|Max Renewal attempts reached. Restart.       |
 |Renewal Failed                 |Lease renewal failed                         |
 |Request Declined               |Requested IP not able to be leased           |
-|IP Invalid                     |Offered IP is currently in use               |
+|IP in use                      |Offered IP is currently in use               |
 |All connections in use         |All Wiznet sockets are in use                |
 
 
 
 ####Example Code:
 ```squirrel
-dhcp.onLease(function leaseCallback(error) {
+dhcp.onLease(function(error) {
     if (error) return server.error(error);
-    // Run this code when IP address is obtained
 });
+dhcp.renewLease();
 ```
 
 ###renewLease()
-The *renewLease()* method renews the lease if an IP address has already been leased or obtains a new IP address if an IP has not been leased. 
+The *renewLease()* method renews the lease or requests a new lease. When this is complete the onLease() callback will be called
 
 ####Example Code:
 ```squirrel
+dhcp.onLease(function(error) {
+    // Run this code when IP address is obtained
+});
 dhcp.renewLease();
 ```
 
@@ -74,15 +77,7 @@ The *getIP()* method returns the leased IP as an array of four integers.
 ####Example Code:
 ```squirrel
 local ip = dhcp.getIP();
-```
-
-
-### getDNS()
-The *getDNS()* method returns the DNS as an array of four integers. 
-
-####Example Code:
-```squirrel
-local dns = dhcp.getDNS();
+server.log(format("ip = %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]))
 ```
 
 
@@ -91,7 +86,17 @@ The *getSubnetMask()* method returns the DNS as an array of four integers.
 
 ####Example Code:
 ```squirrel
-local subnetmask = dhcp.getSubnetMask();
+local subnet_mask = dhcp.getSubnetMask();
+server.log(format("subnet mask = %d.%d.%d.%d", subnet_mask[0], subnet_mask[1], subnet_mask[2], subnet_mask[3]))
+```
+
+
+### getRouterAddress()
+The *getRouterAddress()* method returns the gateway address as an array of four integers. 
+####Example Code:
+```squirrel
+local router = dhcp.getRouterAddress();
+server.log(format("router = %d.%d.%d.%d", router[0], router[1], router[2], router[3]))
 ```
 
 
@@ -104,12 +109,14 @@ local leasetime = dhcp.getLeaseTime();
 ```
 
 
-### getRouterAddress()
-The *getRouterAddress()* method returns the gateway address as an array of four integers. 
+### getDNS()
+The *getDNS()* method returns the DNS as an array of DNS entries, each an array of four integers. 
+
 ####Example Code:
 ```squirrel
-local router = dhcp.getRouterAddress();
+local dns = dhcp.getDNS();
 ```
+
 
 
 ## Extended Example on IMP0005
