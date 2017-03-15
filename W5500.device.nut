@@ -1920,7 +1920,7 @@ class W5500.Connection {
      **************************************************************************/
     function transmit(transmitData, cb = null) {
 
-		local _doTransmit, _transmit;
+		local _transmitNext, _transmit;
 
 		_transmit = function(transmitData, _cb = null) {
 
