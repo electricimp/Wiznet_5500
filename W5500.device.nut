@@ -256,10 +256,11 @@ class W5500 {
     // Constructor
     // Returns: null
     // Parameters:
-    //      spi - configured spi bus, chip supports spi mode 0 or 3
-    //      cs(optional) -  chip select pin, pass in if not using imp005
     //      interruptPin - inerrupt pin
-    //      reset(optional) - reset pin
+    //      spi - configured spi bus, chip supports spi mode 0 or 3
+    //      csPin(optional) -  chip select pin, pass in if not using imp005
+    //      resetPin(optional) - reset pin
+    //      autoRetry(optional) - not implemented yet.
     // ***************************************************************************
     constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false) {
 
