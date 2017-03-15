@@ -504,7 +504,7 @@ class W5500.Driver {
         if (remaining.len() == 0) {
 
             // Set the defaults
-            _availableSockets = setNumberOfAvailableSockets(4);
+            _availableSockets = setNumberOfAvailableSockets(TOTAL_SUPPORTED_SOCKETS);
 
             // Let the sockets settle down before starting anything
             imp.wakeup(1, cb);
