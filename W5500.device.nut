@@ -730,9 +730,9 @@ class W5500.Driver {
         local addr = array(4);
         // server.log((hardware.millis() - started) + ": DBG setGatewayAddr: " + pformat(addr));
         addr[0] = readReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER);
-        addr[0] = readReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER);
-        addr[0] = readReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER);
-        addr[0] = readReg(W5500_GATEWAY_ADDR_3, W5500_COMMON_REGISTER);
+        addr[1] = readReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER);
+        addr[2] = readReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER);
+        addr[3] = readReg(W5500_GATEWAY_ADDR_3, W5500_COMMON_REGISTER);
         return addr;
     }
 
