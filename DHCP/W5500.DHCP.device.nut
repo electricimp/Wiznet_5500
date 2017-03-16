@@ -722,13 +722,14 @@ class W5500.DHCP {
         local len = null;
 
         optionsData.seek(0, 'b');
-        while (optionsData.tell() < optionsData.len()) {
+        while (!optionsData.eos()) {
             // Get Option Type        
             opt = optionsData.readn('b');
 
             if (opt != W5500_DHCP_OPTIONS.endOption) {
 
                 // Get Length
+                if (optionsData.eos()) break;
                 len = optionsData.readn('b');
 
                 // Read Value
