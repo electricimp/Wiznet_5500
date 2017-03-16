@@ -21,7 +21,7 @@ var echo = function(socket) {
    */
   socket.on('data', function(data) {
     // data is a Buffer object
-    console.log("Data:", data);
+    console.log("Data:", data.toString().trim());
   });
 
   socket.on('end', log('socket', 'end'));
