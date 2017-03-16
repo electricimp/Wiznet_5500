@@ -304,17 +304,12 @@ class W5500.DHCP {
     // ***************************************************************************
     function getDNS() {
         if (_leasedDNS) {
-            if (typeof _leasedDNS == "blob") {
-                // Return an array of one item
-                return [_blobtoAddrStr(_leasedDNS)];
-            } else if (typeof _leasedDNS == "array") {
-                // Return an array of all items
-                local dns = array();
-                foreach (dnsi, dnse in _leasedDNS) {
-                    dns.push(_blobtoAddrStr(dnse));
-                }
-                return dns;
+            local dns = array();
+            _leasedDNS.seek(0);
+            while (!_leasedDNS.eos()) {
+                dns.push(_blobtoAddrStr(_leasedDNS.readblob(4)));
             }
+            return dns;
         }
     }
 
@@ -695,18 +690,7 @@ class W5500.DHCP {
                 // Read Value
                 local value = blob(len);
                 if (len > 0) value = optionsData.readblob(len);
-
-                if (opt == W5500_DHCP_OPTIONS.dns) {
-                    // Allow the extraction of multiple DNS entries
-                    options[opt] <- array();
-                    for (local i = 0; i < value.len(); i += 4) {
-                        value.seek(i);
-                        options[opt].push(value.readblob(4));
-                    }
-                } else {
-                    // Lone option, set it directly
-                    options[opt] <- value;
-                }
+                options[opt] <- value;
 
             }
 
