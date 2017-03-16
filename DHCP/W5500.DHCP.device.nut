@@ -533,9 +533,9 @@ class W5500.DHCP {
                 case W5500_DHCP_MSG_ACK:
                     // Grab Connection Settings
                     _leasedIP = _offeredIP;
-                    _leasedSubnetMask = options[W5500_DHCP_OPTIONS.subnetMask];
-                    _leasedRouterAddress = options[W5500_DHCP_OPTIONS.routersOnSubnet];
-                    _leasedDNS = options[W5500_DHCP_OPTIONS.dns];
+                    _leasedSubnetMask = (W5500_DHCP_OPTIONS.subnetMask in options) ? options[W5500_DHCP_OPTIONS.subnetMask] : null;
+                    _leasedRouterAddress = (W5500_DHCP_OPTIONS.routersOnSubnet in options) ? options[W5500_DHCP_OPTIONS.routersOnSubnet] : null;
+                    _leasedDNS = (W5500_DHCP_OPTIONS.dns in options) ? options[W5500_DHCP_OPTIONS.dns] : null;
 
                     // Give 60 second margin on DHCP lease  
                     _leaseTime = _parseLeaseTime(options[W5500_DHCP_OPTIONS.dhcpIPaddrLeaseTime]) - W5500_DHCP_LEASEOFFSET;
