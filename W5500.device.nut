@@ -2137,16 +2137,16 @@ class W5500.Connection {
             local tx_length = transmitData.len();
             local chunks = [];
 
-            if ((tx_length * 8) > txBufferSize) {
+            if (tx_length > txBufferSize) {
                 local startPointer = 0;
-                local endPointer = txBufferSize / 8;
+                local endPointer = txBufferSize;
 
                 // Loop over data and create chunks
                 while (endPointer < tx_length) {
 
                     chunks.push(transmitData.slice(startPointer, endPointer));
                     startPointer = endPointer;
-                    endPointer += (txBufferSize / 8);
+                    endPointer += txBufferSize;
 
                 }
 

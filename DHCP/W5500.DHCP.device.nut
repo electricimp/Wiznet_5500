@@ -342,9 +342,6 @@ class W5500.DHCP {
     // ***************************************************************************
     function _renewLease() {
 
-        // HACK: Prevent the DHCP packets being split
-        _driver._availableSockets = _driver.setNumberOfAvailableSockets(4);
-
         // Setup the global timeout
         if (!_timeoutTimer && _timeout > 0) {
             _timeoutTimer = imp.wakeup(_timeout, _cancelRenewLease.bindenv(this));
