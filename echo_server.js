@@ -9,7 +9,7 @@ var net = require('net');
 var log = function(who, what) {
   return function() {
     var args = Array.prototype.slice.call(arguments);
-    console.log('[%s on %s]', who, what, args);
+    // console.log('[%s on %s]', who, what, args);
   };
 };
 
@@ -19,26 +19,17 @@ var echo = function(socket) {
    *  events: end, data, end, timeout, drain, error, close
    *  methods:
    */
-  socket.on('end', function() {
-    // exec'd when socket other end of connection sends FIN packet
-    console.log('[socket on end]');
-  });
   socket.on('data', function(data) {
     // data is a Buffer object
-    console.log('[socket on data]', data);
-  });
-  socket.on('end', function() {
-    // emitted when the other end sends a FIN packet
+    console.log("Data:", data);
   });
 
+  socket.on('end', log('socket', 'end'));
   socket.on('timeout', log('socket', 'timeout'));
-
-  socket.on('drain', function() {
-    // emitted when the write buffer becomes empty
-    console.log('[socket on drain]');
-  });
+  socket.on('drain', log('socket', 'drain'));
   socket.on('error', log('socket', 'error'));
   socket.on('close', log('socket', 'close'));
+
   socket.pipe(socket);
 };
 
@@ -53,20 +44,25 @@ server.listen({ host: "0.0.0.0", port: PORT });
 server.on('listening', function() {
   var ad = server.address();
   if (typeof ad === 'string') {
-    console.log('[server on listening] %s', ad);
+    console.log('Listening: %s', ad);
   } else {
-    console.log('[server on listening] %s:%s using %s', ad.address, ad.port, ad.family);
+    console.log('Listening on %s:%s using %s', ad.address, ad.port, ad.family);
   }
 });
 
 server.on('connection', function(socket) {
   server.getConnections(function(err, count) {
-    console.log('%d open connections!', count);
+    console.log('Open: %d', count);
   });
 });
 
-server.on('close', function() { console.log('[server on close]'); });
-server.on('err', function(err) { 
+server.on('close', function(socket) {
+  server.getConnections(function(err, count) {
+    console.log('Close: %d', count);
+  });
+});
+
+server.on('error', function(err) { 
   console.log(err);
   server.close(function() { console.log("shutting down the server!"); });
 });
