@@ -82,7 +82,7 @@ class W5500_DHCP_TestCase extends ImpTestCase {
                 local subnet_mask = dhcp.getSubnetMask();
                 local router = dhcp.getRouterAddress();
                 local log = format("%s / %s via %s", source_ip, subnet_mask, router);
-                // server.log("Lease obtained: " + log);
+                server.log("Lease obtained: " + log);
 
                 wiz.configureNetworkSettings(source_ip, subnet_mask, router);
                 wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {

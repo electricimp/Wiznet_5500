@@ -4,12 +4,9 @@
 
 
 // DHCP SETTINGS
-const W5500_DHCP_SEND_PORT = 68
-const W5500_DHCP_DEST_PORT = 67
 const W5500_DHCP_DEST_IP = "255.255.255.255"
-const W5500_DHCP_SEND_IP = "0.0.0.0"
-const W5500_DHCP_SUBNET_MASK = "255.255.255.0"
-const W5500_DHCP_ROUTER = "0.0.0.0"
+const W5500_DHCP_DEST_PORT = 67
+const W5500_DHCP_SRC_PORT = 68
 
 // DHCP MESSAGE OP ODE 
 const W5500_DHCP_BOOTREQUEST = 01; // /< Request Message used in op of @ref RIP_MSG
@@ -203,9 +200,6 @@ class W5500.DHCP {
     // Contain Parsed Info
     _offeredIP = null;
 
-    // Cached network info
-    _cache = null;
-
     // Returned Info
     _leasedIP = null;
     _leasedSubnetMask = null;
@@ -240,7 +234,6 @@ class W5500.DHCP {
         _state = W5500_DHCP_STATE_DISCONNECTED;
         _packetRecipe = W5500_DHCP_STRUCT;
         _nextLoopTime = W5500_DHCP_RESEND;
-        _cache = {};
     }
 
     // Public Functions 
@@ -352,13 +345,10 @@ class W5500.DHCP {
         _renewTimer = null;
 
         // Setup the network for DHCP (UDP)
-        _storeNetworkSettings();
-        _wiz.configureNetworkSettings(W5500_DHCP_SEND_IP, W5500_DHCP_SUBNET_MASK, W5500_DHCP_ROUTER);
-        _driver.openConnection(W5500_DHCP_DEST_IP, W5500_DHCP_DEST_PORT, W5500_SOCKET_MODE_UDP, W5500_DHCP_SEND_PORT, function(err, connection) {
+        _driver.openConnection(W5500_DHCP_DEST_IP, W5500_DHCP_DEST_PORT, W5500_SOCKET_MODE_UDP, W5500_DHCP_SRC_PORT, function(err, connection) {
 
             if (err) {
                 // Couldn't spare a socket for a DHCP request
-                server.error("*** DHCP lease renewal failed (retry): " + err.tostring());
                 if (_renewTimer) imp.cancelwakeup(_renewTimer);
                 _renewTimer = imp.wakeup(10, _renewLease.bindenv(this));
             } else {
@@ -384,9 +374,6 @@ class W5500.DHCP {
         _connection = null;
         _isRenewing = false;
         _state = W5500_DHCP_STATE_DISCONNECTED;
-
-        // Restore Network Settings
-        _restoreNetworkSettings();
 
         // Stop the DHCP loop / state machine altogether
         if (_runLoopTimer) {
@@ -541,13 +528,10 @@ class W5500.DHCP {
                     _leaseTime = _parseLeaseTime(options[W5500_DHCP_OPTIONS.dhcpIPaddrLeaseTime]) - W5500_DHCP_LEASEOFFSET;
 
                     // Close the DHCP connection
-                    _connection.close();
+                    if (_connection) _connection.close();
                     _connection = null;
                     _isRenewing = false;
                     _isLeased = true;
-
-                    // Restore Network Settings
-                    _restoreNetworkSettings();
 
                     // Stop the DHCP loop / state machine altogether
                     if (_runLoopTimer) {
@@ -662,27 +646,6 @@ class W5500.DHCP {
         updatedXID.writen(_dhcpXID++, 'i');
         _packetRecipe[4].v = updatedXID;
         _headerPacket = _initializePacket();
-    }
-
-    // ***************************************************************************
-    // _storeNetworkSettings
-    // Returns: none
-    // Parameters:  none                 
-    // ***************************************************************************
-    function _storeNetworkSettings() {
-        _cache = { ip = _driver.getSourceIP(), subnetMask = _driver.getSubnetMask(), router = _driver.getGatewayAddr() };
-    }
-
-    // ***************************************************************************
-    // _restoreNetworkSettings
-    // Returns: none
-    // Parameters:  none                 
-    // ***************************************************************************
-    function _restoreNetworkSettings() {
-        _cache = { ip = _driver.getSourceIP(), subnetMask = _driver.getSubnetMask(), router = _driver.getGatewayAddr() };
-        if ("ip" in _cache) {
-            _wiz.configureNetworkSettings(_cache.ip, _cache.subnetMask, _cache.router);
-        }
     }
 
 

@@ -275,6 +275,9 @@ class W5500 {
             _driver.clearSocketInterrupts();
             _interruptPin = interruptPin.configure(DIGITAL_IN_PULLUP, _interruptHandler.bindenv(this));
 
+            // Set the default mac address
+            _driver.setSourceHWAddr(imp.getmacaddress(), true);
+
             // Let the caller know the device is ready
             _isReady = true;
             if (_readyCb != null) imp.wakeup(0, _readyCb);
