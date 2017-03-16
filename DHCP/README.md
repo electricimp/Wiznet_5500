@@ -1,4 +1,4 @@
-#W5500.DHCP
+# Wiznet 5500 DHCP
 
 This library class enables Dynamic Host Configuration Protocol (*DHCP*) functionality for the Wiznet W5500 chip [W5500](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It also requires the Wiznet W5500 driver.  
 **To add this code to your project, add `#require W5500.DHCP.device.nut:1.0.0` after `#require W5500.device.nut:1.0.0` to the top of your device code.**
@@ -8,7 +8,7 @@ This library class enables Dynamic Host Configuration Protocol (*DHCP*) function
 ### Constructor: W5500.DHCP(*wiz*)
 Instantiates a new W5500.DHCP object and passes in the wiznet main driver.
 
-##### Example Code:
+#### Example Code:
 ```squirrel
 // Setup for an Imp 005
 // Initialise SPI port
@@ -51,7 +51,7 @@ The *onLease()* method sets the function to be called when an IP address is leas
 
 
 
-####Example Code:
+#### Example Code:
 ```squirrel
 dhcp.onLease(function(error) {
     if (error) return server.error(error);
@@ -59,10 +59,10 @@ dhcp.onLease(function(error) {
 dhcp.renewLease();
 ```
 
-###renewLease()
+### renewLease()
 The *renewLease()* method renews the lease or requests a new lease. When this is complete the onLease() callback will be called
 
-####Example Code:
+#### Example Code:
 ```squirrel
 dhcp.onLease(function(error) {
     // Run this code when IP address is obtained
@@ -74,7 +74,7 @@ dhcp.renewLease();
 ### getIP()
 The *getIP()* method returns the leased IP as an array of four integers. 
 
-####Example Code:
+#### Example Code:
 ```squirrel
 local ip = dhcp.getIP();
 server.log(format("ip = %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]))
@@ -84,7 +84,7 @@ server.log(format("ip = %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]))
 ### getSubnetMask()
 The *getSubnetMask()* method returns the DNS as an array of four integers. 
 
-####Example Code:
+#### Example Code:
 ```squirrel
 local subnet_mask = dhcp.getSubnetMask();
 server.log(format("subnet mask = %d.%d.%d.%d", subnet_mask[0], subnet_mask[1], subnet_mask[2], subnet_mask[3]))
@@ -93,7 +93,8 @@ server.log(format("subnet mask = %d.%d.%d.%d", subnet_mask[0], subnet_mask[1], s
 
 ### getRouterAddress()
 The *getRouterAddress()* method returns the gateway address as an array of four integers. 
-####Example Code:
+
+#### Example Code:
 ```squirrel
 local router = dhcp.getRouterAddress();
 server.log(format("router = %d.%d.%d.%d", router[0], router[1], router[2], router[3]))
@@ -103,7 +104,7 @@ server.log(format("router = %d.%d.%d.%d", router[0], router[1], router[2], route
 ### getLeaseTime()
 The *getIP()* method returns the lease duration as an integer. 
 
-####Example Code:
+#### Example Code:
 ```squirrel
 local leasetime = dhcp.getLeaseTime();
 ```
@@ -112,7 +113,7 @@ local leasetime = dhcp.getLeaseTime();
 ### getDNS()
 The *getDNS()* method returns the DNS as an array of DNS entries, each an array of four integers. 
 
-####Example Code:
+#### Example Code:
 ```squirrel
 local dns = dhcp.getDNS();
 ```
