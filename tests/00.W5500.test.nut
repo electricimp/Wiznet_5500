@@ -8,8 +8,8 @@
 const SOURCE_IP = "192.168.201.254";
 const SUBNET_MASK = "255.255.255.0";
 const GATEWAY_IP = "192.168.201.1";
-const ECHO_SERVER_IP = "173.255.197.142";
-const ECHO_SERVER_PORT = 17294;
+const ECHO_SERVER_IP = "192.168.201.63";
+const ECHO_SERVER_PORT = 60000;
 const ECHO_MESSAGE = "Hello, world!";
 
 class W5500_TestCase extends ImpTestCase {
@@ -117,26 +117,32 @@ class W5500_TestCase extends ImpTestCase {
     // tests openConnection conditions so that it opens after the wiznet has been setup
     // sending to an INVALID port so that it will not connect
     function testOpenConnection() {
-        // check for _isReady
-        _wiz._isReady = false;
-        try {
-            _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5);
-        } catch (error) {
-            this.assertTrue(error == "Wiznet driver not ready", "openConnection ran with an unready wiznet");
-        }
-        // check for too few inputs
-        _wiz._isReady = true;
-        try {
-            _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5);
-        } catch (error) {
-            this.assertTrue(error == W5500_INVALID_PARAMETERS, "openConnection ran with incorrect number of parameters");
-        }
-        // test a sucessful case
-        _wiz._isReady = true;
-        _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5, function(err, connection) {
-            server.log("connection" + connection);
-        });
-
+        return Promise(function(resolve, reject) {
+            // check for _isReady
+            _wiz._isReady = false;
+            try {
+                _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5);
+            } catch (error) {
+                if (error != "Wiznet driver not ready") {
+                    reject("openConnection ran with an unready wiznet");
+                }
+            }
+            // check for too few inputs
+            _wiz._isReady = true;
+            try {
+                _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5);
+            } catch (error) {
+                if (error != W5500_INVALID_PARAMETERS) {
+                    reject("openConnection ran with incorrect number of parameters");
+                }
+            }
+            // test a sucessful case
+            _wiz._isReady = true;
+            _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT + 5, function(error, connection) {
+                if (connection == null) resolve();
+                else                    reject();
+            }.bindenv(this));
+        }.bindenv(this));
 
     }
 
@@ -215,9 +221,7 @@ class W5500_TestCase extends ImpTestCase {
                 this.assertTrue(_wiz._isReady == true, "wiznet not ready when the callback began");
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
-                    if (err) {
-                        return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
-                    }
+                    if (err) return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     try {
                         connection.transmit(ECHO_MESSAGE, function(err) {
                             if (err) return reject("Error transmitting: " + err);
@@ -374,7 +378,7 @@ class W5500_TestCase extends ImpTestCase {
             local readyCb = function() {
                 // set so there is only a single socket
                 _wiz._driver._availableSockets = _wiz._driver.setNumberOfAvailableSockets(1);
-                server.log("last available socket " + _wiz._driver._availableSockets[0]);
+                // server.log("last available socket " + _wiz._driver._availableSockets[0]);
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {

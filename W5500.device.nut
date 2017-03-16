@@ -214,6 +214,7 @@ const W5500_TIMEOUT_INT_TYPE = 0x08;
 const W5500_DATA_RECEIVED_INT_TYPE = 0x04;
 const W5500_DISCONNECTED_INT_TYPE = 0x02;
 const W5500_CONNECTED_INT_TYPE = 0x01;
+const W5500_ALL_INT_TYPES = 0x1F;
 
 // Socket states
 enum W5500_SOCKET_STATES {
@@ -296,7 +297,7 @@ class W5500 {
                 cb();
             }.bindenv(this);
         }
-        if (_isReady) _cb();
+        if (_isReady) imp.wakeup(0, _cb);
         else _readyCb = _cb;
         return this;
     }
@@ -356,6 +357,17 @@ class W5500 {
     }
 
     // ***************************************************************************
+    // getNumSockets - 
+    // Returns: returns the number of unused sockets
+    // Parameters:
+    //      none
+    // **************************************************************************
+    function getNumSockets() {
+        return _driver._noOfSockets - _driver._connections.len();
+    }
+
+
+    // ***************************************************************************
     // reset, note this is blocking for 0.2s
     // Returns: this
     // Parameters:
@@ -377,12 +389,7 @@ class W5500 {
     // Parameters: none
     // ***************************************************************************
     function _interruptHandler() {
-        // Handle the main interrupt
-        local interrupt = _driver.getInterruptStatus();
-        if (interrupt.CONFLICT) _handleConflictInt();
-
-        // Handle the socket interrupts
-        _driver.socketInterruptHandler();
+        _driver.handleInterrupt();
     }
 
     // ***************************************************************************
@@ -392,7 +399,9 @@ class W5500 {
     // ***************************************************************************
     function _handleConflictInt() {
         _driver.clearInterrupt(W5500_CONFLICT_INT_TYPE);
-        server.error("Conflict interrupt occured. Please check IP source and destination addresses");
+        // NOTE: I see this interrupt every time another device on the network requests a DHCP packet.
+        //       I suspect it is not a conflict interrupt.
+        // server.error("Conflict interrupt occured. Please check IP source and destination addresses");
     }
 
 }
@@ -535,14 +544,14 @@ class W5500.Driver {
     //      destIP - the ip address of the destination
     //      destPort - the port of the destination 
     //      mode - TCP or UDP
-    //      sendPort(optional) - the port to send from
+    //      sourcePort(optional) - the port to send from
     //      cb - function to be called when connection successfully established 
     // ****************************************************************************
-    function openConnection(destIP, destPort, mode, sendPort = null, cb = null) {
+    function openConnection(destIP, destPort, mode, sourcePort = null, cb = null) {
 
-        if (typeof sendPort == "function") {
-            cb = sendPort;
-            sendPort = null;
+        if (typeof sourcePort == "function") {
+            cb = sourcePort;
+            sourcePort = null;
         }
 
         // check for required parameters
@@ -553,9 +562,9 @@ class W5500.Driver {
 
         local socket = _availableSockets.pop();
         _connections[socket] <- W5500.Connection(this, socket, destIP, destPort, mode);
-
-        if (typeof sendPort == "integer") _connections[socket].setSourcePort(sendPort);
-
+        if (typeof sourcePort == "integer") {
+            _connections[socket].setSourcePort(sourcePort);
+        }
         _connections[socket].open(cb);
 
     }
@@ -1139,7 +1148,7 @@ class W5500.Driver {
     }
 
     // ***************************************************************************
-    // setNumSockets - configures interrupts and memory for each connection
+    // setNumberOfAvailableSockets - configures interrupts and memory for each connection
     // Returns: number of actual connections configured
     // Parameters:
     //      numSockets - number of desired connections
@@ -1278,7 +1287,7 @@ class W5500.Driver {
     //              or-ed together, if type not passed in all type interrupts
     //              will be cleared.
     // **************************************************************************
-    function setSocketInterrupt(socketInt, type = 0x1F) {
+    function setSocketInterrupt(socketInt, type = W5500_ALL_INT_TYPES) {
         writeReg(W5500_SOCKET_INTERRUPT_MASK, W5500_COMMON_REGISTER, socketInt);
         // default enables all socket interrupt types
         writeReg(W5500_SOCKET_N_INTERRUPT_MASK, W5500_COMMON_REGISTER, type);
@@ -1293,7 +1302,7 @@ class W5500.Driver {
     //      type(optional) - clear specified interrupt type
     //                       if nothing passed in clears all interrupts
     // **************************************************************************
-    function clearSocketInterrupt(socket, type = 0x1F) {
+    function clearSocketInterrupt(socket, type = W5500_ALL_INT_TYPES) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         writeReg(W5500_SOCKET_N_INTERRUPT, bsb, type);
         return this;
@@ -1311,42 +1320,49 @@ class W5500.Driver {
         }
     }
 
+
     // ***************************************************************************
-    // getInterruptStatus
+    // handleInterrupt
     // Returns: interrupt status table
     // Parameters: none
     // **************************************************************************
-    function getInterruptStatus() {
-        local status = readReg(W5500_INTERRUPT, W5500_COMMON_REGISTER);
-        local intStatus = {
-            "CONFLICT": status & W5500_CONFLICT_INT_TYPE ? true : false,
-            "UNREACH": status & W5500_UNREACH_INT_TYPE ? true : false,
-            "PPPoE": status & W5500_PPPoE_INT_TYPE ? true : false,
-            "MAGIC_PACKET": status & W5500_MAGIC_PACKET_TYPE ? true : false,
-            "REGISTER_VALUE": status
-        };
-        return intStatus;
-    }
+    function handleInterrupt() {
 
-    // ***************************************************************************
-    // socketInterruptHandler
-    // Returns: processes a socket interrupt
-    // Parameters: none
-    // **************************************************************************
-    function socketInterruptHandler() {
-        local status = readReg(W5500_SOCKET_INTERRUPT, W5500_COMMON_REGISTER);
-        local intStatus = array(8, false);
-        // Split the byte into bits
-        for (local i = 0; i < 8; ++i) {
-            if (status & (0x01 << i)) {
-                if (i < _connections.len()) {
-                    _connections[i].interruptHandler();
-                } else {
-                    // This connection has already been closed
-                }
+        // Handle the main interrupt
+        local status1 = readReg(W5500_INTERRUPT, W5500_COMMON_REGISTER);
+        local interrupt = {
+            "CONFLICT": status1 & W5500_CONFLICT_INT_TYPE ? true : false,
+            "UNREACH": status1 & W5500_UNREACH_INT_TYPE ? true : false,
+            "PPPoE": status1 & W5500_PPPoE_INT_TYPE ? true : false,
+            "MAGIC_PACKET": status1 & W5500_MAGIC_PACKET_TYPE ? true : false,
+            "REGISTER_VALUE": status1
+        };
+
+        if (interrupt.UNREACH) {
+            // server.error("UNREACH");
+        }
+        if (interrupt.CONFLICT) {
+            // server.error("CONFLICT");
+            // _handleConflictInt();
+        }
+
+        // Handle the socket interrupt
+        local status2 = readReg(W5500_SOCKET_INTERRUPT, W5500_COMMON_REGISTER);
+        if (status1 == 0x00 && status2 == 0x00) return; // server.error("BOTH INTERRUPTS EMPTY");
+
+        // Work out which socket(s) is/are interrupting
+        for (local socket_n = 0; socket_n < 8; ++socket_n) {
+            // Is this socket number flagged?
+            if ((status2 & (0x01 << socket_n)) == 0x00) continue;
+            // Now find the socket in our connection table
+            if (socket_n in _connections) {
+                // server.log(format("INTERRUPT ON SOCKET %d", socket_n));
+                _connections[socket_n].handleInterrupt();                
             }
         }
+
     }
+
 
     // ***************************************************************************
     // getSocketInterruptTypeStatus
@@ -1779,32 +1795,45 @@ class W5500.Connection {
     // **************************************************************************
     function open(cb = null) {
 
-        // Open socket connection
+        // server.log(format("Opening socket %d which is in status 0x%02X and interrupt 0x%02X",
+        //     _socket,
+        //     _driver.getSocketStatus(_socket),
+        //     _driver.getSocketInterruptTypeStatus(_socket).REGISTER_VALUE
+        // ));
+
+        // Close the socket if it is still open
+        while (_driver.getSocketStatus(_socket) != W5500_SOCKET_STATUS_CLOSED) {
+            // NOTE: Worth putting a time limit on this loop
+            _driver.sendSocketCommand(_socket, W5500_SOCKET_CLOSE);
+            imp.sleep(0.1);
+        }
+
+        // Clear out any stagnant interrupts
+        _driver.clearSocketInterrupt(_socket);
+
+        // Set the socket mode
         _driver.setSocketMode(_socket, _mode);
 
+        // Set the source port
         if (_sourcePort == null) {
-            local sourcePort = _returnRandomPort(1024, 65535); // creates a random port between 1024-65535
-            _driver.setSourcePort(_socket, sourcePort);
+            // create a random port between 1024-65535
+            _driver.setSourcePort(_socket, _returnRandomPort(1024, 65535));
         } else {
             _driver.setSourcePort(_socket, _sourcePort);
         }
 
+        // Open the socket and setup the connection
         _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
-        _state = W5500_SOCKET_STATES.INIT;
-
-        // Setup the connection
         _driver.setDestIP(_socket, _ip);
         _driver.setDestPort(_socket, _port);
         _driver.sendSocketCommand(_socket, W5500_SOCKET_CONNECT);
-        _state = W5500_SOCKET_STATES.CONNECTING;
 
-        if (cb) {
-            if (_mode == W5500_SOCKET_MODE_UDP) {
-                _state = W5500_SOCKET_STATES.ESTABLISHED
-                cb(null, this);
-            } else {
-                onConnect(cb);
-            }
+        if (_mode == W5500_SOCKET_MODE_UDP) {
+            _state = W5500_SOCKET_STATES.ESTABLISHED
+            if (cb) cb(null, this);
+        } else {
+            _state = W5500_SOCKET_STATES.CONNECTING;
+            if (cb) onConnect(cb);
         }
 
         return this;
@@ -1948,7 +1977,7 @@ class W5500.Connection {
     // Returns: null
     // Parameters: socket the interrupt occurred on
     // **************************************************************************
-    function interruptHandler() {
+    function handleInterrupt() {
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
         if (status.CONNECTED) {
@@ -2059,6 +2088,8 @@ class W5500.Connection {
             onDisconnect(null);
 
         }
+
+        return status;
 
     }
 
@@ -2233,7 +2264,7 @@ class W5500.Connection {
                     callback(err, data);
                 }.bindenv(this));
             } else if (err) {
-                server.error(err);
+                // server.error(err);
             }
         }
 

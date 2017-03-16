@@ -16,14 +16,37 @@ const W5500_DHCP_BOOTREQUEST = 01; // /< Request Message used in op of @ref RIP_
 const W5500_DHCP_BOOTREPLY = 02; // /< Reply Message used i op of @ref RIP_MSG
 
 // DHCP MESSAGE TYPE
-const W5500_DHCP_DISCOVER = 1; // /< DISCOVER message in OPT of @ref RIP_MSG
-const W5500_DHCP_OFFER = 2; // /< OFFER message in OPT of @ref RIP_MSG
-const W5500_DHCP_REQUEST = 3; // /< REQUEST message in OPT of @ref RIP_MSG
-const W5500_DHCP_DECLINE = 4; // /< DECLINE message in OPT of @ref RIP_MSG
-const W5500_DHCP_ACK = 5; // /< ACK message in OPT of @ref RIP_MSG
-const W5500_DHCP_NAK = 6; // /< NACK message in OPT of @ref RIP_MSG
-const W5500_DHCP_RELEASE = 7; // /< RELEASE message in OPT of @ref RIP_MSG. No use
-const W5500_DHCP_INFORM = 8; // /< INFORM message in OPT of @ref RIP_MSG. No use
+const W5500_DHCP_MSG_DISCOVER = 1; // /< DISCOVER message in OPT of @ref RIP_MSG
+const W5500_DHCP_MSG_OFFER = 2; // /< OFFER message in OPT of @ref RIP_MSG
+const W5500_DHCP_MSG_REQUEST = 3; // /< REQUEST message in OPT of @ref RIP_MSG
+const W5500_DHCP_MSG_DECLINE = 4; // /< DECLINE message in OPT of @ref RIP_MSG
+const W5500_DHCP_MSG_ACK = 5; // /< ACK message in OPT of @ref RIP_MSG
+const W5500_DHCP_MSG_NAK = 6; // /< NACK message in OPT of @ref RIP_MSG
+const W5500_DHCP_MSG_RELEASE = 7; // /< RELEASE message in OPT of @ref RIP_MSG. No use
+const W5500_DHCP_MSG_INFORM = 8; // /< INFORM message in OPT of @ref RIP_MSG. No use
+
+function msgtypeToString(msgtype) {
+    switch (msgtype) {
+        case W5500_DHCP_MSG_DISCOVER:
+            return "W5500_DHCP_MSG_DISCOVER";
+        case W5500_DHCP_MSG_OFFER:
+            return "W5500_DHCP_MSG_OFFER";
+        case W5500_DHCP_MSG_REQUEST:
+            return "W5500_DHCP_MSG_REQUEST";
+        case W5500_DHCP_MSG_DECLINE:
+            return "W5500_DHCP_MSG_DECLINE";
+        case W5500_DHCP_MSG_ACK:
+            return "W5500_DHCP_MSG_ACK";
+        case W5500_DHCP_MSG_NAK:
+            return "W5500_DHCP_MSG_NAK";
+        case W5500_DHCP_MSG_RELEASE:
+            return "W5500_DHCP_MSG_RELEASE";
+        case W5500_DHCP_MSG_INFORM:
+            return "W5500_DHCP_MSG_INFORM";
+        default:
+            return "W5500_DHCP_MSG_UNKNOWN";
+    }
+}
 
 const W5500_DHCP_MSGTYPE_LEN = 1;
 const W5500_DHCP_MAGIC_COOKIE = "\x63\x82\x53\x63";
@@ -38,28 +61,34 @@ const W5500_DHCP_SECS = 00; // /< Used in secs of @ref RIP_MSG
 const W5500_DHCP_OPT_SIZE = 212;
 
 // DHCP State Machine
-const W5500_DHCP_DISCONNECTED = 0x00;
-const W5500_DHCP_INITIALIZE = 0x01;
-const W5500_DHCP_SENDING_DISCOVERY = 0x02;
-const W5500_DHCP_OFFER_RECEIVED = 0x03;
-const W5500_DHCP_SENDING_DECLINE = 0x04;
-const W5500_DHCP_SENDING_REQUEST = 0x05;
-const W5500_DHCP_LEASE_RECEIVED = 0x06;
-const W5500_DHCP_RENEWING = 0x07;
+const W5500_DHCP_STATE_DISCONNECTED = 0x00;
+const W5500_DHCP_STATE_INITIALIZE = 0x01;
+const W5500_DHCP_STATE_SENDING_DISCOVERY = 0x02;
+const W5500_DHCP_STATE_OFFER_RECEIVED = 0x03;
+const W5500_DHCP_STATE_SENDING_DECLINE = 0x04;
+const W5500_DHCP_STATE_SENDING_REQUEST = 0x05;
+const W5500_DHCP_STATE_LEASE_RECEIVED = 0x06;
 
-// function stateToString(state) {
-//     switch (state) {
-//         case W5500_DHCP_DISCONNECTED:      return "W5500_DHCP_DISCONNECTED";
-//         case W5500_DHCP_INITIALIZE:        return "W5500_DHCP_INITIALIZE";
-//         case W5500_DHCP_SENDING_DISCOVERY: return "W5500_DHCP_SENDING_DISCOVERY";
-//         case W5500_DHCP_OFFER_RECEIVED:    return "W5500_DHCP_OFFER_RECEIVED";
-//         case W5500_DHCP_SENDING_DECLINE:   return "W5500_DHCP_SENDING_DECLINE";
-//         case W5500_DHCP_SENDING_REQUEST:   return "W5500_DHCP_SENDING_REQUEST";
-//         case W5500_DHCP_LEASE_RECEIVED:    return "W5500_DHCP_LEASE_RECEIVED";
-//         case W5500_DHCP_RENEWING:          return "W5500_DHCP_RENEWING";
-//         default:                           return "W5500_DHCP_UNKNOWN";
-//     }
-// }
+function stateToString(state) {
+    switch (state) {
+        case W5500_DHCP_STATE_DISCONNECTED:
+            return "W5500_DHCP_STATE_DISCONNECTED";
+        case W5500_DHCP_STATE_INITIALIZE:
+            return "W5500_DHCP_STATE_INITIALIZE";
+        case W5500_DHCP_STATE_SENDING_DISCOVERY:
+            return "W5500_DHCP_STATE_SENDING_DISCOVERY";
+        case W5500_DHCP_STATE_OFFER_RECEIVED:
+            return "W5500_DHCP_STATE_OFFER_RECEIVED";
+        case W5500_DHCP_STATE_SENDING_DECLINE:
+            return "W5500_DHCP_STATE_SENDING_DECLINE";
+        case W5500_DHCP_STATE_SENDING_REQUEST:
+            return "W5500_DHCP_STATE_SENDING_REQUEST";
+        case W5500_DHCP_STATE_LEASE_RECEIVED:
+            return "W5500_DHCP_STATE_LEASE_RECEIVED";
+        default:
+            return "W5500_DHCP_STATE_UNKNOWN";
+    }
+}
 
 // Time Constants
 const W5500_DHCP_RESEND = 5;
@@ -146,43 +175,47 @@ class W5500.DHCP {
 
     _driver = null;
     _wiz = null;
+    _timeout = 0;
     _connection = null;
 
-    _DHCPinit = false;
     _state = null;
-    _dhcpXID = null;
     _isLeased = false;
     _isRenewing = false;
+    _nextLoopTime = null;
+    _resendCount = 0;
+
+    // Timers
+    _runLoopTimer = null;
+    _renewTimer = null;
+    _timeoutTimer = null;
+
+    // Callbacks
     _leasedCb = null;
     _timeoutCb = null;
     _errorCb = null;
-    _resendTime = null;
-    _resendCount = 0;
-    _runLoopTimer = null;
-    _mac = null;
 
     // Data Packaging
     _headerPacket = null;
     _packetRecipe = null;
+    _serverID = null;
+    _dhcpXID = null;
 
     // Contain Parsed Info
     _offeredIP = null;
 
-    // Cached info
-    _cachedSendIP = null;
-    _cachedSubnet = null;
-    _cachedRouter = null;
+    // Cached network info
+    _cache = null;
 
     // Returned Info
     _leasedIP = null;
-    _serverID = null;
     _leasedSubnetMask = null;
-    _routerAddress = null;
+    _leasedRouterAddress = null;
     _leasedDNS = null;
     _leaseTime = null;
 
     // Packet Format
-    W5500_DHCP_STRUCT = [{ "k": "op", "s": 1, "v": W5500_DHCP_BOOTREQUEST },
+    W5500_DHCP_STRUCT = [
+        { "k": "op", "s": 1, "v": W5500_DHCP_BOOTREQUEST },
         { "k": "htype", "s": 1, "v": W5500_DHCP_HTYPE10MB },
         { "k": "hlen", "s": 1, "v": W5500_DHCP_HLENETHERNET },
         { "k": "hops", "s": 1, "v": W5500_DHCP_HOPS },
@@ -204,9 +237,10 @@ class W5500.DHCP {
     constructor(wiz) {
         _wiz = wiz;
         _driver = wiz._driver;
-        _state = W5500_DHCP_DISCONNECTED;
+        _state = W5500_DHCP_STATE_DISCONNECTED;
         _packetRecipe = W5500_DHCP_STRUCT;
-        _resendTime = W5500_DHCP_RESEND;
+        _nextLoopTime = W5500_DHCP_RESEND;
+        _cache = {};
     }
 
     // Public Functions 
@@ -215,45 +249,29 @@ class W5500.DHCP {
     // onLease
     // Returns: none
     // Parameters:
-    //      cb -   callback function to be called when DHCP is complete
+    //      cb -   callback function to be called when a DHCP lease is received
     // ***************************************************************************
     function onLease(cb) {
-        if (typeof(cb) == "function") {
-            if (_isLeased) cb(null);
-            else _leasedCb = cb;
-            return this;
-        } else return "Callback parameter is not a function";
+        _leasedCb = cb;
+        return this;
     }
 
     // ***************************************************************************
     // renewLease
     // Returns: none
-    // Parameters:  none                 
+    // Parameters:  
+    //      timeout - number of seconds to allow for the lease to try before giving up (0 = infinite)
     // ***************************************************************************
-    function renewLease() {
-        _wiz.onReady(function() {
-            if (_DHCPinit == false) {
-                _DHCPinit == true;
-
-                _storeNetworkSettings();
-
-                _wiz.configureNetworkSettings(W5500_DHCP_SEND_IP, W5500_DHCP_SUBNET_MASK, W5500_DHCP_ROUTER);
-                _driver.openConnection(W5500_DHCP_DEST_IP, W5500_DHCP_DEST_PORT, W5500_SOCKET_MODE_UDP, W5500_DHCP_SEND_PORT, function(err, connection) {
-                    if (err) {
-                        imp.wakeup(30, renewLease.bindenv(this));
-                    } else {
-                        _mac = _driver.getSourceHWAddr();
-                        _connection = connection;
-                        _connection.onReceive(_receiveDHCP.bindenv(this));
-                        _runLoopDHCP();
-                    }
-
-                }.bindenv(this));
-            } else {
-                return "INIT IN PROGRESS";
-            }
-        }.bindenv(this));
+    function renewLease(timeout = 0) {
+        // Request a new lease when the wiznet driver is ready
+        _timeout = timeout;
+        if (!_isRenewing) {
+            _isRenewing = true;
+            _wiz.onReady(_renewLease.bindenv(this));
+        }
+        return this;
     }
+
 
     // ***************************************************************************
     // getIP
@@ -262,8 +280,7 @@ class W5500.DHCP {
     //          none
     // ***************************************************************************
     function getIP() {
-        if (_leasedIP) return _blobtoArray(_leasedIP);
-        else return "IP not available yet";
+        if (_leasedIP) return _blobtoAddrStr(_leasedIP);
     }
 
     // ***************************************************************************
@@ -273,8 +290,7 @@ class W5500.DHCP {
     //          none
     // ***************************************************************************
     function getSubnetMask() {
-        if (_routerAddress) return _blobtoArray(_leasedSubnetMask);
-        else return "Subnet Mask not available yet";
+        if (_leasedRouterAddress) return _blobtoAddrStr(_leasedSubnetMask);
     }
 
     // ***************************************************************************
@@ -284,8 +300,7 @@ class W5500.DHCP {
     //          none
     // ***************************************************************************
     function getRouterAddress() {
-        if (_routerAddress) return _blobtoArray(_routerAddress);
-        else return "Router Address not available yet";
+        if (_leasedRouterAddress) return _blobtoAddrStr(_leasedRouterAddress);
     }
 
     // ***************************************************************************
@@ -298,18 +313,16 @@ class W5500.DHCP {
         if (_leasedDNS) {
             if (typeof _leasedDNS == "blob") {
                 // Return an array of one item
-                return [_blobtoArray(_leasedDNS)];
+                return [_blobtoAddrStr(_leasedDNS)];
             } else if (typeof _leasedDNS == "array") {
                 // Return an array of all items
                 local dns = array();
                 foreach (dnsi, dnse in _leasedDNS) {
-                    dns.push(_blobtoArray(dnse));
+                    dns.push(_blobtoAddrStr(dnse));
                 }
                 return dns;
-			} else {
-				return "DNS data corrupted";
-			}
-		} else return "DNS not available yet";
+            }
+        }
     }
 
     // ***************************************************************************
@@ -320,7 +333,81 @@ class W5500.DHCP {
     // ***************************************************************************
     function getLeaseTime() {
         if (_leaseTime) return _leaseTime;
-        else return "Lease Time not available yet";
+    }
+
+    // ***************************************************************************
+    // _renewLease
+    // Returns: none
+    // Parameters:  none                 
+    // ***************************************************************************
+    function _renewLease() {
+
+        // HACK: Prevent the DHCP packets being split
+        _driver._availableSockets = _driver.setNumberOfAvailableSockets(4);
+
+        // Setup the global timeout
+        if (!_timeoutTimer && _timeout > 0) {
+            _timeoutTimer = imp.wakeup(_timeout, _cancelRenewLease.bindenv(this));
+        }
+
+        // Cancel the renew timer
+        if (_renewTimer) imp.cancelwakeup(_renewTimer);
+        _renewTimer = null;
+
+        // Setup the network for DHCP (UDP)
+        _storeNetworkSettings();
+        _wiz.configureNetworkSettings(W5500_DHCP_SEND_IP, W5500_DHCP_SUBNET_MASK, W5500_DHCP_ROUTER);
+        _driver.openConnection(W5500_DHCP_DEST_IP, W5500_DHCP_DEST_PORT, W5500_SOCKET_MODE_UDP, W5500_DHCP_SEND_PORT, function(err, connection) {
+
+            if (err) {
+                // Couldn't spare a socket for a DHCP request
+                server.error("*** DHCP lease renewal failed (retry): " + err.tostring());
+                if (_renewTimer) imp.cancelwakeup(_renewTimer);
+                _renewTimer = imp.wakeup(10, _renewLease.bindenv(this));
+            } else {
+                // Ready to start
+                _connection = connection;
+                _connection.onReceive(_receiveDHCP.bindenv(this));
+                _runLoopDHCP();
+            }
+
+        }.bindenv(this));
+    }
+
+
+    // ***************************************************************************
+    // _cancelRenewLease
+    // Returns: none
+    // Parameters:  none                 
+    // ***************************************************************************
+    function _cancelRenewLease() {
+
+        // Close the DHCP connection
+        if (_connection) _connection.close();
+        _connection = null;
+        _isRenewing = false;
+        _state = W5500_DHCP_STATE_DISCONNECTED;
+
+        // Restore Network Settings
+        _restoreNetworkSettings();
+
+        // Stop the DHCP loop / state machine altogether
+        if (_runLoopTimer) {
+            imp.cancelwakeup(_runLoopTimer);
+            _runLoopTimer = null;
+        }
+
+        // Stop the timeout timer
+        if (_timeoutTimer) {
+            imp.cancelwakeup(_timeoutTimer);
+            _timeoutTimer = null;
+        }
+
+        // Fire the event handler!
+        imp.wakeup(0, function() {
+            if (_leasedCb) _leasedCb("Timeout");
+        }.bindenv(this));
+
     }
 
     // ***************************************************************************
@@ -337,127 +424,75 @@ class W5500.DHCP {
             _runLoopTimer = null;
         }
 
-        // local stateBefore = _state;
+        local stateBefore = _state;
 
-        local ethernetDisconnected = !_driver.getPhysicalLinkStatus();
-        if (ethernetDisconnected) {
+        if (false && !_driver.getPhysicalLinkStatus()) {
+
             // server.log("Ethernet Disconnected");
-            _state = W5500_DHCP_DISCONNECTED;
-            _resendTime = 1;
-        }
+            _state = W5500_DHCP_STATE_DISCONNECTED;
+            _nextLoopTime = 1;
 
-        switch (_state) {
-            case W5500_DHCP_DISCONNECTED:
-                if (!ethernetDisconnected) {
-                    _state = W5500_DHCP_INITIALIZE;
-                }
-                break;
+        } else {
 
-            case W5500_DHCP_INITIALIZE:
-                // Prebuilds the header for the packets
-                _headerPacket = _initializePacket();
-                _resendTime = 7.5;
-                _state = W5500_DHCP_SENDING_DISCOVERY;
-                break;
+            switch (_state) {
+                case W5500_DHCP_STATE_DISCONNECTED:
+                case W5500_DHCP_STATE_INITIALIZE:
+                    // Prebuilds the header for the packets
+                    _headerPacket = _initializePacket();
+                    _state = W5500_DHCP_STATE_SENDING_DISCOVERY;
+                    _nextLoopTime = 0;
+                    _resendCount = 0;
+                    break;
 
-            case W5500_DHCP_SENDING_DISCOVERY:
-                if (_resendCount > 0) {
-                    if (_leasedCb) _leasedCb("Offer Timeout");
-                }
-                // Increment Time Exponentially
-                if (_resendTime < 60) {
-                    _resendTime *= 2;
-                }
-                // Send the DHCP Discover Packet
-                _sendDHCP(W5500_DHCP_DISCOVER);
-                break;
+                case W5500_DHCP_STATE_SENDING_DISCOVERY:
+                    // Exponential backoff
+                    if (_nextLoopTime <= 0) _nextLoopTime = 5;
+                    else if (_nextLoopTime < 60) _nextLoopTime *= 1.25;
 
-            case W5500_DHCP_OFFER_RECEIVED:
-                _checkValidIP(_offeredIP);
-                break;
+                    // Send the DHCP Discover Packet
+                    _sendDHCP(W5500_DHCP_MSG_DISCOVER);
+                    break;
 
-            case W5500_DHCP_SENDING_DECLINE:
-                _sendDHCP(W5500_DHCP_DECLINE, _offeredIP, _serverID);
-                _state = W5500_DHCP_SENDING_DISCOVERY;
-                break;
+                case W5500_DHCP_STATE_OFFER_RECEIVED:
+                    _nextLoopTime = 20;
+                    _resendCount = 0;
 
-            case W5500_DHCP_SENDING_REQUEST:
-                if (_resendCount < W5500_DHCP_MAX_RESEND) {
-                    _resendCount++;
-                    // Send the DHCP Request Packet    
-                    _sendDHCP(W5500_DHCP_REQUEST, _offeredIP, _serverID);
-                } else {
-                    if (_leasedCb) _leasedCb("Renewal Timeout");
-                    _state = W5500_DHCP_INITIALIZE;
-                    _isLeased = false;
-                }
-                break;
+                    // HACK: Skip the validity check for now
+                    // _checkValidIP(_offeredIP);
+                    _state = W5500_DHCP_STATE_SENDING_REQUEST;
+                    _nextLoopTime = 0;
+                    break;
 
-            case W5500_DHCP_LEASE_RECEIVED:
-                _isLeased = true;
-                if (_leasedCb) _leasedCb(null);
-                _state = W5500_DHCP_RENEWING;
-                break;
-
-            case W5500_DHCP_RENEWING:
-                if (_isRenewing) {
-                    if (_resendCount < W5500_DHCP_MAX_RESEND) {
-                        _sendDHCP(W5500_DHCP_REQUEST, _offeredIP, _serverID);
-                        _resendCount++;
+                case W5500_DHCP_STATE_SENDING_REQUEST:
+                    if (_resendCount++ < W5500_DHCP_MAX_RESEND) {
+                        // Send the DHCP Request Packet    
+                        _sendDHCP(W5500_DHCP_MSG_REQUEST, _offeredIP, _serverID);
+                        _nextLoopTime = 5;
                     } else {
-                        if (_leasedCb) _leasedCb("Renewal Failed");
-                        _state = W5500_DHCP_INITIALIZE;
+                        // Start again, we have lost the plot
+                        _state = W5500_DHCP_STATE_INITIALIZE;
                         _isLeased = false;
+                        _nextLoopTime = 1;
+                        _resendCount = 0;
                     }
-                } else {
-                    _storeNetworkSettings();
-                    _incrementXID();
+                    break;
 
-                    _wiz.configureNetworkSettings(W5500_DHCP_SEND_IP, W5500_DHCP_SUBNET_MASK, W5500_DHCP_ROUTER);
-                    _driver.openConnection(W5500_DHCP_DEST_IP, W5500_DHCP_DEST_PORT, W5500_SOCKET_MODE_UDP, W5500_DHCP_SEND_PORT, function(err, connection) {
-                        if (err) {
-                            _resendTime = 30;
-                        } else {
-                            _connection = connection;
-                            _connection.onReceive(_receiveDHCP.bindenv(this));
-                            _isRenewing = true;
-                        }
-                    }.bindenv(this));
-                }
-                break;
+                case W5500_DHCP_STATE_SENDING_DECLINE:
+                    // We don't want what was offered, decline it.
+                    _sendDHCP(W5500_DHCP_MSG_DECLINE, _offeredIP, _serverID);
+                    _state = W5500_DHCP_STATE_SENDING_DISCOVERY;
+                    _nextLoopTime = 1;
+                    break;
+
+            }
         }
-
 
         // Run the same function again soon
-        // server.log(format("### stateBefore: %s, stateAfter: %s, resendTime: %d", stateToString(stateBefore), stateToString(_state), _resendTime));
-        _runLoopTimer = imp.wakeup(_resendTime, _runLoopDHCP.bindenv(this));
+        // server.log(format("### stateBefore: %s, stateAfter: %s, nextLoopTime: %d", stateToString(stateBefore), stateToString(_state), _nextLoopTime));
+        _runLoopTimer = imp.wakeup(_nextLoopTime, _runLoopDHCP.bindenv(this));
     }
 
     // Private Functions
-
-    // ***************************************************************************
-    // _incrementXID
-    // Returns: none
-    // Parameters:  none                 
-    // ***************************************************************************
-    function _incrementXID() {
-        local updatedXID = blob(4);
-        updatedXID.writen(_dhcpXID++, 'i');
-        _packetRecipe[4].v = updatedXID;
-        _headerPacket = _initializePacket();
-    }
-
-    // ***************************************************************************
-    // _storeNetworkSettings
-    // Returns: none
-    // Parameters:  none                 
-    // ***************************************************************************
-    function _storeNetworkSettings() {
-        _cachedSendIP = _driver.getSourceIP();
-        _cachedSubnet = _driver.getSubnetMask();
-        _cachedRouter = _driver.getGatewayAddr();
-    }
-
 
     // ***************************************************************************
     // _receiveDHCP
@@ -482,53 +517,71 @@ class W5500.DHCP {
 
             // Check Message Type
             options[W5500_DHCP_OPTIONS.dhcpMessageType].seek(0, 'b');
-            local state = options[W5500_DHCP_OPTIONS.dhcpMessageType].readn('b');
 
-            switch (state) {
-                case W5500_DHCP_OFFER:
-                    if (_state == W5500_DHCP_SENDING_DISCOVERY) {
+            local msgtype = options[W5500_DHCP_OPTIONS.dhcpMessageType].readn('b');
+            // server.log(format("### receive message, type: %s", msgtypeToString(msgtype)));
+
+            switch (msgtype) {
+                case W5500_DHCP_MSG_OFFER:
+                    if (_state == W5500_DHCP_STATE_SENDING_DISCOVERY) {
                         // Get the offered IP and server ID
                         _offeredIP = offer[8].r;
-                        _state = W5500_DHCP_OFFER_RECEIVED;
-                        _resendTime = 10;
+                        _state = W5500_DHCP_STATE_OFFER_RECEIVED;
                         _runLoopDHCP();
+                    } else {
+                        // server.log("### Ignored W5500_DHCP_MSG_OFFER because in state: " + stateToString(_state))
                     }
                     break;
 
-                case W5500_DHCP_ACK:
+                case W5500_DHCP_MSG_ACK:
                     // Grab Connection Settings
                     _leasedIP = _offeredIP;
                     _leasedSubnetMask = options[W5500_DHCP_OPTIONS.subnetMask];
-                    _routerAddress = options[W5500_DHCP_OPTIONS.routersOnSubnet];
+                    _leasedRouterAddress = options[W5500_DHCP_OPTIONS.routersOnSubnet];
                     _leasedDNS = options[W5500_DHCP_OPTIONS.dns];
 
                     // Give 60 second margin on DHCP lease  
                     _leaseTime = _parseLeaseTime(options[W5500_DHCP_OPTIONS.dhcpIPaddrLeaseTime]) - W5500_DHCP_LEASEOFFSET;
-                    _resendTime = _leaseTime >= 60 ? _leaseTime : 60; // at least 60 seconds
-                    _resendCount = 0;
 
-                    // Restore Network Settings
+                    // Close the DHCP connection
                     _connection.close();
                     _connection = null;
-                    _wiz.configureNetworkSettings(_cachedSendIP, _cachedSubnet, _cachedRouter);
+                    _isRenewing = false;
+                    _isLeased = true;
 
-                    if (_isLeased) {
-                        _isRenewing = false;
-                        _state = W5500_DHCP_RENEWING;
-                    } else {
-                        _state = W5500_DHCP_LEASE_RECEIVED;
-                        _runLoopDHCP();
+                    // Restore Network Settings
+                    _restoreNetworkSettings();
+
+                    // Stop the DHCP loop / state machine altogether
+                    if (_runLoopTimer) {
+                        imp.cancelwakeup(_runLoopTimer);
+                        _runLoopTimer = null;
                     }
+
+                    // Stop the timeout timer
+                    if (_timeoutTimer) {
+                        imp.cancelwakeup(_timeoutTimer);
+                        _timeoutTimer = null;
+                    }
+
+                    // Schedule a renewal
+                    local renewTime = _leaseTime >= 60 ? _leaseTime : 60; // at least 60 seconds
+                    if (_renewTimer) imp.cancelwakeup(_renewTimer);
+                    _renewTimer = imp.wakeup(renewTime, _renewLease.bindenv(this));
+
+                    // Fire the event handler!
+                    imp.wakeup(0, function() {
+                        if (_leasedCb) _leasedCb(null);
+                    }.bindenv(this));
+
                     break;
 
-                case W5500_DHCP_NAK:
-                    _err += "Renewal Failed";
+                case W5500_DHCP_MSG_NAK:
                     _isLeased = false;
-                    _state = W5500_DHCP_SENDING_DISCOVERY;
+                    _nextLoopTime = 0;
+                    _state = W5500_DHCP_STATE_SENDING_DISCOVERY;
+                    _runLoopDHCP();
                     break;
-
-                case W5500_DHCP_DISCOVER:
-                case W5500_DHCP_REQUEST:
             }
 
         }
@@ -542,37 +595,99 @@ class W5500.DHCP {
     //      ip - Blob containing the offered IP Address
     // ***************************************************************************
     function _checkValidIP(ip) {
-        local ARPconnection = null;
 
         // Store retrycount and set to 3.
         local tempRetryCount = _driver.getTimeoutCount();
         _driver.setTimeoutCount(3);
 
         // Open TCP Connection (to send ARP). Should get timeout.
-        _wiz.openConnection(ip, W5500_DHCP_DEST_PORT, W5500_SOCKET_MODE_TCP, function(err, connection) {
+        // server.log("*** Checking valid IP");
+        _wiz.openConnection(ip, W5500_DHCP_DEST_PORT, W5500_SOCKET_MODE_TCP, function(err, conn) {
+
+            // Close the connection immediately
+            if (conn) conn.close();
+            // server.log("*** Finished checking valid IP");
 
             if (err == null) {
-                if (_leasedCb) _leasedCb("IP in use");
-                _state = W5500_DHCP_SENDING_DECLINE;
+
+                // We got a connection. This is bad.
+                // server.log("*** IP in use, requesting another");
+                _state = W5500_DHCP_STATE_SENDING_DECLINE;
+
             } else if (err.find(W5500_CANNOT_CONNECT_SOCKETS_IN_USE) != null) {
-                if (_leasedCb) _leasedCb("All connections in use");
-                _state = W5500_DHCP_SENDING_REQUEST;
+
+                // We can't validate it but we will accept it anyway
+                // server.log("*** No sockets free, accepting anyway");
+                _state = W5500_DHCP_STATE_SENDING_REQUEST;
+
             } else if (err.find("timeout") == null) {
+
                 // This isn't a timeout, so there is something else responding to the arp
-                if (_leasedCb) _leasedCb("IP in use");
-                _state = W5500_DHCP_SENDING_DECLINE;
+                // server.log("*** IP in use, requesting another");
+                _state = W5500_DHCP_STATE_SENDING_DECLINE;
+
             } else {
-                // Nobody else has this IP, let's move on.
-                _state = W5500_DHCP_SENDING_REQUEST;
+
+                // Nobody else has this IP, let's accept it and move on.
+                // server.log("*** Valid IP address accepted");
+                _state = W5500_DHCP_STATE_SENDING_REQUEST;
+
             }
 
-            // Close it
-            if (connection) connection.close();
-
+            // Restore the timeout count
             _driver.setTimeoutCount(tempRetryCount);
+
+            // Start the loop again
+            _runLoopDHCP();
+
         }.bindenv(this));
 
     }
+
+    // ***************************************************************************
+    // _makeXID
+    // Returns: integer containing a random integer from 0 to W5500_DHCP_MAX_INT 
+    // Parameters:
+    //      none
+    // ***************************************************************************
+    function _makeXID() {
+        local XID = (1.0 * math.rand() / RAND_MAX) * (W5500_DHCP_MAX_INT + 1);
+        return XID.tointeger();
+    }
+
+    // ***************************************************************************
+    // _incrementXID
+    // Returns: none
+    // Parameters:  none                 
+    // ***************************************************************************
+    function _incrementXID() {
+        local updatedXID = blob(4);
+        updatedXID.writen(_dhcpXID++, 'i');
+        _packetRecipe[4].v = updatedXID;
+        _headerPacket = _initializePacket();
+    }
+
+    // ***************************************************************************
+    // _storeNetworkSettings
+    // Returns: none
+    // Parameters:  none                 
+    // ***************************************************************************
+    function _storeNetworkSettings() {
+        _cache = { ip = _driver.getSourceIP(), subnetMask = _driver.getSubnetMask(), router = _driver.getGatewayAddr() };
+    }
+
+    // ***************************************************************************
+    // _restoreNetworkSettings
+    // Returns: none
+    // Parameters:  none                 
+    // ***************************************************************************
+    function _restoreNetworkSettings() {
+        _cache = { ip = _driver.getSourceIP(), subnetMask = _driver.getSubnetMask(), router = _driver.getGatewayAddr() };
+        if ("ip" in _cache) {
+            _wiz.configureNetworkSettings(_cache.ip, _cache.subnetMask, _cache.router);
+        }
+    }
+
 
     // ***************************************************************************
     // _parseLeaseTime
@@ -592,17 +707,6 @@ class W5500.DHCP {
             parsedLeaseTime = W5500_DHCP_MAX_INT;
         }
         return parsedLeaseTime;
-    }
-
-    // ***************************************************************************
-    // _makeXID
-    // Returns: integer containing a random integer from 0 to W5500_DHCP_MAX_INT 
-    // Parameters:
-    //      none
-    // ***************************************************************************
-    function _makeXID() {
-        local XID = (1.0 * math.rand() / RAND_MAX) * (W5500_DHCP_MAX_INT + 1);
-        return XID.tointeger();
     }
 
     // ***************************************************************************
@@ -630,16 +734,17 @@ class W5500.DHCP {
                 // Read Value
                 local value = blob(len);
                 if (len > 0) value = optionsData.readblob(len);
-                if (!(opt in options)) {
+
+                if (opt == W5500_DHCP_OPTIONS.dns) {
+                    // Allow the extraction of multiple DNS entries
+                    options[opt] <- array();
+                    for (local i = 0; i < value.len(); i += 4) {
+                        value.seek(i);
+                        options[opt].push(value.readblob(4));
+                    }
+                } else {
                     // Lone option, set it directly
                     options[opt] <- value;
-                } else if (typeof options[opt] == "array") {
-                    // Existing options array, append
-                    options[opt].push(value);
-                } else {
-                    // Existing lone option, convert it into an array, append
-                    options[opt] <-[options[opt]];
-                    options[opt].push(value);
                 }
 
             }
@@ -730,9 +835,7 @@ class W5500.DHCP {
         xid.writen(_dhcpXID, 'i');
 
         // Get the Source MAC Address
-        _mac = _driver.getSourceHWAddr();
-
-        // MAC Address  
+        local _mac = _driver.getSourceHWAddr();
         for (local i = 0; i < _mac.len(); i++) {
             mac.writen(_mac[i], 'b');
         }
@@ -753,7 +856,7 @@ class W5500.DHCP {
 
         // ParamRequest
         options.writen(W5500_DHCP_OPTIONS.dhcpParamRequest, 'b');
-        options.writen(0x06, 'b');
+        options.writen(0x06, 'b'); // length?
         options.writen(W5500_DHCP_OPTIONS.subnetMask, 'b');
         options.writen(W5500_DHCP_OPTIONS.routersOnSubnet, 'b');
         options.writen(W5500_DHCP_OPTIONS.dns, 'b');
@@ -809,23 +912,18 @@ class W5500.DHCP {
         completePacket.writeblob(options);
 
         // Finally, transmit it
-        _connection.transmit(completePacket);
+        if (_connection) _connection.transmit(completePacket);
 
     }
 
     // ***************************************************************************
-    // _blobtoArray
+    // _blobtoAddrStr
     // Returns: array containing the blob converted to an array of numbers
     // Parameters:
     //      data - blob to be converted
     // ***************************************************************************
-    function _blobtoArray(addr) {
-        local arr = array();
-        addr.seek(0, 'b');
-        while (!addr.eos()) {
-            arr.push(addr.readn('b'))
-        }
-        return arr;
+    function _blobtoAddrStr(addr) {
+        return format("%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
     }
 
 }
