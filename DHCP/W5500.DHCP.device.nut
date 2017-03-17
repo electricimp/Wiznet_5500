@@ -22,28 +22,28 @@ const W5500_DHCP_MSG_NAK = 6; // /< NACK message in OPT of @ref RIP_MSG
 const W5500_DHCP_MSG_RELEASE = 7; // /< RELEASE message in OPT of @ref RIP_MSG. No use
 const W5500_DHCP_MSG_INFORM = 8; // /< INFORM message in OPT of @ref RIP_MSG. No use
 
-function msgtypeToString(msgtype) {
-    switch (msgtype) {
-        case W5500_DHCP_MSG_DISCOVER:
-            return "W5500_DHCP_MSG_DISCOVER";
-        case W5500_DHCP_MSG_OFFER:
-            return "W5500_DHCP_MSG_OFFER";
-        case W5500_DHCP_MSG_REQUEST:
-            return "W5500_DHCP_MSG_REQUEST";
-        case W5500_DHCP_MSG_DECLINE:
-            return "W5500_DHCP_MSG_DECLINE";
-        case W5500_DHCP_MSG_ACK:
-            return "W5500_DHCP_MSG_ACK";
-        case W5500_DHCP_MSG_NAK:
-            return "W5500_DHCP_MSG_NAK";
-        case W5500_DHCP_MSG_RELEASE:
-            return "W5500_DHCP_MSG_RELEASE";
-        case W5500_DHCP_MSG_INFORM:
-            return "W5500_DHCP_MSG_INFORM";
-        default:
-            return "W5500_DHCP_MSG_UNKNOWN";
-    }
-}
+// function msgtypeToString(msgtype) {
+//     switch (msgtype) {
+//         case W5500_DHCP_MSG_DISCOVER:
+//             return "W5500_DHCP_MSG_DISCOVER";
+//         case W5500_DHCP_MSG_OFFER:
+//             return "W5500_DHCP_MSG_OFFER";
+//         case W5500_DHCP_MSG_REQUEST:
+//             return "W5500_DHCP_MSG_REQUEST";
+//         case W5500_DHCP_MSG_DECLINE:
+//             return "W5500_DHCP_MSG_DECLINE";
+//         case W5500_DHCP_MSG_ACK:
+//             return "W5500_DHCP_MSG_ACK";
+//         case W5500_DHCP_MSG_NAK:
+//             return "W5500_DHCP_MSG_NAK";
+//         case W5500_DHCP_MSG_RELEASE:
+//             return "W5500_DHCP_MSG_RELEASE";
+//         case W5500_DHCP_MSG_INFORM:
+//             return "W5500_DHCP_MSG_INFORM";
+//         default:
+//             return "W5500_DHCP_MSG_UNKNOWN";
+//     }
+// }
 
 const W5500_DHCP_MSGTYPE_LEN = 1;
 const W5500_DHCP_MAGIC_COOKIE = "\x63\x82\x53\x63";
@@ -66,26 +66,26 @@ const W5500_DHCP_STATE_SENDING_DECLINE = 0x04;
 const W5500_DHCP_STATE_SENDING_REQUEST = 0x05;
 const W5500_DHCP_STATE_LEASE_RECEIVED = 0x06;
 
-function stateToString(state) {
-    switch (state) {
-        case W5500_DHCP_STATE_DISCONNECTED:
-            return "W5500_DHCP_STATE_DISCONNECTED";
-        case W5500_DHCP_STATE_INITIALIZE:
-            return "W5500_DHCP_STATE_INITIALIZE";
-        case W5500_DHCP_STATE_SENDING_DISCOVERY:
-            return "W5500_DHCP_STATE_SENDING_DISCOVERY";
-        case W5500_DHCP_STATE_OFFER_RECEIVED:
-            return "W5500_DHCP_STATE_OFFER_RECEIVED";
-        case W5500_DHCP_STATE_SENDING_DECLINE:
-            return "W5500_DHCP_STATE_SENDING_DECLINE";
-        case W5500_DHCP_STATE_SENDING_REQUEST:
-            return "W5500_DHCP_STATE_SENDING_REQUEST";
-        case W5500_DHCP_STATE_LEASE_RECEIVED:
-            return "W5500_DHCP_STATE_LEASE_RECEIVED";
-        default:
-            return "W5500_DHCP_STATE_UNKNOWN";
-    }
-}
+// function stateToString(state) {
+//     switch (state) {
+//         case W5500_DHCP_STATE_DISCONNECTED:
+//             return "W5500_DHCP_STATE_DISCONNECTED";
+//         case W5500_DHCP_STATE_INITIALIZE:
+//             return "W5500_DHCP_STATE_INITIALIZE";
+//         case W5500_DHCP_STATE_SENDING_DISCOVERY:
+//             return "W5500_DHCP_STATE_SENDING_DISCOVERY";
+//         case W5500_DHCP_STATE_OFFER_RECEIVED:
+//             return "W5500_DHCP_STATE_OFFER_RECEIVED";
+//         case W5500_DHCP_STATE_SENDING_DECLINE:
+//             return "W5500_DHCP_STATE_SENDING_DECLINE";
+//         case W5500_DHCP_STATE_SENDING_REQUEST:
+//             return "W5500_DHCP_STATE_SENDING_REQUEST";
+//         case W5500_DHCP_STATE_LEASE_RECEIVED:
+//             return "W5500_DHCP_STATE_LEASE_RECEIVED";
+//         default:
+//             return "W5500_DHCP_STATE_UNKNOWN";
+//     }
+// }
 
 // Time Constants
 const W5500_DHCP_RESEND = 5;
