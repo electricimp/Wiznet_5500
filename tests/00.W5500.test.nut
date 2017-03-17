@@ -354,11 +354,12 @@ class W5500_TestCase extends ImpTestCase {
                     if (err) {
                         return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     } else {
-                        connection.close(function() {
+                        connection.onClose(function() {
                             // check that the number of sockets is back what is needed
                             this.assertTrue(_wiz._driver._availableSockets.len() == 1);
                             return resolve();
                         }.bindenv(this));
+                        connection.close();
                     }
                 }.bindenv(this));
             }
@@ -384,7 +385,7 @@ class W5500_TestCase extends ImpTestCase {
                     if (err) {
                         return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     } else {
-                        connection.close(function() {
+                        connection.onClose(function() {
                             // open a connection once it is closed
                             _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                                 if (err) {
@@ -395,6 +396,7 @@ class W5500_TestCase extends ImpTestCase {
                                 }
                             }.bindenv(this));
                         }.bindenv(this));
+                        connection.close();
 
                     }
 

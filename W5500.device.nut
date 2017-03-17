@@ -361,11 +361,22 @@ class W5500 {
 
     // ***************************************************************************
     // getNumSockets - 
-    // Returns: returns the number of unused sockets
+    // Returns: returns the total number of sockets available
     // Parameters:
     //      none
     // **************************************************************************
     function getNumSockets() {
+        return _driver._noOfSockets;
+    }
+
+
+    // ***************************************************************************
+    // getNumSocketsFree - 
+    // Returns: returns the number of unused sockets
+    // Parameters:
+    //      none
+    // **************************************************************************
+    function getNumSocketsFree() {
         return _driver._noOfSockets - _driver._connections.len();
     }
 
@@ -1379,7 +1390,7 @@ class W5500.Driver {
             // Now find the socket in our connection table
             if (socket_n in _connections) {
                 // server.log(format("INTERRUPT ON SOCKET %d", socket_n));
-                _connections[socket_n].handleInterrupt();                
+                _connections[socket_n].handleInterrupt(true);
             }
         }
 
@@ -1615,6 +1626,7 @@ class W5500.Driver {
     //      obj2 - the second object
     // **************************************************************************
     static
+
     function _areObjectsEqual(obj1, obj2) {
         if (typeof obj1 != typeof obj2) return false;
         if (typeof obj1 == "array" || typeof obj1 == "table" || typeof obj1 == "blob") {
@@ -1810,6 +1822,7 @@ class W5500.Connection {
     _sourcePort = null;
     _transmitQueue = null;
     _transmitting = false;
+    _interrupt_timer = null;
 
     // ***************************************************************************
     // Constructor
@@ -1820,17 +1833,15 @@ class W5500.Connection {
     //      ip      - the ip address of the destination
     //      port    - the port of the destination
     //      mode    - TCP or UDP
-    //      handlers(optional) - table of callback functions
-    //                              (connect, disconnect, transmit, receive)
     // **************************************************************************
-    constructor(driver, socket, ip, port, mode, handlers = {}) {
+    constructor(driver, socket, ip, port, mode) {
         _driver = driver;
         _socket = socket;
         _state = W5500_SOCKET_STATES.CLOSED;
         _ip = ip;
         _port = port;
         _mode = mode;
-        _handlers = handlers;
+        _handlers = {};
         _transmitQueue = [];
     }
 
@@ -1843,12 +1854,6 @@ class W5500.Connection {
     // **************************************************************************
     function open(cb = null) {
 
-        // server.log(format("Opening socket %d which is in status 0x%02X and interrupt 0x%02X",
-        //     _socket,
-        //     _driver.getSocketStatus(_socket),
-        //     _driver.getSocketInterruptTypeStatus(_socket).REGISTER_VALUE
-        // ));
-
         // Close the socket if it is still open
         while (_driver.getSocketStatus(_socket) != W5500_SOCKET_STATUS_CLOSED) {
             // NOTE: Worth putting a time limit on this loop
@@ -1859,8 +1864,9 @@ class W5500.Connection {
         // Clear out any stagnant interrupts
         _driver.clearSocketInterrupt(_socket);
 
-        // Set the socket mode
+        // Set the socket mode and open the socket
         _driver.setSocketMode(_socket, _mode);
+        _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
 
         // Set the source port
         if (_sourcePort == null) {
@@ -1871,18 +1877,24 @@ class W5500.Connection {
         }
 
         // Open the socket and setup the connection
-        _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
         _driver.setDestIP(_socket, _ip);
         _driver.setDestPort(_socket, _port);
+        imp.sleep(0.1)
         _driver.sendSocketCommand(_socket, W5500_SOCKET_CONNECT);
 
         if (_mode == W5500_SOCKET_MODE_UDP) {
+            // UDP packet's don't actually connect, so we can call the callback immediately.
             _state = W5500_SOCKET_STATES.ESTABLISHED
             if (cb) cb(null, this);
         } else {
+            // For all other modes we just prepare for a future connection
             _state = W5500_SOCKET_STATES.CONNECTING;
             if (cb) onConnect(cb);
         }
+
+
+        // Start polling the interrupts
+        _interrupt_timer = imp.wakeup(0, handleInterrupt.bindenv(this));
 
         return this;
     }
@@ -1894,13 +1906,11 @@ class W5500.Connection {
     // Parameters:
     //      none
     // **************************************************************************
-    function close(cb = null) {
-        if (_state == W5500_SOCKET_STATES.DISCONNECTING) {
-            if (cb) imp.wakeup(1, cb);
-        } else {
-            _state = W5500_SOCKET_STATES.DISCONNECTING;
-            _driver.closeConnection(_socket, cb);
-        }
+    function close() {
+        _state = W5500_SOCKET_STATES.DISCONNECTING;
+        _driver.closeConnection(_socket, _getHandler("close"));
+        _handlers = {};
+        if (_interrupt_timer) imp.cancelwakeup(_interrupt_timer);
     }
 
 
@@ -1969,6 +1979,17 @@ class W5500.Connection {
     }
 
     // ***************************************************************************
+    // onClose
+    // Returns: this
+    // Parameters:
+    //      cb - function to called when socket is deregistered
+    // **************************************************************************
+    function onClose(cb) {
+        _handlers["close"] <- cb;
+        return this;
+    }
+
+    // ***************************************************************************
     // setSourcePort
     // Returns: this
     // Parameters:
@@ -2025,14 +2046,16 @@ class W5500.Connection {
     // Returns: null
     // Parameters: socket the interrupt occurred on
     // **************************************************************************
-    function handleInterrupt() {
+    function handleInterrupt(skip_timer = false) {
+        
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
         if (status.CONNECTED) {
+
             // server.log("Connection established on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_CONNECTED_INT_TYPE);
-
             _state = W5500_SOCKET_STATES.ESTABLISHED;
+            skip_timer = true;
 
             local _connectionCallback = _getHandler("connect");
             if (_connectionCallback) {
@@ -2045,8 +2068,10 @@ class W5500.Connection {
         }
 
         if (status.TIMEOUT) {
+
             // server.log("Timeout occurred on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_TIMEOUT_INT_TYPE);
+            skip_timer = true;
 
             if (_state == W5500_SOCKET_STATES.CONNECTING) {
 
@@ -2060,7 +2085,7 @@ class W5500.Connection {
                 }
 
                 // Close this socket
-                _driver.closeConnection(_socket);
+                close();
 
             } else {
 
@@ -2078,8 +2103,10 @@ class W5500.Connection {
         }
 
         if (status.SEND_COMPLETE) {
+
             // server.log("Send complete on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_SEND_COMPLETE_INT_TYPE);
+            skip_timer = true;
 
             // call transmitting callback
             local _transmitCallback = _getHandler("transmit");
@@ -2093,15 +2120,19 @@ class W5500.Connection {
         }
 
         if (status.DATA_RECEIVED) {
+
             // server.log("Data received on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_DATA_RECEIVED_INT_TYPE);
+            skip_timer = true;
             receive(); // process incoming data
+
         }
 
         if (status.DISCONNECTED) {
 
             // server.log("Connection disconnected on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_DISCONNECTED_INT_TYPE);
+            skip_timer = true;
 
             if (_state == W5500_SOCKET_STATES.CONNECTING) {
 
@@ -2127,15 +2158,13 @@ class W5500.Connection {
 
             }
 
-            // Close the socket
-            _driver.closeConnection(_socket);
-
-            // clear transmit and connection callbacks
-            onTransmitted(null);
-            onConnect(null);
-            onDisconnect(null);
+            // Close the socket and remove interrupts
+            close();
 
         }
+
+        // Scan the interrupt again very soon
+        _interrupt_timer = imp.wakeup(0.5, handleInterrupt.bindenv(this))
 
         return status;
 

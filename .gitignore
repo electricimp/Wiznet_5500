@@ -1,6 +1,6 @@
 *.swp
 *.out.*
 .DS_Store
-.build_api_key.json
-.imptest
-settings.wrench
+.build_api_key.json*
+.imptest*
+settings.wrench*
