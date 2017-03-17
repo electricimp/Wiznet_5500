@@ -57,30 +57,29 @@ wiz.onReady(function() {
 
             if (err) return server.error(format("Connection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
 
-            function closure() {
-                // Keep the port active
-                local mid = 0;
-                local cid = ++next_cid;
-                server.log(format("Connected #%d to %s:%d", cid, ECHO_SERVER_IP, ECHO_SERVER_PORT));
+            // Keep the port active
+            local mid = 0;
+            local cid = ++next_cid;
+            server.log(format("Connected #%d to %s:%d", cid, ECHO_SERVER_IP, ECHO_SERVER_PORT));
 
-                // Output a log on close
-                conn.onClose(function() {
-                    server.log(format("Disconnected #%d from %s:%d", cid, ECHO_SERVER_IP, ECHO_SERVER_PORT));
-                }.bindenv(this));
+            // Output a log on close
+            conn.onClose(function() {
+                server.log(format("Disconnected #%d from %s:%d", cid, ECHO_SERVER_IP, ECHO_SERVER_PORT));
+            }.bindenv(this));
 
-                // Send something on the line so we can be sure its actively connected
-                function keepalive() {
-                    if (conn.isEstablished()) {
-                        conn.transmit(format("keepalive: #%d, %d", cid, ++mid));
-                        server.log(format("sending on #%d", cid));
-                        imp.wakeup(5, keepalive.bindenv(this));
-                    } else {
-                        conn.close();
-                    }
+            // Send something on the line so we can be sure its actively connected
+            local keepalive;
+            keepalive = function() {
+                if (conn.isEstablished()) {
+                    conn.transmit(format("keepalive: #%d, %d", cid, ++mid));
+                    server.log(format("sending on #%d, %d", cid, mid));
+                    imp.wakeup(5, keepalive.bindenv(this));
+                } else {
+                    server.log(format("closing #%d", cid));
+                    conn.close();
                 }
-                imp.wakeup(0, keepalive.bindenv(this));
             }
-            closure();
+            imp.wakeup(0, keepalive.bindenv(this));
 
         }.bindenv(this));
     }.bindenv(this));
