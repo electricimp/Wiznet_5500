@@ -16,7 +16,7 @@ spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
 // Initialise Wiznet and DHCP
 wiz <- W5500(interruptPin, spi, null, resetPin);
 dhcp <- W5500.DHCP(wiz);
-cid <- 0;
+next_cid <- 0;
 
 // Wait for Wiznet to be ready
 server.log("Waiting for Wiznet to be ready ...");
@@ -25,6 +25,10 @@ wiz.onReady(function() {
     dhcp.onLease(function(err) {
 
         if (err) return server.error(format("DHCP lease failed: %s", err.toString()));
+
+        // Renew the lease early
+        imp.wakeup(30, dhcp.renewLease.bindenv(dhcp));
+
 
         // Output the lease data
         server.log("/--------[ LEASE ]--------\\");
@@ -43,46 +47,59 @@ wiz.onReady(function() {
                 server.log(format("dns%d = %s", dnsi + 1, dnse))
             }
         }
-        server.log("sockets = " + wiz.getNumSockets());
         server.log("\\-------------------------/");
+        wiz.configureNetworkSettings(ip, subnet_mask, router);
+
 
         // Use the new values to connect to the echo server
-        local cid = ++cid;
         server.log(format("Connecting from %s to %s:%d with %d sockets free", ip, ECHO_SERVER_IP, ECHO_SERVER_PORT, wiz.getNumSockets()));
-        wiz.configureNetworkSettings(ip, subnet_mask, router);
-        wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
+        wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, conn) {
 
             if (err) return server.error(format("Connection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
-            server.log(format("Connected to %s:%d", ECHO_SERVER_IP, ECHO_SERVER_PORT));
 
-            // Renew the lease early
-            imp.wakeup(30, dhcp.renewLease.bindenv(dhcp));
+            function closure() {
+                // Keep the port active
+                local mid = 0;
+                local cid = ++next_cid;
+                server.log(format("Connected #%d to %s:%d", cid, ECHO_SERVER_IP, ECHO_SERVER_PORT));
 
-            // Keep the port active
-            local mid = 0;
+                // Output a log on close
+                conn.onClose(function() {
+                    server.log(format("Disconnected #%d from %s:%d", cid, ECHO_SERVER_IP, ECHO_SERVER_PORT));
+                }.bindenv(this));
 
-            function keepalive() {
-                if (connection.isEstablished()) {
-                    connection.transmit(format("keepalive: %d - %d", cid, ++mid));
-                    imp.wakeup(5, keepalive.bindenv(this));
-                } else {
-                    server.log("Connection died.");
-                    connection.close();
+                // Send something on the line so we can be sure its actively connected
+                function keepalive() {
+                    if (conn.isEstablished()) {
+                        conn.transmit(format("keepalive: #%d, %d", cid, ++mid));
+                        server.log(format("sending on #%d", cid));
+                        imp.wakeup(5, keepalive.bindenv(this));
+                    } else {
+                        conn.close();
+                    }
                 }
+                imp.wakeup(0, keepalive.bindenv(this));
             }
-            imp.wakeup(0, keepalive.bindenv(this));
+            closure();
 
         }.bindenv(this));
     }.bindenv(this));
+
 
     // Request a DHCP lease
     server.log("Waiting for DHCP lease ...");
     dhcp.renewLease();
 
-    // Log the number of free sockets over time
+
+    // Log the number of free sockets whenever it changes
+    local sockets_free = wiz.getNumSocketsFree();
     function log() {
-        server.log("Sockets free: " + wiz.getNumSockets());
-        imp.wakeup(10, log)
+        local new_sockets_free = wiz.getNumSocketsFree();
+        if (new_sockets_free != sockets_free) {
+            server.log(format("sockets free: %d of %d", new_sockets_free, wiz.getNumSockets()));
+            sockets_free = new_sockets_free;
+        }
+        imp.wakeup(1, log)
     }
     log();
 

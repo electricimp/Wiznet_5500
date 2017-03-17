@@ -572,9 +572,8 @@ class W5500.DHCP {
     // ***************************************************************************
     function _checkValidIP(ip) {
 
-        // Store retrycount and set to 3.
-        local tempRetryCount = _driver.getTimeoutCount();
-        _driver.setTimeoutCount(3);
+        // Shorten the timeouts
+        _driver.setRetries(1000, 3);
 
         // Open TCP Connection (to send ARP). Should get timeout.
         // server.log("*** Checking valid IP");
@@ -609,9 +608,6 @@ class W5500.DHCP {
                 _state = W5500_DHCP_STATE_SENDING_REQUEST;
 
             }
-
-            // Restore the timeout count
-            _driver.setTimeoutCount(tempRetryCount);
 
             // Start the loop again
             _runLoopDHCP();

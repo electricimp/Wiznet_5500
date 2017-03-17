@@ -284,6 +284,25 @@ class W5500 {
         }.bindenv(this));
     }
 
+
+    // ***************************************************************************
+    // setNumberOfAvailableSockets - configures interrupts and memory for each connection
+    // Returns: number of actual connections configured
+    // Parameters:
+    //      numSockets - number of desired connections
+    // **************************************************************************
+    function setNumberOfAvailableSockets(numSockets = null) {
+        if (_isReady) {
+            return _driver.setNumberOfAvailableSockets(numSockets);
+        } else {
+            if (_networkSettings == null) {
+                _networkSettings = {};
+            }
+            _networkSettings.availableSockets <- numSockets;
+        }
+    }
+
+
     // ***************************************************************************
     // onReady
     // Returns: this
@@ -295,7 +314,12 @@ class W5500 {
         if (_networkSettings != null) {
             // Slip the network settings into the _cb
             _cb = function() {
-                configureNetworkSettings(_networkSettings.sourceIP, _networkSettings.subnetMask, _networkSettings.gatewayIP, _networkSettings.mac);
+                if ("availableSockets" in _networkSettings) {
+                    _driver.setNumberOfAvailableSockets(_networkSettings.availableSockets);
+                }
+                if ("sourceIP" in _networkSettings) {
+                    configureNetworkSettings(_networkSettings.sourceIP, _networkSettings.subnetMask, _networkSettings.gatewayIP, _networkSettings.mac);
+                }
                 _networkSettings = null;
                 cb();
             }.bindenv(this);
@@ -323,7 +347,7 @@ class W5500 {
             if (sourceIP) _driver.setSourceIP(sourceIP);
             _networkSettings = null;
         } else {
-            _networkSettings = {};
+            if (_networkSettings == null) _networkSettings = {};
             _networkSettings.sourceIP <- sourceIP;
             _networkSettings.subnetMask <- subnetMask;
             _networkSettings.gatewayIP <- gatewayIP;
@@ -527,7 +551,7 @@ class W5500.Driver {
         if (remaining.len() == 0) {
 
             // Set the defaults
-            _availableSockets = setNumberOfAvailableSockets(TOTAL_SUPPORTED_SOCKETS);
+            setNumberOfAvailableSockets(TOTAL_SUPPORTED_SOCKETS);
 
             // Let the sockets settle down before starting anything
             imp.wakeup(1, cb);
@@ -563,17 +587,19 @@ class W5500.Driver {
     // ****************************************************************************
     function openConnection(destIP, destPort, mode, sourcePort = null, cb = null) {
 
+        // shuffle oarameters around
         if (typeof sourcePort == "function") {
             cb = sourcePort;
             sourcePort = null;
         }
 
-        // check for required parameters
+        // check for available socket
         if (_availableSockets.len() == 0) {
             if (cb) return cb(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
             else throw W5500_CANNOT_CONNECT_SOCKETS_IN_USE;
         }
 
+        // Create the connection object and assign it to a spare socket
         local socket = _availableSockets.pop();
         _connections[socket] <- W5500.Connection(this, socket, destIP, destPort, mode);
         if (typeof sourcePort == "integer") {
@@ -720,13 +746,13 @@ class W5500.Driver {
     // setRetries
     // Returns: this
     // Parameters:
-    //      time - amount of time (in ms) for each attempt (default: 1000ms)
-    //      times - the number of retry attempts (default: 3x)
+    //      time - amount of time (in ms) for each attempt (default: 2000ms)
+    //      count - the number of retry attempts (default: 5x)
     // ***************************************************************************
-    function setRetries(time = 1000, times = 5) {
+    function setRetries(time = 3000, count = 5) {
         writeReg(W5500_RETRY_TIME_0, W5500_COMMON_REGISTER, ((time & 0xFF00) >> 8));
         writeReg(W5500_RETRY_TIME_1, W5500_COMMON_REGISTER, (time & 0x00FF));
-        writeReg(W5500_RETRY_COUNT, W5500_COMMON_REGISTER, times);
+        writeReg(W5500_RETRY_COUNT, W5500_COMMON_REGISTER, count);
         return this;
     }
 
@@ -1229,7 +1255,7 @@ class W5500.Driver {
         setMemory(txmem, "tx");
         setMemory(rxmem, "rx");
 
-        return sockets;
+        return _availableSockets = sockets;
     }
 
     // ***************************************************************************
@@ -1430,27 +1456,6 @@ class W5500.Driver {
         };
         return intStatus;
     }
-
-    // ***************************************************************************
-    // getTimeoutCount
-    // Returns: Connection timeout count
-    // Parameters:
-    //      none
-    // **************************************************************************
-    function getTimeoutCount() {
-        return readReg(W5500_RETRY_COUNT, 0x00);
-    }
-
-    // ***************************************************************************
-    // setTimeoutCount
-    // Returns: none
-    // Parameters:
-    //      count - number of times to retry on timeout
-    // **************************************************************************
-    function setTimeoutCount(count) {
-        writeReg(W5500_RETRY_COUNT, 0x00, count);
-    }
-
 
     // SPI FUNCTIONS
     // ---------------------------------------------
@@ -1879,8 +1884,8 @@ class W5500.Connection {
         _driver.clearSocketInterrupt(_socket);
 
         // Set the socket mode and open the socket
+        _driver.setRetries(3000, 5); // 3000ms, 5x
         _driver.setSocketMode(_socket, _mode);
-        _driver.setRetries();
         _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
 
         // Set the source port
@@ -1909,7 +1914,7 @@ class W5500.Connection {
 
 
         // Start polling the interrupts
-        _interrupt_timer = imp.wakeup(0, handleInterrupt.bindenv(this));
+        _interrupt_timer = imp.wakeup(1, handleInterrupt.bindenv(this));
 
         return this;
     }
@@ -2062,7 +2067,7 @@ class W5500.Connection {
     // Parameters: socket the interrupt occurred on
     // **************************************************************************
     function handleInterrupt(skip_timer = false) {
-        
+
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
         if (status.CONNECTED) {
