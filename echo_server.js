@@ -1,37 +1,55 @@
 #!/usr/bin/env node
+
 /**
  *  echo server
  *
  */
 
-const PORT = 60000;
+const DEFAULT_PORT = 60000;
+
+
 var net = require('net');
 var log = function(who, what) {
-  return function() {
-    var args = Array.prototype.slice.call(arguments);
-    // console.log('[%s on %s]', who, what, args);
-  };
+    return function() {
+        var args = Array.prototype.slice.call(arguments);
+        // console.log('[%s on %s]', who, what, args);
+    };
 };
 
+
+var cid = 1;
 var echo = function(socket) {
-  /**
-   *  net.Socket (http://nodejs.org/api/net.html#net_class_net_socket)
-   *  events: end, data, end, timeout, drain, error, close
-   *  methods:
-   */
-  socket.on('data', function(data) {
-    // data is a Buffer object
-    console.log("Data:", data.toString().trim());
-  });
 
-  socket.on('end', log('socket', 'end'));
-  socket.on('timeout', log('socket', 'timeout'));
-  socket.on('drain', log('socket', 'drain'));
-  socket.on('error', log('socket', 'error'));
-  socket.on('close', log('socket', 'close'));
+    socket.id = cid++;
 
-  socket.pipe(socket);
+    socket.on('data', function(data) {
+        console.log("Data[%d]: %s", socket.id, data.toString().trim());
+    });
+
+    socket.on('timeout', function() {
+        socket.destroy();
+    });
+
+    socket.on('close', function() {
+        server.getConnections(function(err, count) {
+            console.log("Disconnection from %s:%d, %d of %d open connections", socket.remoteAddress, socket.remotePort, socket.id, count);
+        })
+    });
+
+    socket.on('end', log('socket', 'end'));
+    socket.on('drain', log('socket', 'drain'));
+    socket.on('error', log('socket', 'error'));
+
+    socket.pipe(socket);
+
+    server.getConnections(function(err, count) {
+        console.log("Connection from %s:%d to %s:%d, %d of %d open connections", socket.remoteAddress, socket.remotePort, socket.localAddress, socket.localPort, socket.id, count);
+    });
 };
+
+
+var port = parseInt(process.argv[2]);
+if (port <= 1024 || isNaN(port)) port = DEFAULT_PORT;
 
 /**
  *  net.Server (http://nodejs.org/api/net.html#net_class_net_server)
@@ -39,31 +57,19 @@ var echo = function(socket) {
  *  methods: listen, address, getConnections,  
  */
 var server = net.createServer(echo);
-server.listen({ host: "0.0.0.0", port: PORT }); 
+server.listen({ host: "0.0.0.0", port: port });
 
 server.on('listening', function() {
-  var ad = server.address();
-  if (typeof ad === 'string') {
-    console.log('Listening: %s', ad);
-  } else {
+    var ad = server.address();
     console.log('Listening on %s:%s using %s', ad.address, ad.port, ad.family);
-  }
 });
 
 server.on('connection', function(socket) {
-  server.getConnections(function(err, count) {
-    console.log('Open: %d', count);
-  });
+    socket.setKeepAlive(true);
+    socket.setTimeout(30000);
 });
 
-server.on('close', function(socket) {
-  server.getConnections(function(err, count) {
-    console.log('Close: %d', count);
-  });
+server.on('error', function(err) {
+    console.log(err);
+    server.close(function() { console.log("shutting down the server!"); });
 });
-
-server.on('error', function(err) { 
-  console.log(err);
-  server.close(function() { console.log("shutting down the server!"); });
-});
-
