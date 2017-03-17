@@ -5,7 +5,7 @@
 // #require "W5500.device.nut:1.0.0"
 
 // echo server address and port
-const SOURCE_IP = "192.168.201.254";
+const SOURCE_IP = "192.168.201.185";
 const SUBNET_MASK = "255.255.255.0";
 const GATEWAY_IP = "192.168.201.1";
 const ECHO_SERVER_IP = "192.168.201.63";

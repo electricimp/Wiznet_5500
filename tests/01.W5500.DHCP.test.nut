@@ -64,7 +64,7 @@ class W5500_DHCP_TestCase extends ImpTestCase {
             }.bindenv(this));
 
             // Request the lease renewal with a 20s timeout
-            dhcp.renewLease(20);
+            dhcp.renewLease(50);
 
         }.bindenv(this));
     }
@@ -101,7 +101,7 @@ class W5500_DHCP_TestCase extends ImpTestCase {
             }.bindenv(this));
 
             // Request the lease renewal with a 20s timeout
-            dhcp.renewLease(20);
+            dhcp.renewLease(50);
 
         }.bindenv(this));
     }
