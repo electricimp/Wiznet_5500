@@ -726,6 +726,11 @@ class W5500.Driver {
     // ***************************************************************************
     function setGatewayAddr(addr) {
         local addr = _addrToIP(addr);
+
+        // Check that the address is actually different
+        local old_addr = getGatewayAddr();
+        if (_areObjectsEqual(addr, old_addr)) return;
+
         writeReg(W5500_GATEWAY_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
         writeReg(W5500_GATEWAY_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
         writeReg(W5500_GATEWAY_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
@@ -757,6 +762,11 @@ class W5500.Driver {
     // **************************************************************************
     function setSubnetMask(addr) {
         local addr = _addrToIP(addr);
+
+        // Check that the address is actually different
+        local old_addr = getSubnetMask();
+        if (_areObjectsEqual(addr, old_addr)) return;
+
         writeReg(W5500_SUBNET_MASK_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
         writeReg(W5500_SUBNET_MASK_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
         writeReg(W5500_SUBNET_MASK_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
@@ -799,6 +809,10 @@ class W5500.Driver {
             addr[0] = addr[0] | 0x02;
         }
 
+        // Check that the address is actually different
+        local old_addr = getSourceHWAddr();
+        if (_areObjectsEqual(addr, old_addr)) return;
+
         writeReg(W5500_SOURCE_HW_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
         writeReg(W5500_SOURCE_HW_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
         writeReg(W5500_SOURCE_HW_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
@@ -837,6 +851,11 @@ class W5500.Driver {
     // **************************************************************************
     function setSourceIP(addr) {
         local addr = _addrToIP(addr);
+
+        // Check that the address is actually different
+        local old_addr = getSourceIP();
+        if (_areObjectsEqual(addr, old_addr)) return;
+
         writeReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER, addr[0]);
         writeReg(W5500_SOURCE_IP_ADDR_1, W5500_COMMON_REGISTER, addr[1]);
         writeReg(W5500_SOURCE_IP_ADDR_2, W5500_COMMON_REGISTER, addr[2]);
@@ -1586,6 +1605,32 @@ class W5500.Driver {
             throw "Bad Mac address";
         }
     }
+
+
+    // ***************************************************************************
+    // _areObjectsEqual
+    // Returns: true if the two objects are identical. Currently only checks the one node deep
+    // Parameters:
+    //      obj1 - the first object
+    //      obj2 - the second object
+    // **************************************************************************
+    static
+    function _areObjectsEqual(obj1, obj2) {
+        if (typeof obj1 != typeof obj2) return false;
+        if (typeof obj1 == "array" || typeof obj1 == "table" || typeof obj1 == "blob") {
+            if (obj1.len() != obj2.len()) return false;
+            foreach (k, v in obj1) {
+                if (!(k in obj2)) return false;
+                if (typeof obj1[k] != typeof obj2[k]) return false;
+                // NOTE: Should recurse here if not a scalar
+                if (obj1[k] != obj2[k]) return false;
+            }
+            return true;
+        } else {
+            return obj1 == obj2;
+        }
+    }
+
 
     // ***************************************************************************
     // _getSocketRegBlockSelectBit
