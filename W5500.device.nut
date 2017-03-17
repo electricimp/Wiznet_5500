@@ -717,6 +717,20 @@ class W5500.Driver {
     }
 
     // ***************************************************************************
+    // setRetries
+    // Returns: this
+    // Parameters:
+    //      time - amount of time (in ms) for each attempt (default: 1000ms)
+    //      times - the number of retry attempts (default: 3x)
+    // ***************************************************************************
+    function setRetries(time = 1000, times = 5) {
+        writeReg(W5500_RETRY_TIME_0, W5500_COMMON_REGISTER, ((time & 0xFF00) >> 8));
+        writeReg(W5500_RETRY_TIME_1, W5500_COMMON_REGISTER, (time & 0x00FF));
+        writeReg(W5500_RETRY_COUNT, W5500_COMMON_REGISTER, times);
+        return this;
+    }
+
+    // ***************************************************************************
     // setSocketMode
     // Returns: this
     // Parameters:
@@ -1866,6 +1880,7 @@ class W5500.Connection {
 
         // Set the socket mode and open the socket
         _driver.setSocketMode(_socket, _mode);
+        _driver.setRetries();
         _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
 
         // Set the source port
