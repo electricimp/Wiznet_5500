@@ -2059,8 +2059,8 @@ class W5500.Connection {
                     }.bindenv(this))
                 }
 
-                // Deregister this socket
-                _driver.deregisterSocket(_socket);
+                // Close this socket
+                _driver.closeConnection(_socket);
 
             } else {
 
@@ -2127,8 +2127,8 @@ class W5500.Connection {
 
             }
 
-            // Deregister the socket
-            _driver.deregisterSocket(_socket);
+            // Close the socket
+            _driver.closeConnection(_socket);
 
             // clear transmit and connection callbacks
             onTransmitted(null);
