@@ -5,6 +5,7 @@
 // echo server address and port
 const SOURCE_IP = "192.168.1.185";
 const SUBNET_MASK = "255.255.255.0";
+const ROUTER = "192.168.1.1";
 const MTIII_SERVER_IP = "192.168.1.42";
 const MTIII_SERVER_PORT = 4242;
 const MTIII_CONNECT_ATTEMPTS = 5;
@@ -26,7 +27,7 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
     function setUp() {
         spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
         wiz = W5500(interruptPin, spi, null, resetPin);
-        wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK);
+        wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, ROUTER);
         wiz.setNumberOfAvailableSockets(2);
     }
 
@@ -42,12 +43,12 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
                     wiz.openConnection(MTIII_SERVER_IP, MTIII_SERVER_PORT, function(err, connection) {
 
                         if (err) return reject(format("Connection attempt %d failed to %s:%d: %s", attempt, MTIII_SERVER_IP, MTIII_SERVER_PORT, err.tostring()));
-                        server.log(format("Connection attempt %d successful", attempt));
+                        this.info(format("Connection attempt %d successful", attempt));
 
                         // Now disconnect and recurse
                         connection.close(function() {
                             if (attempt >= MTIII_CONNECT_ATTEMPTS) {
-                                return resolve(format("Connected to %s:%d a total of %d attempts", MTIII_SERVER_IP, MTIII_SERVER_PORT, MTIII_CONNECT_ATTEMPTS));
+                                return resolve(format("Connected to %s:%d a total of %d times", MTIII_SERVER_IP, MTIII_SERVER_PORT, MTIII_CONNECT_ATTEMPTS));
                             } else {
                                 connectOnce(attempt + 1);
                             }
@@ -66,24 +67,36 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
 
 
     // Tests the Wiznet's ability to send and receive binary data to the MTIII
-    function testSendingBinaryData() {
+    function testBinaryData() {
         return Promise(function(resolve, reject) {
 
             wiz.onReady(function() {
                 wiz.openConnection(MTIII_SERVER_IP, MTIII_SERVER_PORT, function(err, connection) {
 
                     if (err) return reject(format("Connection to MTIII failed: %s", err.tostring()));
-                    server.log(format("Connection successful"));
+                    this.info(format("Connection successful"));
 
-                    connection.close();
-                    return reject("Tests not written yet");
+                    connection.transmit(MTIII_REQUEST, function(err) {
+                        if (err) return reject("Transmission failed: " + err);
+                        this.info("Transmitted: " + MTIII_REQUEST.len() + " bytes");
+                    }.bindenv(this));
+
+                    connection.receive(function(err, data) {
+                        this.info("Response: " + data.len() + " bytes");
+                        if (data.tostring() == MTIII_RESPONSE.tostring()) {
+                            resolve();
+                        } else {
+                            reject("Response did not match expectation");
+                        }
+                        connection.close();
+                    }.bindenv(this))
+
 
                 }.bindenv(this));
 
             }.bindenv(this));
 
         }.bindenv(this));
-
 
     }
 }

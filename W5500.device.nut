@@ -221,6 +221,7 @@ enum W5500_SOCKET_STATES {
     CLOSED,
     INIT,
     CONNECTING,
+    LISTENING,
     ESTABLISHED,
     DISCONNECTING
 }
@@ -381,6 +382,20 @@ class W5500 {
 
         // Create a socket, a connection object & a handler
         _driver.openConnection(ip, port, mode, cb);
+    }
+
+    // ***************************************************************************
+    // listen
+    // Returns: this
+    // Parameters:
+    //      sourcePort - the port to listen on
+    //      cb - function to be called when connection successfully established 
+    // ****************************************************************************
+    function listen(sourcePort, cb) {
+        if (!_isReady) throw "Wiznet driver not ready";
+
+        // Create a socket, a connection object & a handler
+        _driver.listen(sourcePort, cb);
     }
 
     // ***************************************************************************
@@ -575,6 +590,7 @@ class W5500.Driver {
         return (status & 0x01);
     }
 
+
     // ***************************************************************************
     // openConnection
     // Returns: this
@@ -606,6 +622,30 @@ class W5500.Driver {
             _connections[socket].setSourcePort(sourcePort);
         }
         _connections[socket].open(cb);
+
+    }
+
+
+    // ***************************************************************************
+    // listen
+    // Returns: this
+    // Parameters:
+    //      sourcePort - the port to listen on
+    //      cb - function to be called when connection successfully established 
+    // ****************************************************************************
+    function listen(sourcePort, cb) {
+
+        // check for available socket
+        if (_availableSockets.len() == 0) {
+            return cb(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
+        }
+
+        local socket = _availableSockets.pop();
+
+        // Create the connection object and assign it to a spare socket
+        _connections[socket] <- W5500.Connection(this, socket, null, null, W5500_SOCKET_MODE_TCP);
+        _connections[socket].setSourcePort(sourcePort);
+        _connections[socket].listen(cb);
 
     }
 
@@ -893,6 +933,26 @@ class W5500.Driver {
         return addr;
     }
 
+
+    // ***************************************************************************
+    // setDestHWAddr
+    // Returns: this
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    //      addr - an array of 6 integers with the mac address for the
+    //             destination hardware
+    // **************************************************************************
+    function setDestHWAddr(socket, addr) {
+        local bsb = _getSocketRegBlockSelectBit(socket);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_0, bsb, addr[0]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_1, bsb, addr[1]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_2, bsb, addr[2]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_3, bsb, addr[3]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_4, bsb, addr[4]);
+        writeReg(W5500_SOCKET_DEST_HW_ADDR_5, bsb, addr[5]);
+        return this;
+    }
+
     // ***************************************************************************
     // setSourceIP
     // Returns: this
@@ -923,7 +983,6 @@ class W5500.Driver {
     // **************************************************************************
     function getSourceIP() {
         local addr = array(4);
-        // server.log((hardware.millis() - started) + ": DBG setSourceIP: " + pformat(addr));
         addr[0] = readReg(W5500_SOURCE_IP_ADDR_0, W5500_COMMON_REGISTER);
         addr[1] = readReg(W5500_SOURCE_IP_ADDR_1, W5500_COMMON_REGISTER);
         addr[2] = readReg(W5500_SOURCE_IP_ADDR_2, W5500_COMMON_REGISTER);
@@ -955,22 +1014,21 @@ class W5500.Driver {
     }
 
     // ***************************************************************************
-    // setDestHWAddr
-    // Returns: this
+    // getDestIP
+    // Returns: addr
     // Parameters:
     //      socket - select the socket using an integer 0-3
-    //      addr - an array of 6 integers with the mac address for the
-    //             destination hardware
     // **************************************************************************
-    function setDestHWAddr(socket, addr) {
+    function getDestIP(socket) {
+
         local bsb = _getSocketRegBlockSelectBit(socket);
-        writeReg(W5500_SOCKET_DEST_HW_ADDR_0, bsb, addr[0]);
-        writeReg(W5500_SOCKET_DEST_HW_ADDR_1, bsb, addr[1]);
-        writeReg(W5500_SOCKET_DEST_HW_ADDR_2, bsb, addr[2]);
-        writeReg(W5500_SOCKET_DEST_HW_ADDR_3, bsb, addr[3]);
-        writeReg(W5500_SOCKET_DEST_HW_ADDR_4, bsb, addr[4]);
-        writeReg(W5500_SOCKET_DEST_HW_ADDR_5, bsb, addr[5]);
-        return this;
+        local addr = array(4);
+        addr[0] = readReg(W5500_SOCKET_DEST_IP_ADDR_0, bsb);
+        addr[1] = readReg(W5500_SOCKET_DEST_IP_ADDR_1, bsb);
+        addr[2] = readReg(W5500_SOCKET_DEST_IP_ADDR_2, bsb);
+        addr[3] = readReg(W5500_SOCKET_DEST_IP_ADDR_3, bsb);
+        return addr;
+
     }
 
     // ***************************************************************************
@@ -985,18 +1043,27 @@ class W5500.Driver {
 
         // Convert the type
         local addr = _addrToIP(addr);
-        if (typeof addr == "array") {
-            local bsb = _getSocketRegBlockSelectBit(socket);
-            writeReg(W5500_SOCKET_DEST_IP_ADDR_0, bsb, addr[0]);
-            writeReg(W5500_SOCKET_DEST_IP_ADDR_1, bsb, addr[1]);
-            writeReg(W5500_SOCKET_DEST_IP_ADDR_2, bsb, addr[2]);
-            writeReg(W5500_SOCKET_DEST_IP_ADDR_3, bsb, addr[3]);
-        } else {
-            // Send to the DNS and require a callback
-            throw "DNS not available yet";
-        }
+        local bsb = _getSocketRegBlockSelectBit(socket);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_0, bsb, addr[0]);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_1, bsb, addr[1]);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_2, bsb, addr[2]);
+        writeReg(W5500_SOCKET_DEST_IP_ADDR_3, bsb, addr[3]);
 
         return this;
+    }
+
+    // ***************************************************************************
+    // getDestPort
+    // Returns: integer port number
+    // Parameters:
+    //      socket - select the socket using an integer 0-3
+    // **************************************************************************
+    function getDestPort(socket) {
+
+        local bsb = _getSocketRegBlockSelectBit(socket);
+        local port_hi = readReg(W5500_SOCKET_DEST_PORT_0, bsb) << 8;
+        local port_lo = readReg(W5500_SOCKET_DEST_PORT_1, bsb);
+        return port_hi + port_lo;
     }
 
     // ***************************************************************************
@@ -1519,16 +1586,16 @@ class W5500.Driver {
     // **************************************************************************
     function reset(sw = false) {
 
-		// Force disconnect/close all ports
-		_maxNoOfSockets = getTotalSupportedSockets();
-		for (local socket = 0; socket < _maxNoOfSockets; socket++) {
-			sendSocketCommand(socket, W5500_SOCKET_DISCONNECT);
-		}
-		imp.sleep(1);
-		for (local socket = 0; socket < _maxNoOfSockets; socket++) {
-			sendSocketCommand(socket, W5500_SOCKET_CLOSE);
-		}
-		imp.sleep(0.1);
+        // Force disconnect/close all ports
+        _maxNoOfSockets = getTotalSupportedSockets();
+        for (local socket = 0; socket < _maxNoOfSockets; socket++) {
+            sendSocketCommand(socket, W5500_SOCKET_DISCONNECT);
+        }
+        imp.sleep(1);
+        for (local socket = 0; socket < _maxNoOfSockets; socket++) {
+            sendSocketCommand(socket, W5500_SOCKET_CLOSE);
+        }
+        imp.sleep(0.1);
 
         // Reset chip to default state, blocks for 0.2s
         // Note: Datasheet states that W5500 software reset is not reliable, use hardware reset.
@@ -1873,16 +1940,6 @@ class W5500.Connection {
         _mode = mode;
         _handlers = {};
         _transmitQueue = [];
-    }
-
-
-    // ***************************************************************************
-    // open
-    // Returns: this
-    // Parameters:
-    //      cb - callback to be called when the connection is opened
-    // **************************************************************************
-    function open(cb = null) {
 
         // Close the socket if it is still open
         while (_driver.getSocketStatus(_socket) != W5500_SOCKET_STATUS_CLOSED) {
@@ -1893,6 +1950,17 @@ class W5500.Connection {
 
         // Clear out any stagnant interrupts
         _driver.clearSocketInterrupt(_socket);
+
+    }
+
+
+    // ***************************************************************************
+    // open
+    // Returns: this
+    // Parameters:
+    //      cb - callback to be called when the connection is opened
+    // **************************************************************************
+    function open(cb = null) {
 
         // Set the socket mode and open the socket
         _driver.setRetries(3000, 5); // 3000ms, 5x
@@ -1910,7 +1978,6 @@ class W5500.Connection {
         // Open the socket and setup the connection
         _driver.setDestIP(_socket, _ip);
         _driver.setDestPort(_socket, _port);
-        imp.sleep(0.1)
         _driver.sendSocketCommand(_socket, W5500_SOCKET_CONNECT);
 
         if (_mode == W5500_SOCKET_MODE_UDP) {
@@ -1920,7 +1987,7 @@ class W5500.Connection {
         } else {
             // For all other modes we just prepare for a future connection
             _state = W5500_SOCKET_STATES.CONNECTING;
-            if (cb) onConnect(cb);
+            if (cb) _handlers["connect"] <- cb;
         }
 
 
@@ -1932,13 +1999,47 @@ class W5500.Connection {
 
 
     // ***************************************************************************
+    // listen
+    // Returns: sets the socket to listen mode
+    // Parameters:
+    //      cb - function to called when a connection is established
+    //      
+    // **************************************************************************
+    function listen(cb) {
+
+        // Set the socket mode and open the socket
+        _driver.setSocketMode(_socket, W5500_SOCKET_MODE_TCP);
+        _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
+        _driver.setSourcePort(_socket, _sourcePort);
+        _driver.sendSocketCommand(_socket, W5500_SOCKET_LISTEN);
+
+        _state = W5500_SOCKET_STATES.LISTENING;
+
+        // Start polling the interrupts
+        _interrupt_timer = imp.wakeup(1, handleInterrupt.bindenv(this));
+
+        // Setup the callback
+        _handlers["connect"] <- function(err, conn) {
+            if (!err) {
+                _ip = _driver.getDestIP(_socket);
+                _port = _driver.getDestPort(_socket);
+            }
+            cb(err, conn);
+        }.bindenv(this);
+
+        return this;
+    }
+
+
+
+    // ***************************************************************************
     // close
     // Returns: close connection
     // Parameters:
     //      none
     // **************************************************************************
     function close(cb = null) {
-		if (cb) onClose(cb);
+        if (cb) onClose(cb);
         _state = W5500_SOCKET_STATES.DISCONNECTING;
         _driver.closeConnection(_socket, _getHandler("close"));
         _handlers = {};
@@ -1967,17 +2068,6 @@ class W5500.Connection {
     }
 
     // ***************************************************************************
-    // onConnect
-    // Returns: this
-    // Parameters:
-    //      cb - function to called when connect/timeout interrupt triggered
-    // **************************************************************************
-    function onConnect(cb) {
-        _handlers["connect"] <- cb;
-        return this;
-    }
-
-    // ***************************************************************************
     // onDisconnect
     // Returns: this
     // Parameters:
@@ -1996,17 +2086,6 @@ class W5500.Connection {
     // **************************************************************************
     function onReceive(cb) {
         _handlers["receive"] <- cb;
-        return this;
-    }
-
-    // ***************************************************************************
-    // onTransmitted
-    // Returns: this
-    // Parameters:
-    //      cb - function to called when transmit/timeout interrupt triggered
-    // **************************************************************************
-    function onTransmitted(cb) {
-        _handlers["transmit"] <- cb;
         return this;
     }
 
@@ -2091,7 +2170,7 @@ class W5500.Connection {
 
             local _connectionCallback = _getHandler("connect");
             if (_connectionCallback) {
-                onConnect(null);
+                _handlers["connect"] <- null;
 
                 imp.wakeup(0, function() {
                     _connectionCallback(null, this);
@@ -2109,7 +2188,7 @@ class W5500.Connection {
 
                 local _connectionCallback = _getHandler("connect");
                 if (_connectionCallback) {
-                    onConnect(null);
+                    _handlers["connect"] <- null;
 
                     imp.wakeup(0, function() {
                         _connectionCallback("timeout", null);
@@ -2123,7 +2202,7 @@ class W5500.Connection {
 
                 local _transmitCallback = _getHandler("transmit");
                 if (_transmitCallback) {
-                    onTransmitted(null);
+                    _handlers["transmit"] <- null;
 
                     imp.wakeup(0, function() {
                         _transmitCallback("Transmission timeout");
@@ -2143,7 +2222,7 @@ class W5500.Connection {
             // call transmitting callback
             local _transmitCallback = _getHandler("transmit");
             if (_transmitCallback) {
-                onTransmitted(null);
+                _handlers["transmit"] <- null;
 
                 imp.wakeup(0, function() {
                     _transmitCallback(null);
@@ -2171,7 +2250,7 @@ class W5500.Connection {
                 // call connected (failed) callback
                 local _connectionCallback = _getHandler("connect");
                 if (_connectionCallback) {
-                    onConnect(null);
+                    _handlers["connect"] <- null;
 
                     imp.wakeup(0, function() {
                         _connectionCallback("failed", null);
@@ -2279,7 +2358,7 @@ class W5500.Connection {
             _transmitNextChunk = function(chunk) {
 
                 // Setup the temporary callback
-                onTransmitted(function(err) {
+                _handlers["transmit"] <- function(err) {
                     if (!err && chunks.len() > 0) {
                         // Send the next chunk
                         _transmitNextChunk(chunks.remove(0));
@@ -2287,7 +2366,7 @@ class W5500.Connection {
                         // All done.
                         __cb(err);
                     }
-                }.bindenv(this));
+                }.bindenv(this);
 
                 // Send the chunk
                 _driver.sendTxData(_socket, chunk);

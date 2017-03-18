@@ -124,6 +124,37 @@ The *openConnection()*  finds a socket that is not in use and Initializes a conn
     }.bindenv(this))
 
 ```
+
+
+### listen(*port, cb*)
+
+The *listen()* function finds a socket that is not in use and sets up a TCP server. 
+
+#### Connection Settings
+| key | Data Type | Required | Default Value |Description |
+| ----- | -------- | ----|----|  --------------- |
+| port | An integer | Yes | N/A | The port to listen on for connections. |
+| cb   | Function   | Yes | N/A | A callback function that is passed an error message or the connection when a remote connection is established. |
+
+#### Callback Arguments
+|Key |Data Type|Description|
+|-----|----|--------------|
+|error|String|An error message if there was a problem or null if successful.|
+|connection|W5500.Connection object|An instantiated object representing the open socket connection.|
+
+
+##### Example Code:
+```squirrel
+    local port = 80;
+    wiz.listen(port, function(error, connection) {
+        if (error) return server.log(error);
+        local ip = connection.getIP();
+        local port = connection.getPort();
+        server.log(format("Connection established from %d.%d.%d.%d:%d", ip[0], ip[1], ip[2], ip[3], port));
+    }.bindenv(this))
+```
+
+
 ### reset (*[sw]*)
 *reset()* causes the Wiznet chip to undergo a software reset. It is  recommended to use hardware resets.
 
@@ -151,7 +182,7 @@ Closes the connection on a socket then fires the callback on completion of all s
 
 |Key|Data Type|Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
-|cb|Function|No|null|Callback function that can be called upon the closure of a connection.This callback should not expect any parameters.|
+|cb|Function|No|null|Callback function that can be called upon the closure of a connection. This callback should not expect any parameters.|
 
 #### Callback Arguments
 |Key |Data Type|Description|
@@ -181,29 +212,6 @@ The *isEstablished()* method returns a Boolean. Returns true if a connection is 
     server.log(connection.isEstablished() ? "established" : "not established");
 ```
 
-### onConnect(*cb*)
-Passes the callback function to be called when connection is established. Set automatically in the  *open()* function hence should not be used.
-
-### onDisconnect(*[cb]*)
-Passes the callback function to be called when the connection disconnects.
-
-| key | Data Type |Required|Default Value |Description |
-| ----- | -------- | ----|----|  --------------- |
-|cb|Function|Yes|N/A|Callback function to called in the event of a disconnection |
-
-#### Callback Arguments
-|Key |Data Type|Description|
-|-----|----|----|
-|error|string|An error message if there was a problem or null if it was successful|
-
-
-#### Example Code:
-```squirrel
-    connection.onDisconnect(function(error) {
-        server.log("Disconnected")
-    }.bindenv(this));
-```
-
 ### onReceive(*[cb]*)
 Passes the callback function to called when data is received.
 
@@ -225,13 +233,12 @@ Passes the callback function to called when data is received.
     }.bindenv(this));
 ```
 
-### onTransmitted(*[cb]*)
-Passes the callback function to be handled when data is transmitted. Called within the *transmit*  function.
+### onDisconnect(*[cb]*)
+Passes the callback function to be called when the connection disconnects.
 
 | key | Data Type |Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
-|cb|Function|Yes|N/A|Callback function to called in the event of data being transmitted |
-
+|cb|Function|Yes|N/A|Callback function to called in the event of a disconnection |
 
 #### Callback Arguments
 |Key |Data Type|Description|
@@ -241,8 +248,23 @@ Passes the callback function to be handled when data is transmitted. Called with
 
 #### Example Code:
 ```squirrel
-    connection.onTransmitted(function(error) {
-        server.log("Transmission complete");
+    connection.onDisconnect(function(error) {
+        server.log("Disconnected")
+    }.bindenv(this));
+```
+
+### onClose(*[cb]*)
+Passes the callback function to be called when the connection is fully closed and removed from the system.
+
+| key | Data Type |Required|Default Value |Description |
+| ----- | -------- | ----|----|  --------------- |
+|cb|Function|Yes|N/A|Callback function to called. Has no parameters.  |
+
+
+#### Example Code:
+```squirrel
+    connection.onClose(function() {
+        server.log("Closed")
     }.bindenv(this));
 ```
 
