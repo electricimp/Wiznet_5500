@@ -1518,9 +1518,20 @@ class W5500.Driver {
     //                unreliable - don't use
     // **************************************************************************
     function reset(sw = false) {
+
+		// Force disconnect/close all ports
+		_maxNoOfSockets = getTotalSupportedSockets();
+		for (local socket = 0; socket < _maxNoOfSockets; socket++) {
+			sendSocketCommand(socket, W5500_SOCKET_DISCONNECT);
+		}
+		imp.sleep(1);
+		for (local socket = 0; socket < _maxNoOfSockets; socket++) {
+			sendSocketCommand(socket, W5500_SOCKET_CLOSE);
+		}
+		imp.sleep(0.1);
+
         // Reset chip to default state, blocks for 0.2s
-        // Note: Datasheet states that W5500 software reset
-        //       is not reliable, use hardware reset.
+        // Note: Datasheet states that W5500 software reset is not reliable, use hardware reset.
         if (sw || _resetPin == null) {
             setMode(W5500_SW_RESET);
             imp.sleep(0.2);
