@@ -3,9 +3,9 @@
 // http://opensource.org/licenses/MIT
 
 // echo server address and port
-const SOURCE_IP = "192.168.201.185";
+const SOURCE_IP = "192.168.1.185";
 const SUBNET_MASK = "255.255.255.0";
-const ROUTER = "192.168.201.1";
+const ROUTER = "192.168.1.1";
 const LISTEN_PORT = 80;
 
 class W5500_Listener_TestCase extends ImpTestCase {
@@ -24,6 +24,7 @@ class W5500_Listener_TestCase extends ImpTestCase {
         wiz = W5500(interruptPin, spi, null, resetPin);
         wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, ROUTER);
         wiz.setNumberOfAvailableSockets(3);
+        this.info("Configured IP address to " + SOURCE_IP);
     }
 
 

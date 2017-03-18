@@ -82,7 +82,7 @@ class W5500_DHCP_TestCase extends ImpTestCase {
                 local subnet_mask = dhcp.getSubnetMask();
                 local router = dhcp.getRouterAddress();
                 local log = format("%s / %s via %s", source_ip, subnet_mask, router);
-                server.log("Lease obtained: " + log);
+                this.info("Lease obtained: " + log);
 
                 wiz.configureNetworkSettings(source_ip, subnet_mask, router);
                 wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
@@ -93,7 +93,7 @@ class W5500_DHCP_TestCase extends ImpTestCase {
                     connection.transmit(ECHO_MESSAGE, function(err) {
                         connection.close();
                         if (err) return reject("Error transmitting: " + err);
-                        resolve(format("Connection setup successfully from %s to %s:%d", log, ECHO_SERVER_IP, ECHO_SERVER_PORT));
+                        resolve(format("Connection setup successfully to %s:%d", ECHO_SERVER_IP, ECHO_SERVER_PORT));
                     }.bindenv(this));
 
                 }.bindenv(this));

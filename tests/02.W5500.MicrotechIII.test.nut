@@ -29,6 +29,7 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
         wiz = W5500(interruptPin, spi, null, resetPin);
         wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, ROUTER);
         wiz.setNumberOfAvailableSockets(2);
+        this.info("Configured IP address to " + SOURCE_IP);
     }
 
 

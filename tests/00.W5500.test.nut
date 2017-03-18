@@ -53,7 +53,6 @@ class W5500_TestCase extends ImpTestCase {
         try {
             _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
         } catch (error) {
-            // server.log("error occured");
             this.assertTrue(error == "Wiznet driver not ready", "configureNetworkSettings ran with wiznet not yet ready");
         }
         _wiz._isReady = true;
@@ -199,7 +198,6 @@ class W5500_TestCase extends ImpTestCase {
             _wiz._driver._addrToMac(badArray);
             this.assertTrue(false, "Bad mac address array was rejected");
         } catch (error) {
-            // server.log("error occured from bad array")
             this.assertTrue(error == "Bad Mac address", "Bad mac address array was rejected");
         }
 
@@ -209,7 +207,6 @@ class W5500_TestCase extends ImpTestCase {
             _wiz._driver._addrToMac(badArray);
             this.assertTrue(false, "Bad mac address array was rejected");
         } catch (error) {
-            // server.log("error occured from bad string");
             this.assertTrue(error == "Bad Mac address", "Bad mac address string was rejected");
         }
 
@@ -235,6 +232,7 @@ class W5500_TestCase extends ImpTestCase {
                 // making sure that the callback is not called unless wiznet is ready
                 _wiz.setNumberOfAvailableSockets(4);
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
+                this.info("Configured IP address to " + SOURCE_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
                         return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
@@ -270,6 +268,7 @@ class W5500_TestCase extends ImpTestCase {
                 // making sure that the callback is not called unless wiznet is ready
                 _wiz.setNumberOfAvailableSockets(4);
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
+                this.info("Configured IP address to " + SOURCE_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
 
                     if (err != null || connection == null) {
@@ -310,6 +309,7 @@ class W5500_TestCase extends ImpTestCase {
                 // making sure that the callback is not called unless wiznet is ready
                 _wiz.setNumberOfAvailableSockets(4);
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
+                this.info("Configured IP address to " + SOURCE_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
                         return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
@@ -343,6 +343,7 @@ class W5500_TestCase extends ImpTestCase {
 
                 _wiz.setNumberOfAvailableSockets(1);
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
+                this.info("Configured IP address to " + SOURCE_IP);
 
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, conn1) {
                     if (err) {
@@ -379,6 +380,7 @@ class W5500_TestCase extends ImpTestCase {
                 // set so there is only a single socket
                 _wiz.setNumberOfAvailableSockets(1);
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
+                this.info("Configured IP address to " + SOURCE_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
                     if (err) {
                         return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
@@ -410,17 +412,17 @@ class W5500_TestCase extends ImpTestCase {
             local readyCb = function() {
                 // set so there is only a single socket
                 _wiz.setNumberOfAvailableSockets(1);
-                // server.log("last available socket " + _wiz._driver._availableSockets[0]);
                 _wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
+                this.info("Configured IP address to " + SOURCE_IP);
                 _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, conn1) {
                     if (err) {
                         return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
                     } else {
-                        server.log("testOpenClose: first connection opened.");
+                        this.info("First connection opened");
 
                         conn1.onClose(function() {
                             // open a second connection once it is closed
-                            server.log("testOpenClose: first connection closed, opening second");
+                            this.info("First connection closed, opening second");
                             _wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, conn2) {
                                 if (err) {
                                     return reject(format("openConnection failed to %s:%d : %s", ECHO_SERVER_IP, ECHO_SERVER_PORT, err.tostring()));
