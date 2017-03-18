@@ -1937,7 +1937,8 @@ class W5500.Connection {
     // Parameters:
     //      none
     // **************************************************************************
-    function close() {
+    function close(cb = null) {
+		if (cb) onClose(cb);
         _state = W5500_SOCKET_STATES.DISCONNECTING;
         _driver.closeConnection(_socket, _getHandler("close"));
         _handlers = {};
