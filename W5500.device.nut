@@ -227,11 +227,14 @@ enum W5500_SOCKET_STATES {
 }
 
 // Error messages
-const W5500_ERR_INVALID_PARAMETERS = "Provide 'ip', 'port', 'mode' and a callback.";
-const W5500_ERR_CANNOT_CONNECT_STILL_CLEANING = "Cannot open a connection. Still cleaning up.";
-const W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All connection sockets in use.";
+const W5500_ERR_INVALID_PARAMETERS = "Provide 'ip', 'port', 'mode' and a callback";
+const W5500_ERR_CANNOT_CONNECT_STILL_CLEANING = "Cannot open a connection. Still cleaning up";
+const W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All connection sockets in use";
 const W5500_ERR_CANNOT_CONNECT_TIMEOUT = "Connection timeout";
 const W5500_ERR_TRANSMIT_TIMEOUT = "Transmit timeout";
+const W5500_ERR_RECEIVE_TIMEOUT = "Receive timeout";
+const W5500_ERR_NOT_CONNECTED = "Not connected";
+
 
 // Miscellaneous constants
 const W5500_TRANSMIT_TIMEOUT = 8;
@@ -2191,7 +2194,7 @@ class W5500.Connection {
                     _handlers["connect"] <- null;
 
                     imp.wakeup(0, function() {
-                        _connectionCallback("timeout", null);
+                        _connectionCallback(W5500_ERR_CONNECT_TIMEOUT, null);
                     }.bindenv(this))
                 }
 
@@ -2205,7 +2208,7 @@ class W5500.Connection {
                     _handlers["transmit"] <- null;
 
                     imp.wakeup(0, function() {
-                        _transmitCallback("Transmission timeout");
+                        _transmitCallback(W5500_ERR_TRANSMIT_TIMEOUT);
                     }.bindenv(this))
                 } else {
                     // server.error("No timeout handler")
@@ -2443,7 +2446,7 @@ class W5500.Connection {
             // Set a timeout before putting the handler back
             if (timeout > 0) {
                 timeout_timer = imp.wakeup(timeout, function() {
-                    cb("timeout", null);
+                    cb(W5500_ERR_RECEIVE_TIMEOUT, null);
                     onReceive(receiveHandler);
                 }.bindenv(this))
             }
