@@ -9,6 +9,7 @@ const ROUTER = "192.168.1.1";
 const MTIII_SERVER_IP = "192.168.1.42";
 const MTIII_SERVER_PORT = 4242;
 const MTIII_CONNECT_ATTEMPTS = 5;
+const MTIII_RESPONSE_TIMEOUT = 2; // seconds
 
 MTIII_SEQUENCE <- [
     // Init
@@ -27,6 +28,9 @@ MTIII_SEQUENCE <- [
     "\x1a\x00\x0c\x00\xd8\x6c\x24\x00\x16\x00\x00\x00\x00\x00\x0d\x23\x89\xda\xaf\xf0\x00\x00\x00\x00\x00\x00", // Request
     128, // Response length
 
+    // Fake an error, should timeout
+    "timeout", // Request
+    null // Response
 
 ];
 
@@ -97,42 +101,61 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
                     // Local function for sending and waiting for response
                     local sendAndReceive = function(send, receive, done) {
 
+                        // Transmit the packet to the microtech
                         connection.transmit(send, function(err) {
                             if (err) return done(err, send, null);
                             this.info("Transmitted: " + send.len() + " bytes");
                         }.bindenv(this));
 
+                        // Wait for a response from the microtech
                         connection.receive(function(err, data) {
-                            if (err) return done(err, null, null);
+                            if (err) return done(err, send, null);
                             this.info("Received: " + data.len() + " bytes");
-                            if (receive == null || (typeof receive == "integer" && data.len() == receive) || data.tostring() == receive.tostring()) {
-                                done(null, send, data);
-                            } else {
-                                done("Response didn't match", send, data);
-                            }
-                        }.bindenv(this))
+                            done(err, send, data);
+                        }.bindenv(this), MTIII_RESPONSE_TIMEOUT);
 
                     }
 
                     // Track where we are up to in the sequence
                     local pos = 0;
                     local runSequence;
-                    runSequence = function() {
+                    runSequence = function(done) {
                         local send = MTIII_SEQUENCE[pos];
                         local receive = MTIII_SEQUENCE[pos+1];
                         sendAndReceive(send, receive, function(err, sent, received) {
-                            if (err) reject(err);
+
+                            // Check the errors
+                            if (sent == "timeout" && err != "timeout") {
+                                return done("Expected timeout error");
+                            } else if (sent != "timeout" && err != null) {
+                                return done(err);
+                            }
+
+                            // Check the values
+                            if (receive == null || (typeof receive == "integer" && received.len() == receive) || received.tostring() == receive.tostring()) {
+                                // Continue
+                            } else {
+                                return done("Response didn't match");
+                            }
+
+                            // Move onto the next one
                             pos += 2;
                             if (pos < MTIII_SEQUENCE.len()) {
-                                imp.wakeup(0, runSequence.bindenv(this));
+                                imp.wakeup(0, function() {
+                                    runSequence(done);
+                                }.bindenv(this));
                             } else {
-                                resolve();
+                                done(null);
                             }
                         }.bindenv(this));
                     }
 
                     // Start running the sequence
-                    runSequence();
+                    runSequence(function(err) {
+                        connection.close();
+                        if (err) reject(err);
+                        else resolve();
+                    }.bindenv(this));
 
                 }.bindenv(this));
 

@@ -2423,7 +2423,7 @@ class W5500.Connection {
     //                     the callback set by setReceiveCallback, and will be
     //                     used only for during this check for data)
     // **************************************************************************
-    function receive(cb = null) {
+    function receive(cb = null, timeout = 0) {
 
         local receiveHandler = _getHandler("receive");
         local callback = cb ? cb : receiveHandler;
@@ -2431,11 +2431,22 @@ class W5500.Connection {
 
         if (cb) {
 
+            local timeout_timer = null;
+
             // Temporarily take over the callback
             onReceive(function(err, data) {
+                if (timeout_timer) imp.cancelwakeup(timeout_timer);
                 cb(err, data);
                 onReceive(receiveHandler);
             }.bindenv(this));
+
+            // Set a timeout before putting the handler back
+            if (timeout > 0) {
+                timeout_timer = imp.wakeup(timeout, function() {
+                    cb("timeout", null);
+                    onReceive(receiveHandler);
+                }.bindenv(this))
+            }
 
         } else {
             // Handle a normal callback here
