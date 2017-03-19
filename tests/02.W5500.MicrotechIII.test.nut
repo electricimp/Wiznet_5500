@@ -9,9 +9,26 @@ const ROUTER = "192.168.1.1";
 const MTIII_SERVER_IP = "192.168.1.42";
 const MTIII_SERVER_PORT = 4242;
 const MTIII_CONNECT_ATTEMPTS = 5;
-const MTIII_REQUEST = "\x22\x1a\x5c\x75\x30\x30\x30\x30\x5c\x66\x5c\x75\x30\x30\x30\x30\xd8\x6c\x24\x5c\x75\x30\x30\x30\x30\x16\x5c\x75\x30\x30\x30\x30\x5c\x75\x30\x30\x30\x30\x5c\x75\x30\x30\x30\x30\x5c\x75\x30\x30\x30\x30\x5c\x75\x30\x30\x30\x30\x5c\x72\x23\x15\x06\xf0\x00\x00\x00\x5c\x75\x30\x30\x30\x30\x5c\x75\x30\x30\x30\x30\x5c\x75\x30\x30\x30\x30\x22";
-const MTIII_RESPONSE = "\x80\x00\x0c\x00\xd8\x6c\x24\x40\x16\x00\x00\x00\x00\x00\x00\x00\x0d\x23\x15\x06\xaf\xf0\x68\x00\x68\x00\x2c\x00\x43\x66\x67\x31\x2d\x31\x35\x00\x00\x00\x00\x00\x00\x00\x00\x00\x43\x66\x67\x31\x2d\x31\x35\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x33\x31\x34\x4d\x38\x30\x38\x33\x30\x30\x31\x31\x30\x30\x37\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 
+MTIII_SEQUENCE <- [
+    // Init
+    "\x0e\x00\x04\x00\xd8\x6c\x81\x00\x16\x00\x00\x00\x00\x00", // Request
+    "\x12\x00\x04\x00\xd8\x6c\x81\x40\x16\x00\x00\x00\x00\x00\x01\x00\x00\x04", // Response
+
+    // Read the serial number
+    "\x1a\x00\x0c\x00\xd8\x6c\x24\x00\x16\x00\x00\x00\x00\x00\x04\x23\x89\xd1\xea\x5c\x00\x00\x00\x00\x00\x00", // Request
+    128, // Response length
+
+    // Read the config code 1-15
+    "\x1a\x00\x0c\x00\xd8\x6c\x24\x00\x16\x00\x00\x00\x00\x00\x0d\x23\x15\x06\xaf\xf0\x00\x00\x00\x00\x00\x00", // Request
+    128, // Response length
+
+    // Read the config code 16-30
+    "\x1a\x00\x0c\x00\xd8\x6c\x24\x00\x16\x00\x00\x00\x00\x00\x0d\x23\x89\xda\xaf\xf0\x00\x00\x00\x00\x00\x00", // Request
+    128, // Response length
+
+
+];
 
 class W5500_MicrotechIII_TestCase extends ImpTestCase {
 
@@ -35,7 +52,7 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
 
     // Tests the ability of the wiznet to open and close multiple times cleanly
     // Failure to cleanly close the connection leads to the MTIII rejecting new connections
-    function testConnectMultipleTimes() {
+    function _testConnectMultipleTimes() {
         return Promise(function(resolve, reject) {
 
             local connectOnce;
@@ -77,21 +94,45 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
                     if (err) return reject(format("Connection to MTIII failed: %s", err.tostring()));
                     this.info(format("Connection successful"));
 
-                    connection.transmit(MTIII_REQUEST, function(err) {
-                        if (err) return reject("Transmission failed: " + err);
-                        this.info("Transmitted: " + MTIII_REQUEST.len() + " bytes");
-                    }.bindenv(this));
+                    // Local function for sending and waiting for response
+                    local sendAndReceive = function(send, receive, done) {
 
-                    connection.receive(function(err, data) {
-                        this.info("Response: " + data.len() + " bytes");
-                        if (data.tostring() == MTIII_RESPONSE.tostring()) {
-                            resolve();
-                        } else {
-                            reject("Response did not match expectation");
-                        }
-                        connection.close();
-                    }.bindenv(this))
+                        connection.transmit(send, function(err) {
+                            if (err) return done(err, send, null);
+                            this.info("Transmitted: " + send.len() + " bytes");
+                        }.bindenv(this));
 
+                        connection.receive(function(err, data) {
+                            if (err) return done(err, null, null);
+                            this.info("Received: " + data.len() + " bytes");
+                            if (receive == null || (typeof receive == "integer" && data.len() == receive) || data.tostring() == receive.tostring()) {
+                                done(null, send, data);
+                            } else {
+                                done("Response didn't match", send, data);
+                            }
+                        }.bindenv(this))
+
+                    }
+
+                    // Track where we are up to in the sequence
+                    local pos = 0;
+                    local runSequence;
+                    runSequence = function() {
+                        local send = MTIII_SEQUENCE[pos];
+                        local receive = MTIII_SEQUENCE[pos+1];
+                        sendAndReceive(send, receive, function(err, sent, received) {
+                            if (err) reject(err);
+                            pos += 2;
+                            if (pos < MTIII_SEQUENCE.len()) {
+                                imp.wakeup(0, runSequence.bindenv(this));
+                            } else {
+                                resolve();
+                            }
+                        }.bindenv(this));
+                    }
+
+                    // Start running the sequence
+                    runSequence();
 
                 }.bindenv(this));
 
