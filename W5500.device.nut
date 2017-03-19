@@ -238,6 +238,8 @@ const W5500_ERR_NOT_CONNECTED = "Not connected";
 
 // Miscellaneous constants
 const W5500_TRANSMIT_TIMEOUT = 8;
+const W5500_INTERRUPT_POLL_TIME_IDLE = 0.5;
+const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 // ==============================================================================
 // CLASS: W5500
@@ -1995,7 +1997,7 @@ class W5500.Connection {
 
 
         // Start polling the interrupts
-        _interrupt_timer = imp.wakeup(1, handleInterrupt.bindenv(this));
+        _interrupt_timer = imp.wakeup(W5500_INTERRUPT_POLL_TIME_IDLE, handleInterrupt.bindenv(this));
 
         return this;
     }
@@ -2019,7 +2021,7 @@ class W5500.Connection {
         _state = W5500_SOCKET_STATES.LISTENING;
 
         // Start polling the interrupts
-        _interrupt_timer = imp.wakeup(1, handleInterrupt.bindenv(this));
+        _interrupt_timer = imp.wakeup(W5500_INTERRUPT_POLL_TIME_IDLE, handleInterrupt.bindenv(this));
 
         // Setup the callback
         _handlers["connect"] <- function(err, conn) {
@@ -2089,6 +2091,7 @@ class W5500.Connection {
     // **************************************************************************
     function onReceive(cb) {
         _handlers["receive"] <- cb;
+        receive();
         return this;
     }
 
@@ -2237,7 +2240,6 @@ class W5500.Connection {
 
             // server.log("Data received on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_DATA_RECEIVED_INT_TYPE);
-            skip_timer = true;
             receive(); // process incoming data
 
         }
@@ -2278,7 +2280,9 @@ class W5500.Connection {
         }
 
         // Scan the interrupt again very soon
-        _interrupt_timer = imp.wakeup(0.5, handleInterrupt.bindenv(this))
+        if (_interrupt_timer) imp.cancelwakeup(_interrupt_timer);
+        local timer_time = ("receive" in _handlers) ? W5500_INTERRUPT_POLL_TIME_ACTIVE : W5500_INTERRUPT_POLL_TIME_IDLE;
+        _interrupt_timer = imp.wakeup(timer_time, handleInterrupt.bindenv(this))
 
         return status;
 
@@ -2451,7 +2455,7 @@ class W5500.Connection {
                 }.bindenv(this))
             }
 
-        } else {
+        } else if (callback) {
             // Handle a normal callback here
             if (_state == W5500_SOCKET_STATES.ESTABLISHED) {
                 if (_dataWaiting()) {
@@ -2461,12 +2465,10 @@ class W5500.Connection {
                 err = "Connection not established in receive()";
             }
 
-            if (callback) {
+            if (err || (data && data.len() > 0)) {
                 imp.wakeup(0, function() {
                     callback(err, data);
                 }.bindenv(this));
-            } else if (err) {
-                // server.error(err);
             }
         }
 
