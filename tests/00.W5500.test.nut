@@ -137,7 +137,7 @@ class W5500_TestCase extends ImpTestCase {
                 _wiz.openConnection(null, null, null, null);
                 reject("openConnection ran with incorrect number of parameters");
             } catch (error) {
-                if (error != W5500_INVALID_PARAMETERS) {
+                if (error != W5500_ERR_INVALID_PARAMETERS) {
                     reject("openConnection ran with incorrect number of parameters");
                 }
             }

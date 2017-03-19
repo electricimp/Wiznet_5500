@@ -227,11 +227,11 @@ enum W5500_SOCKET_STATES {
 }
 
 // Error messages
-const W5500_INVALID_PARAMETERS = "Provide 'ip', 'port', 'mode' and a callback.";
-const W5500_CANNOT_CONNECT_STILL_CLEANING = "Cannot open a connection. Still cleaning up.";
-const W5500_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All connection sockets in use.";
-const W5500_CANNOT_CONNECT_TIMEOUT = "Connection timeout";
-const W5500_TRANSMIT_TIMEOUT = "Transmit timeout";
+const W5500_ERR_INVALID_PARAMETERS = "Provide 'ip', 'port', 'mode' and a callback.";
+const W5500_ERR_CANNOT_CONNECT_STILL_CLEANING = "Cannot open a connection. Still cleaning up.";
+const W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All connection sockets in use.";
+const W5500_ERR_CANNOT_CONNECT_TIMEOUT = "Connection timeout";
+const W5500_ERR_TRANSMIT_TIMEOUT = "Transmit timeout";
 
 // Miscellaneous constants
 const W5500_TRANSMIT_TIMEOUT = 8;
@@ -372,8 +372,8 @@ class W5500 {
         if (!_isReady) throw "Wiznet driver not ready";
 
         if ((mode == null && cb == null) || (typeof mode != "function" && cb == null)) {
-            if (cb) cb(W5500_INVALID_PARAMETERS, null);
-            else throw W5500_INVALID_PARAMETERS;
+            if (cb) cb(W5500_ERR_INVALID_PARAMETERS, null);
+            else throw W5500_ERR_INVALID_PARAMETERS;
             return;
         } else if (typeof mode == "function") {
             cb = mode;
@@ -611,8 +611,8 @@ class W5500.Driver {
 
         // check for available socket
         if (_availableSockets.len() == 0) {
-            if (cb) return cb(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
-            else throw W5500_CANNOT_CONNECT_SOCKETS_IN_USE;
+            if (cb) return cb(W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE, null);
+            else throw W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE;
         }
 
         // Create the connection object and assign it to a spare socket
@@ -637,7 +637,7 @@ class W5500.Driver {
 
         // check for available socket
         if (_availableSockets.len() == 0) {
-            return cb(W5500_CANNOT_CONNECT_SOCKETS_IN_USE, null);
+            return cb(W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE, null);
         }
 
         local socket = _availableSockets.pop();
@@ -2302,7 +2302,7 @@ class W5500.Connection {
 
             // Prepare for a timeout
             transmit_timer = imp.wakeup(W5500_TRANSMIT_TIMEOUT, function() {
-                __cb(W5500_TRANSMIT_TIMEOUT)
+                __cb(W5500_ERR_TRANSMIT_TIMEOUT)
             }.bindenv(this));
 
             // Prepare a dummy callback to clear the timer before calling the real callback
