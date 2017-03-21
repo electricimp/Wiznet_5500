@@ -2197,7 +2197,7 @@ class W5500.Connection {
                     _handlers["connect"] <- null;
 
                     imp.wakeup(0, function() {
-                        _connectionCallback(W5500_ERR_CONNECT_TIMEOUT, null);
+                        _connectionCallback(W5500_ERR_CANNOT_CONNECT_TIMEOUT, null);
                     }.bindenv(this))
                 }
 
