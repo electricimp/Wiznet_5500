@@ -237,6 +237,7 @@ const W5500_ERR_NOT_CONNECTED = "Not connected";
 
 
 // Miscellaneous constants
+const W5500_CONNECT_TIMEOUT = 60;
 const W5500_TRANSMIT_TIMEOUT = 8;
 const W5500_INTERRUPT_POLL_TIME_IDLE = 0.5;
 const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
@@ -250,7 +251,6 @@ class W5500 {
     static VERSION = "1.0.0";
 
     _driver = null;
-    _interruptPin = null;
     _isReady = false; // set to true once the driver is loaded and connection to chip made
     _readyCb = null; // callback for when isReady becomes true
     _networkSettings = null;
@@ -271,24 +271,71 @@ class W5500 {
     // ***************************************************************************
     constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false) {
 
-        // Initialise the driver and close any stale connections
-        _driver = W5500.Driver(spi, csPin, resetPin);
+        // Initialise the driver 
+        _driver = W5500.Driver(interruptPin, spi, csPin, resetPin);
         _driver.init(function() {
-
-            // Configure interrupts
-            _driver.setInterrupt(W5500_CONFLICT_INT_TYPE);
-            _driver.clearInterrupt();
-            _driver.clearSocketInterrupts();
-            _interruptPin = interruptPin.configure(DIGITAL_IN_PULLUP, _interruptHandler.bindenv(this));
-
-            // Set the default mac address
-            _driver.setSourceHWAddr(imp.getmacaddress(), true);
 
             // Let the caller know the device is ready
             _isReady = true;
-            if (_readyCb != null) imp.wakeup(0, _readyCb);
+            if (_readyCb) imp.wakeup(0, _readyCb);
+
         }.bindenv(this));
     }
+
+
+    // ***************************************************************************
+    // reset, note this is blocking for 0.2s
+    // Returns: this
+    // Parameters:
+    //          sw(optional) - boolean if true forces a software reset
+    //          Note: Datasheet states that SW reset should not be used
+    //                 on the W5500.
+    // ***************************************************************************
+    function reset(sw = false) {
+
+        // Initialise the driver 
+        _isReady = false;
+        _driver.reset(sw);
+        _driver.init(function() {
+
+            // Let the caller know the device is ready
+            _isReady = true;
+            if (_readyCb) imp.wakeup(0, _readyCb);
+
+        }.bindenv(this));
+    }
+
+
+
+    // ***************************************************************************
+    // onReady
+    // Returns: this
+    // Parameters:
+    //      cb - function to be called when the Wiznet device is initialised
+    // ***************************************************************************
+    function onReady(cb) {
+
+        local _cb = cb;
+        if (_networkSettings != null) {
+            // Slip the network settings into the _cb
+            _cb = function() {
+                if ("availableSockets" in _networkSettings) {
+                    _driver.setNumberOfAvailableSockets(_networkSettings.availableSockets);
+                }
+                if ("sourceIP" in _networkSettings) {
+                    configureNetworkSettings(_networkSettings.sourceIP, _networkSettings.subnetMask, _networkSettings.gatewayIP, _networkSettings.mac);
+                }
+                _networkSettings = null;
+                cb();
+            }.bindenv(this);
+        }
+
+        if (_isReady) imp.wakeup(0, _cb);
+        else _readyCb = _cb;
+
+        return this;
+    }
+
 
 
     // ***************************************************************************
@@ -310,30 +357,26 @@ class W5500 {
 
 
     // ***************************************************************************
-    // onReady
-    // Returns: this
+    // isPhysicallyConnected
+    // Returns: true if there is a cable plugged in
     // Parameters:
-    //      cb - function to be called when the Wiznet device is initialised
+    //      none
     // ***************************************************************************
-    function onReady(cb) {
-        local _cb = cb;
-        if (_networkSettings != null) {
-            // Slip the network settings into the _cb
-            _cb = function() {
-                if ("availableSockets" in _networkSettings) {
-                    _driver.setNumberOfAvailableSockets(_networkSettings.availableSockets);
-                }
-                if ("sourceIP" in _networkSettings) {
-                    configureNetworkSettings(_networkSettings.sourceIP, _networkSettings.subnetMask, _networkSettings.gatewayIP, _networkSettings.mac);
-                }
-                _networkSettings = null;
-                cb();
-            }.bindenv(this);
-        }
-        if (_isReady) imp.wakeup(0, _cb);
-        else _readyCb = _cb;
-        return this;
+    function isPhysicallyConnected() {
+        return _driver.getPhysicalLinkStatus();
     }
+
+
+    // ***************************************************************************
+    // forceCloseAllSockets
+    // Returns: nothing
+    // Parameters:
+    //      none
+    // ***************************************************************************
+    function forceCloseAllSockets() {
+        return _driver.forceCloseAllSockets();
+    }
+
 
     // ***************************************************************************
     // configureNetworkSettings
@@ -425,43 +468,6 @@ class W5500 {
     }
 
 
-    // ***************************************************************************
-    // reset, note this is blocking for 0.2s
-    // Returns: this
-    // Parameters:
-    //          sw(optional) - boolean if true forces a software reset
-    //          Note: Datasheet states that SW reset should not be used
-    //                 on the W5500.
-    // ***************************************************************************
-    function reset(sw = false) {
-        _driver.reset(sw);
-    }
-
-
-    // PRIVATE FUNCTIONS
-    // ---------------------------------------------
-
-    // ***************************************************************************
-    // _interruptHandler, checks interrupt registers and calls appropriate handlers
-    // Returns: null
-    // Parameters: none
-    // ***************************************************************************
-    function _interruptHandler() {
-        _driver.handleInterrupt();
-    }
-
-    // ***************************************************************************
-    // _handleConflictInt, logs conflict error message & clears interrupt
-    // Returns: null
-    // Parameters: none
-    // ***************************************************************************
-    function _handleConflictInt() {
-        _driver.clearInterrupt(W5500_CONFLICT_INT_TYPE);
-        // NOTE: I see this interrupt every time another device on the network requests a DHCP packet.
-        //       I suspect it is not a conflict interrupt.
-        // server.error("Conflict interrupt occured. Please check IP source and destination addresses");
-    }
-
 }
 
 
@@ -477,6 +483,7 @@ class W5500.Driver {
     static MAX_RX_MEM_BUFFER = 16;
 
     // CLASS VARIABLES
+    _interruptPin = null;
     _spi = null;
     _cs = null;
     _resetPin = null;
@@ -495,7 +502,9 @@ class W5500.Driver {
     //      cs(optional) - configured chip select pin
     //      reset(optional) - configured reset pin
     // ***************************************************************************
-    constructor(spi, cs = null, resetPin = null) {
+    constructor(interruptPin, spi, cs = null, resetPin = null) {
+
+        _interruptPin = interruptPin;
         _spi = spi;
         _cs = cs;
         _resetPin = resetPin;
@@ -515,9 +524,50 @@ class W5500.Driver {
         // Reset the hardware
         reset();
 
+    }
+
+
+    // ***************************************************************************
+    // reset, note this is blocking for 0.2s
+    // Returns: this
+    // Parameters:
+    //          sw(optional) - boolean if true forces a software reset
+    //          Note: datasheet for W5500 states that software reset is
+    //                unreliable - don't use
+    // **************************************************************************
+    function reset(sw = false) {
+
+        // Stop the interrupt pin from firing
+        _interruptPin.configure(DIGITAL_IN);
+
+        // Clear the connections and sockets
+        _connections = {};
+        _availableSockets = [];
+
+        // Force disconnect/close all ports
+        forceCloseAllSockets();
+
+        // Reset chip to default state, blocks for 0.2s
+        // Note: Datasheet states that W5500 software reset is not reliable, use hardware reset.
+        if (sw || _resetPin == null) {
+            setMode(W5500_SW_RESET);
+            imp.sleep(0.2);
+        } else {
+            _resetPin.write(0);
+            imp.sleep(0.01); // hold at least 500us after assert low
+            _resetPin.write(1);
+        }
+        imp.sleep(0.2); // wait at least 150ms before configuring
+
+        // Reset the default memory allocation
+        _setMemDefaults();
+
         // server.log("Wiznet chip version: " + getChipVersion());
 
+        return this;
     }
+
+
 
     // ***************************************************************************
     // init(cb)
@@ -528,59 +578,42 @@ class W5500.Driver {
     //                                  - subseuqent goes to to else
     //        closes all sockets and fires the callback when complete
     // ***************************************************************************
-    function init(cb, remaining = null) {
+    function init(cb) {
 
-        if (remaining == null) {
+        // Configure interrupts
+        setInterrupt(W5500_CONFLICT_INT_TYPE);
+        clearInterrupt();
+        clearSocketInterrupts();
+        _interruptPin.configure(DIGITAL_IN_PULLUP, handleInterrupt.bindenv(this));
 
-            // Initialise the number of sockets
-            _maxNoOfSockets = getTotalSupportedSockets();
+        // Set the default mac address
+        setSourceHWAddr(imp.getmacaddress(), true);
 
-            // The first time through, check what needs to be dealt with
-            remaining = [];
-            for (local socket = 0; socket < _maxNoOfSockets; socket++) {
-                local status = getSocketStatus(socket);
-                if (status == W5500_SOCKET_STATUS_ESTABLISHED) {
-                    sendSocketCommand(socket, W5500_SOCKET_DISCONNECT);
-                    remaining.push({ socket = socket, status = status });
-                } else if (status != W5500_SOCKET_STATUS_CLOSED) {
-                    remaining.push({ socket = socket, status = status });
-                }
-            }
+        // Set the defaults
+        setNumberOfAvailableSockets(TOTAL_SUPPORTED_SOCKETS);
 
-        } else {
+        // Done
+        imp.wakeup(0, cb);
 
-            // The second+ time through
-            local oldremaining = remaining;
-            remaining = [];
-            foreach (prev in oldremaining) {
+    }
 
-                local socket = prev.socket;
-                local prevstatus = prev.status;
-                local newstatus = getSocketStatus(socket);
 
-                if (newstatus == W5500_SOCKET_STATUS_CLOSED) {
-                    sendSocketCommand(socket, W5500_SOCKET_CLOSE);
-                } else {
-                    remaining.push({ socket = socket, status = newstatus });
-                }
-
-            }
-
+    // ***************************************************************************
+    // forceCloseAllSockets, note this is blocking for 1.1s+
+    // Returns: this
+    // Parameters:
+    //          none
+    // **************************************************************************
+    function forceCloseAllSockets() {
+        _maxNoOfSockets = getTotalSupportedSockets();
+        for (local socket = 0; socket < _maxNoOfSockets; socket++) {
+            sendSocketCommand(socket, W5500_SOCKET_DISCONNECT);
         }
-
-        if (remaining.len() == 0) {
-
-            // Set the defaults
-            setNumberOfAvailableSockets(TOTAL_SUPPORTED_SOCKETS);
-
-            // Let the sockets settle down before starting anything
-            imp.wakeup(1, cb);
-        } else {
-            imp.wakeup(0.1, function() {
-                init(cb, remaining);
-            }.bindenv(this));
+        imp.sleep(1);
+        for (local socket = 0; socket < _maxNoOfSockets; socket++) {
+            sendSocketCommand(socket, W5500_SOCKET_CLOSE);
         }
-
+        imp.sleep(0.1);
     }
 
 
@@ -592,7 +625,7 @@ class W5500.Driver {
     // ***************************************************************************
     function getPhysicalLinkStatus() {
         local status = readReg(W5500_PHYSICAL_CONFIG, W5500_COMMON_REGISTER);
-        return (status & 0x01);
+        return (status & 0x01) == 0x01;
     }
 
 
@@ -1335,26 +1368,28 @@ class W5500.Driver {
     // Returns: data from received data register
     // Parameters:
     //      socket - select the socket using an integer 0-3
+    //      maxlen - the maximum length of the buffer to receive
     // **************************************************************************
-    function readRxData(socket) {
+    function readRxData(socket, maxlen = null) {
 
-        // get the received data size
-        local dataSize = getRxDataSize(socket);
-        // TODO: check dataSize is within range of avail memory - throw error
+        // get the amount of data waiting for attention
+        local dataWaiting = getRxDataSize(socket);
+        if (dataWaiting == 0) return blob();
+        if (maxlen != null && dataWaiting > maxlen) dataWaiting = maxlen;
 
-        // select RX memory
-        local cntl_byte = getSocketRXBufferSize(socket);
+        // get the buffer size to make sure we don't read more than we have space for
+        local bufferSize = getSocketRXBufferSize(socket);
+
         // Get offset address
         local src_ptr = getRxReadPointer(socket);
-        // get Block select bit for RX buffer
-        local bsb = _getSocketRXBufferBlockSelectBit(socket);
 
         // use cntl_byte and src_ptr to get addr??
         // read transmitted data here
-        local data = _readData(src_ptr, bsb, dataSize);
+        local bsb = _getSocketRXBufferBlockSelectBit(socket);
+        local data = _readData(src_ptr, bsb, dataWaiting);
 
         // increase Sn_RX_RD as length of len
-        src_ptr += dataSize;
+        src_ptr += dataWaiting;
         setRxReadPointer(socket, src_ptr);
 
         // set RECV command
@@ -1484,11 +1519,12 @@ class W5500.Driver {
         };
 
         if (interrupt.UNREACH) {
-            // server.error("UNREACH");
+            clearInterrupt(W5500_UNREACH_INT_TYPE);
+            // handleUnreachableInt();
         }
         if (interrupt.CONFLICT) {
-            // server.error("CONFLICT");
-            // _handleConflictInt();
+            clearInterrupt(W5500_CONFLICT_INT_TYPE);
+            handleConflictInt();
         }
 
         // Handle the socket interrupt
@@ -1506,6 +1542,18 @@ class W5500.Driver {
             }
         }
 
+    }
+
+
+    // ***************************************************************************
+    // _handleConflictInt, logs conflict error message & clears interrupt
+    // Returns: null
+    // Parameters: none
+    // ***************************************************************************
+    function handleConflictInt() {
+        // NOTE: I see this interrupt every time another device on the network requests a DHCP packet.
+        //       I suspect it is not a conflict interrupt.
+        // server.error("Conflict interrupt occured. Please check IP source and destination addresses");
     }
 
 
@@ -1580,44 +1628,6 @@ class W5500.Driver {
         (_cs) ? _cs.write(1): _spi.chipselect(0);
     }
 
-
-    // ***************************************************************************
-    // reset, note this is blocking for 0.2s
-    // Returns: this
-    // Parameters:
-    //          sw(optional) - boolean if true forces a software reset
-    //          Note: datasheet for W5500 states that software reset is
-    //                unreliable - don't use
-    // **************************************************************************
-    function reset(sw = false) {
-
-        // Force disconnect/close all ports
-        _maxNoOfSockets = getTotalSupportedSockets();
-        for (local socket = 0; socket < _maxNoOfSockets; socket++) {
-            sendSocketCommand(socket, W5500_SOCKET_DISCONNECT);
-        }
-        imp.sleep(1);
-        for (local socket = 0; socket < _maxNoOfSockets; socket++) {
-            sendSocketCommand(socket, W5500_SOCKET_CLOSE);
-        }
-        imp.sleep(0.1);
-
-        // Reset chip to default state, blocks for 0.2s
-        // Note: Datasheet states that W5500 software reset is not reliable, use hardware reset.
-        if (sw || _resetPin == null) {
-            setMode(W5500_SW_RESET);
-            imp.sleep(0.2);
-        } else {
-            _resetPin.write(0);
-            imp.sleep(0.001); // hold at least 500us after assert low
-            _resetPin.write(1);
-            imp.sleep(0.2); // wait at least 150ms before configuring
-        }
-
-        // Reset the default memory allocation
-        _setMemDefaults();
-        return this;
-    }
 
 
     // PRIVATE FUNCTIONS
@@ -1925,6 +1935,8 @@ class W5500.Connection {
     _transmitQueue = null;
     _transmitting = false;
     _interrupt_timer = null;
+    _open_timer = null;
+    _debug = false;
 
     // ***************************************************************************
     // Constructor
@@ -1943,7 +1955,7 @@ class W5500.Connection {
         _ip = ip;
         _port = port;
         _mode = mode;
-        _handlers = {};
+        _handlers = { "receive": null, "connect": null, "close": null, "transmit": null };
         _transmitQueue = [];
 
         // Close the socket if it is still open
@@ -1993,6 +2005,18 @@ class W5500.Connection {
             // For all other modes we just prepare for a future connection
             _state = W5500_SOCKET_STATES.CONNECTING;
             if (cb) _handlers["connect"] <- cb;
+
+            // Setup a timeout timer
+            _open_timer = imp.wakeup(W5500_CONNECT_TIMEOUT, function() {
+                _open_timer = null;
+
+                local _connectionCallback = _getHandler("connect");
+                if (_connectionCallback) {
+                    _handlers["connect"] <- null;
+                    _connectionCallback(W5500_ERR_CANNOT_CONNECT_TIMEOUT, null);
+                }
+
+            }.bindenv(this))
         }
 
 
@@ -2024,7 +2048,9 @@ class W5500.Connection {
         _interrupt_timer = imp.wakeup(W5500_INTERRUPT_POLL_TIME_IDLE, handleInterrupt.bindenv(this));
 
         // Setup the callback
-        _handlers["connect"] <- function(err, conn) {
+        _handlers["connect"] <-
+
+        function(err, conn) {
             if (!err) {
                 _ip = _driver.getDestIP(_socket);
                 _port = _driver.getDestPort(_socket);
@@ -2139,12 +2165,12 @@ class W5500.Connection {
 
 
     // ***************************************************************************
-    // _dataWaiting
+    // dataWaiting
     // Returns: boolean
     // Parameters:
     //      socket - connection socket
     // **************************************************************************
-    function _dataWaiting() {
+    function dataWaiting() {
         return (_driver.getRxDataSize(_socket) == 0x00) ? false : true;
     }
 
@@ -2172,6 +2198,10 @@ class W5500.Connection {
             // server.log("Connection established on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_CONNECTED_INT_TYPE);
             _state = W5500_SOCKET_STATES.ESTABLISHED;
+
+            if (_open_timer) imp.cancelwakeup(_open_timer);
+            _open_timer = null;
+
             skip_timer = true;
 
             local _connectionCallback = _getHandler("connect");
@@ -2191,6 +2221,9 @@ class W5500.Connection {
             skip_timer = true;
 
             if (_state == W5500_SOCKET_STATES.CONNECTING) {
+
+                if (_open_timer) imp.cancelwakeup(_open_timer);
+                _open_timer = null;
 
                 local _connectionCallback = _getHandler("connect");
                 if (_connectionCallback) {
@@ -2249,6 +2282,9 @@ class W5500.Connection {
             // server.log("Connection disconnected on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_DISCONNECTED_INT_TYPE);
             skip_timer = true;
+
+            if (_open_timer) imp.cancelwakeup(_open_timer);
+            _open_timer = null;
 
             if (_state == W5500_SOCKET_STATES.CONNECTING) {
 
@@ -2356,7 +2392,7 @@ class W5500.Connection {
 
             // Receive any waiting data first
             local receiveHandler = _getHandler("receive");
-            if (receiveHandler && _dataWaiting()) {
+            if (receiveHandler && dataWaiting()) {
                 receiveHandler(null, _driver.readRxData(_socket));
             }
 
@@ -2365,7 +2401,9 @@ class W5500.Connection {
             _transmitNextChunk = function(chunk) {
 
                 // Setup the temporary callback
-                _handlers["transmit"] <- function(err) {
+                _handlers["transmit"] <-
+
+                function(err) {
                     if (!err && chunks.len() > 0) {
                         // Send the next chunk
                         _transmitNextChunk(chunks.remove(0));
@@ -2434,7 +2472,6 @@ class W5500.Connection {
 
         local receiveHandler = _getHandler("receive");
         local callback = cb ? cb : receiveHandler;
-        local err = null, data = null;
 
         if (cb) {
 
@@ -2443,6 +2480,7 @@ class W5500.Connection {
             // Temporarily take over the callback
             onReceive(function(err, data) {
                 if (timeout_timer) imp.cancelwakeup(timeout_timer);
+                timeout_timer = null;
                 cb(err, data);
                 onReceive(receiveHandler);
             }.bindenv(this));
@@ -2458,17 +2496,25 @@ class W5500.Connection {
         } else if (callback) {
             // Handle a normal callback here
             if (_state == W5500_SOCKET_STATES.ESTABLISHED) {
-                if (_dataWaiting()) {
-                    data = _driver.readRxData(_socket);
+                // local before = _driver.getRxDataSize(_socket);
+                local data = _driver.readRxData(_socket);
+                // local after = _driver.getRxDataSize(_socket);
+                if (data && data.len() > 0) {
+                    // if (_debug) server.error(format("RECEIVE CALLBACK: %d - %d = %d", before, data.len(), after));
+                    callback(null, data);
+                    if (dataWaiting()) {
+                        // _debug = true;
+                        // server.error(format("DATA WAITING: %d - %d = %d", before, data.len(), _driver.getRxDataSize(_socket)));
+                        imp.wakeup(0, receive.bindenv(this));
+                    } else {
+                        // _debug = false;
+                    }
+                } else {
+                    // if (_debug) server.error(format("RECEIVE STOP: %d - %d = %d", before, data.len(), after));
+                    // _debug = false;
                 }
             } else {
-                err = "Connection not established in receive()";
-            }
-
-            if (err || (data && data.len() > 0)) {
-                imp.wakeup(0, function() {
-                    callback(err, data);
-                }.bindenv(this));
+                callback(W5500_ERR_NOT_CONNECTED, data);
             }
         }
 
