@@ -263,7 +263,7 @@ class W5500 {
     // Constructor
     // Returns: null
     // Parameters:
-    //      interruptPin - inerrupt pin
+    //      interruptPin - interrupt pin
     //      spi - configured spi bus, chip supports spi mode 0 or 3
     //      csPin(optional) -  chip select pin, pass in if not using imp005
     //      resetPin(optional) - reset pin
@@ -498,6 +498,7 @@ class W5500.Driver {
     // Constructor
     // Returns: null
     // Parameters:
+    //      interruptPin - interrupt pin
     //      spi - configured spi, W5500 supports spi mode 0 or 3
     //      cs(optional) - configured chip select pin
     //      reset(optional) - configured reset pin
@@ -514,6 +515,7 @@ class W5500.Driver {
         // Check the pins
         if (resetPin) _resetPin.configure(DIGITAL_OUT, 1);
 
+        // TODO: When imp.info() is available, change this code.
         local imp005 = ("spi0" in hardware);
         if (_cs != null) {
             _cs.configure(DIGITAL_OUT, 1);
@@ -551,13 +553,12 @@ class W5500.Driver {
         // Note: Datasheet states that W5500 software reset is not reliable, use hardware reset.
         if (sw || _resetPin == null) {
             setMode(W5500_SW_RESET);
-            imp.sleep(0.2);
         } else {
             _resetPin.write(0);
-            imp.sleep(0.01); // hold at least 500us after assert low
+            imp.sleep(0.3); // hold at least 500us after assert low
             _resetPin.write(1);
         }
-        imp.sleep(0.2); // wait at least 150ms before configuring
+        imp.sleep(1.0); // wait at least 150ms before configuring
 
         // Reset the default memory allocation
         _setMemDefaults();
@@ -570,13 +571,11 @@ class W5500.Driver {
 
 
     // ***************************************************************************
-    // init(cb)
+    // init(cb) - initialises the device to basic defaults ready for use after boot or reset
     // Returns: nothing
     // Parameters:
-    //        cb                        - callback function
-    //        remaining(optional)       - for first time Initialise == null
-    //                                  - subseuqent goes to to else
-    //        closes all sockets and fires the callback when complete
+    //        cb - callback function
+    //        
     // ***************************************************************************
     function init(cb) {
 

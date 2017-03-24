@@ -1,22 +1,22 @@
-# Wiznet W5500
+#Wiznet W5500
 
-This library allows you to communicate with a TCP/IP network (separate from the Imp's connection to the network) using the Wiznet W5500 chip [W5500](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. This library supports SPI integration with the W5500.
+This library allows you to communicate with a TCP/IP network (separate from the Imp's connection to the network) using the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. This library supports SPI integration with the W5500.
 
 **To use this library, add `#require "W5500.device.nut:1.0.0"` to the top of your device code.**
 
 ## Class W5500
 
-### Constructor: W5500(*interruptPin, spi[, csPin], resetPin[, autoRetry]*)
+### Constructor: W5500(*interruptPin, spi[, csPin][, resetPin][, autoRetry]*)
 
 | Key | Data Type |Required | Default Value |Description |
 |----|------------|---------|--------------|------------|
 |interruptPin|hardware.pin|Yes|N/A|The Pin represents a physical pin on the imp card or module. This pin is used for receiving interrupts from the W5500 chip. The pin can be any digital input that supports a callback on pin state change  |
 |spi|hardware.spi|Yes|N/A|A configured spi object|
 |csPin|hardware.pin|No|null|The Pin represents a physical pin on the imp card or module. In this case the pin used for selecting the spi bus. On the Imp005 if you do not pass in a csPin you must configure the SPI with the USE_CS_L constant|
-|resetPin|hardware.pin|Yes|N/A|The Pin represents a physical pin on the imp card or module. In this case the pin used for sending a hard reset signal for the W5500 chip|
+|resetPin|hardware.pin|No|N/A|The Pin represents a physical pin on the imp card or module. In this case the pin used for sending a hard reset signal for the W5500 chip|
 |autoRetry|Boolean|No|false| autoRetry will automatically retry to open a connection should one initially fail. Yet to be implemented.|
 
-##### Example Code:
+#### Example Code:
 ```squirrel
 // setup for an Imp 005
 speed <- 4000;
@@ -57,7 +57,7 @@ This function takes the network information and sets the data into the relevant 
 | *gatewayIP* | String or an array of four integers |No|null |The IP address of the gateway or router. For an IP address 192.168.1.1 pass it in as array  [192, 168, 1, 1] or as a string "192.168.1.1"|
 | *mac* | string or an array of six integers |No|An internal function that  will return the mac address of the Wiznet |The mac address to assign to the Wiznet adapter. It is easiest to let the mac address be set automatically by leaving this as null. You can manually enter the address 0c:2a:69:09:76:64 by passing it into an array [0x0c, 0x2a, 0x69, 0x09, 0x76, 0x64] or pass it as a string `"0c2a69097664"`|
 
-##### Example Code:
+#### Example Code:
 ```squirrel
     // configured using strings
     wiz.configureNetworkSettings("192.168.1.37", "255.255.255.0", "192.168.1.1");
@@ -73,7 +73,7 @@ Has 1 required argument a callback function. The callback will be called when th
 |----|------------|---------|--------------|------------|
 |cb|function|Yes|N/A| A function that is called when the Wiznet initialization has completed. It expects no parameters.|
 
-#### Example Code;  
+#### Example Code:  
 ```squirrel
     // the callback funciton will not run until wiz has finished initializing
     wiz.onReady(function() {
@@ -106,7 +106,7 @@ The *openConnection()*  finds a socket that is not in use and Initializes a conn
 |connection|W5500.Connection object|An instantiated object representing the open socket connection.|
 
 
-##### Example Code:
+#### Example Code:
 ```squirrel
     // using a string and a integer
     local destIp = "192.168.1.42";
@@ -143,7 +143,7 @@ The *listen()* function finds a socket that is not in use and sets up a TCP serv
 |connection|W5500.Connection object|An instantiated object representing the open socket connection.|
 
 
-##### Example Code:
+#### Example Code:
 ```squirrel
     local port = 80;
     wiz.listen(port, function(error, connection) {
@@ -162,10 +162,73 @@ The *listen()* function finds a socket that is not in use and sets up a TCP serv
 | ----- | -------- | ----|----|  --------------- |
 |sw|boolean|No |false|Set to true to perform a software reset or false to perform a hardware reset|
 
-##### Example Code:
+#### Example Code:
 ```squirrel
     wiz.reset();
 ```
+
+### setNumberOfAvailableSockets(*numSockets*)
+
+The *setNumberOfAvailableSockets()* function configures the Wiznet 5500's buffer memory allocation by dividing the available memory between the number of required sockets evenly. If you need a greater buffer, allocate fewer sockets. The default behaviour is to allocate all 8 sockets.
+
+#### Connection Settings
+| key | Data Type | Required | Default Value |Description |
+| ----- | -------- | ----|----|  --------------- |
+| numSockets | integer | No | 8 | The number of sockets to enable. |
+
+
+#### Example Code:
+```squirrel
+    wiz.setNumberOfAvailableSockets(2);
+```
+
+
+### reset (*[sw]*)
+*reset()* causes the Wiznet chip to undergo a software reset. It is  recommended to use hardware resets.
+
+| key | Data Type |Required|Default Value |Description |
+| ----- | -------- | ----|----|  --------------- |
+|sw|boolean|No |false|Set to true to perform a software reset or false to perform a hardware reset|
+
+#### Example Code:
+```squirrel
+    wiz.reset();
+```
+
+
+
+### isPhysicallyConnected()
+*isPhysicallyConnected()* returns true if the W5500 detects an ethernet cable is plugged into the socket.
+
+#### Example Code:
+```squirrel
+    server.log(format("Cable %s connected.", wiz.isPhysicallyConnected() ? "is" : "is not"));
+```
+
+
+
+### forceCloseAllSockets()
+*forceCloseAllSockets()* closes all sockets by sending a disconnect request followed by a close request.
+
+#### Example Code:
+```squirrel
+    wiz.forceCloseAllSockets();
+```
+
+
+
+### getNumSocketsFree()
+*getNumSocketsFree()* returns the number (integer) of sockets that are still available for use. 
+
+#### Example Code:
+```squirrel
+    if (wiz.getNumSocketsFree() == 0) {
+        server.error("Wiznet is busy.")
+    }
+```
+
+
+
 
 # W5500.Connection
 

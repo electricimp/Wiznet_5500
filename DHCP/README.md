@@ -102,7 +102,7 @@ server.log(format("router = %d.%d.%d.%d", router[0], router[1], router[2], route
 
 
 ### getLeaseTime()
-The *getIP()* method returns the lease duration as an integer. 
+The *getLeaseTime()* method returns the lease duration as an integer. 
 
 #### Example Code:
 ```squirrel
