@@ -295,13 +295,14 @@ class W5500 {
 
         // Initialise the driver 
         _isReady = false;
-        _driver.reset(sw);
-        _driver.init(function() {
+        _driver.reset(sw, function() {
+            _driver.init(function() {
 
-            // Let the caller know the device is ready
-            _isReady = true;
-            if (_readyCb) imp.wakeup(0, _readyCb);
+                // Let the caller know the device is ready
+                _isReady = true;
+                if (_readyCb) imp.wakeup(0, _readyCb);
 
+            }.bindenv(this));
         }.bindenv(this));
     }
 
@@ -537,7 +538,13 @@ class W5500.Driver {
     //          Note: datasheet for W5500 states that software reset is
     //                unreliable - don't use
     // **************************************************************************
-    function reset(sw = false) {
+    function reset(sw = false, cb = null) {
+
+        // Wrangle the parameters
+        if (typeof sw == "function") {
+            cb = sw;
+            sw = false;
+        }
 
         // Stop the interrupt pin from firing
         _interruptPin.configure(DIGITAL_IN);
@@ -549,21 +556,49 @@ class W5500.Driver {
         // Force disconnect/close all ports
         forceCloseAllSockets();
 
-        // Reset chip to default state, blocks for 0.2s
-        // Note: Datasheet states that W5500 software reset is not reliable, use hardware reset.
-        if (sw || _resetPin == null) {
-            setMode(W5500_SW_RESET);
+        if (cb) {
+            // Asynchronouse reset 
+            if (sw || _resetPin == null) {
+                setMode(W5500_SW_RESET);
+                // Allow things to settle down again
+                imp.wakeup(1.0, function() {
+                    // Reset the default memory allocation
+                    _setMemDefaults();
+                    cb();
+                }.bindenv(this));
+            } else {
+                // hold at least 500us after assert low
+                _resetPin.write(0);
+                imp.wakeup(0.3, function() {
+                    _resetPin.write(1);
+                    // Allow things to settle down again
+                    imp.wakeup(1.0, function() {
+                        // Reset the default memory allocation
+                        _setMemDefaults();
+                        cb();
+                    }.bindenv(this));
+                }.bindenv(this));
+            }
         } else {
-            _resetPin.write(0);
-            imp.sleep(0.3); // hold at least 500us after assert low
-            _resetPin.write(1);
+            // Synchronous reset
+            if (sw || _resetPin == null) {
+                setMode(W5500_SW_RESET);
+                // Allow things to settle down again
+                imp.sleep(1.0);
+                // Reset the default memory allocation
+                _setMemDefaults();
+            } else {
+                // hold at least 500us after assert low
+                _resetPin.write(0);
+                imp.sleep(0.3);
+                _resetPin.write(1);
+                // Allow things to settle down again
+                imp.sleep(1.0);
+                // Reset the default memory allocation
+                _setMemDefaults();
+            }
+
         }
-        imp.sleep(1.0); // wait at least 150ms before configuring
-
-        // Reset the default memory allocation
-        _setMemDefaults();
-
-        // server.log("Wiznet chip version: " + getChipVersion());
 
         return this;
     }

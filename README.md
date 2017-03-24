@@ -1,4 +1,4 @@
-#Wiznet W5500
+# Wiznet W5500
 
 This library allows you to communicate with a TCP/IP network (separate from the Imp's connection to the network) using the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. This library supports SPI integration with the W5500.
 
@@ -156,23 +156,35 @@ The *listen()* function finds a socket that is not in use and sets up a TCP serv
 
 
 ### reset (*[sw]*)
-*reset()* causes the Wiznet chip to undergo a software reset. It is  recommended to use hardware resets.
+*reset()* causes the Wiznet chip to undergo a reset. It is recommended to use hardware resets (the default behaviour). It is recommended to wait for the onReady() callback before proceeding further after a reset.
 
-| key | Data Type |Required|Default Value |Description |
-| ----- | -------- | ----|----|  --------------- |
-|sw|boolean|No |false|Set to true to perform a software reset or false to perform a hardware reset|
+| Key   | Data Type | Required | Default Value | Description     |
+| ----- | --------- | -------- | ------------- | --------------- |
+| sw    | boolean   | No       | false         | Set to true to perform a software reset or false to perform a hardware reset |
 
 #### Example Code:
 ```squirrel
+    // A hardware reset
     wiz.reset();
+    wiz.onReady(function() {
+        // Reset complete, configure the Wiznet 5500 here
+    }.bindenv(this));
 ```
+```squirrel
+    // A software reset
+    wiz.reset(true);
+    wiz.onReady(function() {
+        // Reset complete, configure the Wiznet 5500 here
+    }.bindenv(this));
+```
+
 
 ### setNumberOfAvailableSockets(*numSockets*)
 
 The *setNumberOfAvailableSockets()* function configures the Wiznet 5500's buffer memory allocation by dividing the available memory between the number of required sockets evenly. If you need a greater buffer, allocate fewer sockets. The default behaviour is to allocate all 8 sockets.
 
 #### Connection Settings
-| key | Data Type | Required | Default Value |Description |
+| Key | Data Type | Required | Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
 | numSockets | integer | No | 8 | The number of sockets to enable. |
 
@@ -186,7 +198,7 @@ The *setNumberOfAvailableSockets()* function configures the Wiznet 5500's buffer
 ### reset (*[sw]*)
 *reset()* causes the Wiznet chip to undergo a software reset. It is  recommended to use hardware resets.
 
-| key | Data Type |Required|Default Value |Description |
+| Key | Data Type |Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
 |sw|boolean|No |false|Set to true to perform a software reset or false to perform a hardware reset|
 
@@ -278,7 +290,7 @@ The *isEstablished()* method returns a Boolean. Returns true if a connection is 
 ### onReceive(*[cb]*)
 Passes the callback function to called when data is received.
 
-| key | Data Type |Required|Default Value |Description |
+| Key | Data Type |Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
 |cb|function|Yes|N/A|Callback function to called in the event of data being received |
 
@@ -299,7 +311,7 @@ Passes the callback function to called when data is received.
 ### onDisconnect(*[cb]*)
 Passes the callback function to be called when the connection disconnects.
 
-| key | Data Type |Required|Default Value |Description |
+| Key | Data Type |Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
 |cb|Function|Yes|N/A|Callback function to called in the event of a disconnection |
 
@@ -319,7 +331,7 @@ Passes the callback function to be called when the connection disconnects.
 ### onClose(*[cb]*)
 Passes the callback function to be called when the connection is fully closed and removed from the system.
 
-| key | Data Type |Required|Default Value |Description |
+| Key | Data Type |Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
 |cb|Function|Yes|N/A|Callback function to called. Has no parameters.  |
 
@@ -335,7 +347,7 @@ Passes the callback function to be called when the connection is fully closed an
 
 *transmit* is called within a connection. Transmitting the data through the socket.  
 
-| key | Data Type |Required|Default Value |Description |
+| Key | Data Type |Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
 |transmitData|blob or string|Yes|N/A|The data to be transmitted |
 |cb|Function|No|null|The call back is called in the event of data being successfully sent or in the event of a timeout.|
@@ -357,7 +369,7 @@ Passes the callback function to be called when the connection is fully closed an
 ### receive(*[cb]*)
 The *receive* function is an alternative to *onReceive* which will temporarily override *onReceive*. It receives the next available data packet on the connection.
 
-| key | Data Type |Required|Default Value |Description |
+| Key | Data Type |Required|Default Value |Description |
 | ----- | -------- | ----|----|  --------------- |
 |cb|Function|No|null|The received data is passed into the callback|
 
