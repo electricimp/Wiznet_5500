@@ -1760,9 +1760,7 @@ class W5500.Driver {
     //      obj1 - the first object
     //      obj2 - the second object
     // **************************************************************************
-    static
-
-    function _areObjectsEqual(obj1, obj2) {
+    static function _areObjectsEqual(obj1, obj2) {
         if (typeof obj1 != typeof obj2) return false;
         if (typeof obj1 == "array" || typeof obj1 == "table" || typeof obj1 == "blob") {
             if (obj1.len() != obj2.len()) return false;
