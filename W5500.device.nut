@@ -1554,11 +1554,12 @@ class W5500.Driver {
 
         if (interrupt.UNREACH) {
             clearInterrupt(W5500_UNREACH_INT_TYPE);
-            // handleUnreachableInt();
+            // TODO: We are currently ignoring this error response. We should implement something to handle it.
         }
         if (interrupt.CONFLICT) {
             clearInterrupt(W5500_CONFLICT_INT_TYPE);
-            handleConflictInt();
+            // TODO: We are currently ignoring this error response. We should implement something to handle it.
+            //       I found this error was triggering at times where there was definitely no conflict.
         }
 
         // Handle the socket interrupt
@@ -1572,22 +1573,10 @@ class W5500.Driver {
             // Now find the socket in our connection table
             if (socket_n in _connections) {
                 // server.log(format("INTERRUPT ON SOCKET %d", socket_n));
-                _connections[socket_n].handleInterrupt(true);
+                _connections[socket_n].handleInterrupt();
             }
         }
 
-    }
-
-
-    // ***************************************************************************
-    // _handleConflictInt, logs conflict error message & clears interrupt
-    // Returns: null
-    // Parameters: none
-    // ***************************************************************************
-    function handleConflictInt() {
-        // NOTE: I see this interrupt every time another device on the network requests a DHCP packet.
-        //       I suspect it is not a conflict interrupt.
-        // server.error("Conflict interrupt occured. Please check IP source and destination addresses");
     }
 
 
@@ -2223,7 +2212,7 @@ class W5500.Connection {
     // Returns: null
     // Parameters: socket the interrupt occurred on
     // **************************************************************************
-    function handleInterrupt(skip_timer = false) {
+    function handleInterrupt() {
 
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
@@ -2235,8 +2224,6 @@ class W5500.Connection {
 
             if (_open_timer) imp.cancelwakeup(_open_timer);
             _open_timer = null;
-
-            skip_timer = true;
 
             local _connectionCallback = _getHandler("connect");
             if (_connectionCallback) {
@@ -2252,7 +2239,6 @@ class W5500.Connection {
 
             // server.log("Timeout occurred on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_TIMEOUT_INT_TYPE);
-            skip_timer = true;
 
             if (_state == W5500_SOCKET_STATES.CONNECTING) {
 
@@ -2290,7 +2276,6 @@ class W5500.Connection {
 
             // server.log("Send complete on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_SEND_COMPLETE_INT_TYPE);
-            skip_timer = true;
 
             // call transmitting callback
             local _transmitCallback = _getHandler("transmit");
@@ -2315,7 +2300,6 @@ class W5500.Connection {
 
             // server.log("Connection disconnected on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_DISCONNECTED_INT_TYPE);
-            skip_timer = true;
 
             if (_open_timer) imp.cancelwakeup(_open_timer);
             _open_timer = null;
