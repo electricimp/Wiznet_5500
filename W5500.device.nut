@@ -1554,12 +1554,10 @@ class W5500.Driver {
 
         if (interrupt.UNREACH) {
             clearInterrupt(W5500_UNREACH_INT_TYPE);
-            // TODO: We are currently ignoring this error response. We should implement something to handle it.
         }
         if (interrupt.CONFLICT) {
             clearInterrupt(W5500_CONFLICT_INT_TYPE);
-            // TODO: We are currently ignoring this error response. We should implement something to handle it.
-            //       I found this error was triggering at times where there was definitely no conflict.
+            handleConflictInt();
         }
 
         // Handle the socket interrupt
@@ -1577,6 +1575,19 @@ class W5500.Driver {
             }
         }
 
+    }
+
+
+    // ***************************************************************************
+    // _handleConflictInt, logs conflict error message & clears interrupt
+    // Returns: null
+    // Parameters: none
+    // ***************************************************************************
+    function handleConflictInt() {
+        // TODO: Throw an error callback for the developer to capture this instead of just logging it
+        local addr = getSourceIP();
+        if (_areObjectsEqual(addr, [0, 0, 0, 0])) return;
+        server.error(format("Conflict with IP address: %d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]));
     }
 
 
