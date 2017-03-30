@@ -2546,7 +2546,7 @@ class W5500.Connection {
                     // _debug = false;
                 }
             } else {
-                callback(W5500_ERR_NOT_CONNECTED, data);
+                callback(W5500_ERR_NOT_CONNECTED, null);
             }
         }
 
