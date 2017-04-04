@@ -79,7 +79,7 @@ Has method has a single, required argument: a callback function. The callback wi
 #### Example
 
 ```squirrel
-// The callback funciton will not run until the 5500 has finished initializing
+// The callback function will not run until the 5500 has finished initializing
 wiz.onReady(function() {
     server.log("The Wiznet W5500 is ready");     
 }.bindenv(this));
@@ -174,7 +174,7 @@ wiz.listen(port, function(error, connection) {
 
 This method causes the Wiznet chip to undergo a reset. It is recommended that your use hardware resets (the default behaviour) and to wait for the *onReady()* callback to be triggered before proceeding after a reset.
 
-The single parameter, *softReset*, is a Boolean value: pass `true` to trigger a soft reset, or `false` (the detault) for a hard reset.
+The single parameter, *softReset*, is a Boolean value: pass `true` to trigger a soft reset, or `false` (the default) for a hard reset.
 
 #### Example
 
@@ -299,7 +299,7 @@ connection.onReceive(function(error, data) {
 
 ### onDisconnect(*[callback]*)
 
-This method triggers the supplied callback function when a disconnection takes place. The callback takes a single parameter of its own: *error*, which will be a string if an error occured, or `null`.
+This method triggers the supplied callback function when a disconnection takes place. The callback takes a single parameter of its own: *error*, which will be a string if an error occurred, or `null`.
 
 #### Example
 
@@ -310,7 +310,7 @@ connection.onDisconnect(function(error) {
 }.bindenv(this));
 ```
 
-### onClose(*[cb]*)
+### onClose(*[callback]*)
 
 This method triggers the supplied callback function when the connection is fully closed and removed from the system. The callback takes no parameters.
 
