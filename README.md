@@ -49,9 +49,7 @@ wiz <- W5500(interruptPin, spi, cs, resetPin);
 
 ### configureNetworkSettings(*sourceIP[, subnet_mask][, gatewayIP][, mac]*)
 
-This method takes the network information and sets the data into the relevant registers in the Wiznet chip.
-
-#### Inputs
+This method takes the network information and sets the data into the relevant registers in the Wiznet chip. It takes the following parameters:
 
 | Parameter | Data Type | Required | Default Value | Description |
 | --- | --- | --- | --- | --- |
@@ -87,7 +85,7 @@ wiz.onReady(function() {
 
 ### openConnection(*ip, port[, mode][, callback]*)
 
-This method finds a socket that is not in use and initializes a connection for the socket.
+This method finds a socket that is not in use and initializes a connection for the socket. It takes the following parameters:
 
 | Parameter | Data Type | Required | Default Value | Description |
 | --- | --- | --- | --- | --- |
