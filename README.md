@@ -94,16 +94,12 @@ This method finds a socket that is not in use and initializes a connection for t
 | *mode* | Constant | No | *W5500_SOCKET_MODE_TCP* | The mode of communication to be used by the socket. The list of available options is listed in the table below. Currently only TCP is supported |
 | *callback* | Function | No | null | A callback function that is passed an error message or the opened connection. The callback’s parameters are listed below |
 
-#### Communication Modes
-
-| Constant | Value |
+| Communication Mode | Value |
 | --- | --- |
-| W5500_SOCKET_MODE_TCP | 0x01 |
-| W5500_SOCKET_MODE_UDP | 0x02 |
+| *W5500_SOCKET_MODE_TCP* | 0x01 |
+| *W5500_SOCKET_MODE_UDP* | 0x02 |
 
-#### Callback Parameters
-
-| Parameter | Data Type | Description |
+| Callback Parameter | Data Type | Description |
 | --- | --- | --- |
 | *error* | String | An error message if there was a problem, or null if successful |
 | *connection* | A W5500.Connection object | An instantiated object representing the open socket connection |
@@ -146,9 +142,7 @@ This method function finds a socket that is not in use and sets up a TCP server.
 | *port* | An integer | Yes | N/A | The port to listen on for connections |
 | *callback* | Function | Yes | N/A | A callback function that is passed an error message, or the established remote connection is established. The table below lists its parameters |
 
-#### Callback Parameters
-
-| Parameter | Data Type | Description |
+| Callback Parameter | Data Type | Description |
 | --- | --- | --- |
 | *error* | String | An error message if there was a problem, or null if successful |
 | *connection* | A W5500.Connection object | An instantiated object representing the open socket connection |
