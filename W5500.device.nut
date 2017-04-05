@@ -2482,7 +2482,7 @@ class W5500.Connection {
 
         // Check the socket is ready
         if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
-            throw "Connection not established";
+            return cb("Connection not established");
         }
 
         // Append to the queue and start the transmission.
