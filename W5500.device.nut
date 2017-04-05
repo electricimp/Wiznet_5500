@@ -2349,8 +2349,10 @@ class W5500.Connection {
 
         // Scan the interrupt again very soon
         if (_interrupt_timer) imp.cancelwakeup(_interrupt_timer);
-        local timer_time = ("receive" in _handlers) ? W5500_INTERRUPT_POLL_TIME_ACTIVE : W5500_INTERRUPT_POLL_TIME_IDLE;
-        _interrupt_timer = imp.wakeup(timer_time, handleInterrupt.bindenv(this))
+        if (_socket in _driver._connections) {
+            local timer_time = ("receive" in _handlers) ? W5500_INTERRUPT_POLL_TIME_ACTIVE : W5500_INTERRUPT_POLL_TIME_IDLE;
+            _interrupt_timer = imp.wakeup(timer_time, handleInterrupt.bindenv(this))
+        }
 
         return status;
 
