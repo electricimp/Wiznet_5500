@@ -238,7 +238,7 @@ This method opens a socket then sets up the connection. It is called as part of 
 
 ### close(*[callback]*)
 
-This method loses the connection on a socket then fires the supplied callback on completion of all stages of disconnection. This callback takes no parameters.
+This method closes the connection on a socket then fires the supplied callback on completion of all stages of disconnection. This callback takes no parameters.
 
 #### Example
 
