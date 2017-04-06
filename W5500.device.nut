@@ -2349,8 +2349,10 @@ class W5500.Connection {
 
         // Scan the interrupt again very soon
         if (_interrupt_timer) imp.cancelwakeup(_interrupt_timer);
-        local timer_time = ("receive" in _handlers) ? W5500_INTERRUPT_POLL_TIME_ACTIVE : W5500_INTERRUPT_POLL_TIME_IDLE;
-        _interrupt_timer = imp.wakeup(timer_time, handleInterrupt.bindenv(this))
+        if (_socket in _driver._connections) {
+            local timer_time = ("receive" in _handlers) ? W5500_INTERRUPT_POLL_TIME_ACTIVE : W5500_INTERRUPT_POLL_TIME_IDLE;
+            _interrupt_timer = imp.wakeup(timer_time, handleInterrupt.bindenv(this))
+        }
 
         return status;
 
@@ -2480,7 +2482,7 @@ class W5500.Connection {
 
         // Check the socket is ready
         if (_state != W5500_SOCKET_STATES.ESTABLISHED) {
-            throw "Connection not established";
+            return cb("Connection not established");
         }
 
         // Append to the queue and start the transmission.
