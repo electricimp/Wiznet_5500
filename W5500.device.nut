@@ -1356,6 +1356,10 @@ class W5500.Driver {
     function sendSocketCommand(socket, command) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         writeReg(W5500_SOCKET_COMMAND, bsb, command);
+        while (readReg(W5500_SOCKET_COMMAND, bsb) != 0x00) {
+            // Check for timeouts here
+        }
+
         return this;
     }
 
