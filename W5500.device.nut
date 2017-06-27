@@ -2223,9 +2223,9 @@ class W5500.Connection {
     // ***************************************************************************
     // _handleSocketInt, handles/clears the specified socket interrupt
     // Returns: null
-    // Parameters: socket the interrupt occurred on
+    // Parameters: none
     // **************************************************************************
-    function handleInterrupt(skip_timer = false) {
+    function handleInterrupt() {
 
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
@@ -2292,7 +2292,6 @@ class W5500.Connection {
 
             // server.log("Send complete on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_SEND_COMPLETE_INT_TYPE);
-            skip_timer = true;
 
             // call transmitting callback
             local _transmitCallback = _getHandler("transmit");
@@ -2317,7 +2316,6 @@ class W5500.Connection {
 
             // server.log("Connection disconnected on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_DISCONNECTED_INT_TYPE);
-            skip_timer = true;
 
             if (_open_timer) imp.cancelwakeup(_open_timer);
             _open_timer = null;
