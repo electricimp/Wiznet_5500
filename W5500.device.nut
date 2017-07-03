@@ -862,8 +862,9 @@ class W5500.Driver {
     //      count - the number of retry attempts (default: 5x)
     // ***************************************************************************
     function setRetries(time = 3000, count = 5) {
-        writeReg(W5500_RETRY_TIME_0, W5500_COMMON_REGISTER, ((time & 0xFF00) >> 8));
-        writeReg(W5500_RETRY_TIME_1, W5500_COMMON_REGISTER, (time & 0x00FF));
+        local time_us = time * 1000 / 100;
+        writeReg(W5500_RETRY_TIME_0, W5500_COMMON_REGISTER, ((time_us & 0xFF00) >> 8));
+        writeReg(W5500_RETRY_TIME_1, W5500_COMMON_REGISTER, (time_us & 0x00FF));
         writeReg(W5500_RETRY_COUNT, W5500_COMMON_REGISTER, count);
         return this;
     }
@@ -2016,7 +2017,7 @@ class W5500.Connection {
     function open(cb = null) {
 
         // Set the socket mode and open the socket
-        _driver.setRetries(3000, 5); // 3000ms, 5x
+        _driver.setRetries(); // Default: 3000ms, 5x
         _driver.setSocketMode(_socket, _mode);
         _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
 
