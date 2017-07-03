@@ -1359,6 +1359,7 @@ class W5500.Driver {
         writeReg(W5500_SOCKET_COMMAND, bsb, command);
         while (readReg(W5500_SOCKET_COMMAND, bsb) != 0x00) {
             // Check for timeouts here
+            imp.sleep(0.001);
         }
 
         return this;
@@ -1600,7 +1601,7 @@ class W5500.Driver {
     // getSocketInterruptTypeStatus
     // Returns: socket interrupt status table
     // Parameters:
-    //      socket - select the socket using an integer 0-3
+    //      socket - select the socket using an integer 0-7
     // **************************************************************************
     function getSocketInterruptTypeStatus(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
@@ -2224,9 +2225,9 @@ class W5500.Connection {
     // ***************************************************************************
     // _handleSocketInt, handles/clears the specified socket interrupt
     // Returns: null
-    // Parameters: none
+    // Parameters: socket the interrupt occurred on
     // **************************************************************************
-    function handleInterrupt() {
+    function handleInterrupt(skip_timer = false) {
 
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
@@ -2293,6 +2294,7 @@ class W5500.Connection {
 
             // server.log("Send complete on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_SEND_COMPLETE_INT_TYPE);
+            skip_timer = true;
 
             // call transmitting callback
             local _transmitCallback = _getHandler("transmit");
@@ -2317,6 +2319,7 @@ class W5500.Connection {
 
             // server.log("Connection disconnected on socket " + _socket);
             _driver.clearSocketInterrupt(_socket, W5500_DISCONNECTED_INT_TYPE);
+            skip_timer = true;
 
             if (_open_timer) imp.cancelwakeup(_open_timer);
             _open_timer = null;
