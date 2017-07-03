@@ -233,12 +233,14 @@ const W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All c
 const W5500_ERR_CANNOT_CONNECT_TIMEOUT = "Connection timeout";
 const W5500_ERR_TRANSMIT_TIMEOUT = "Transmit timeout";
 const W5500_ERR_RECEIVE_TIMEOUT = "Receive timeout";
+const W5500_ERR_COMMAND_TIMEOUT = "Command timeout";
 const W5500_ERR_NOT_CONNECTED = "Not connected";
 
 
 // Miscellaneous constants
 const W5500_CONNECT_TIMEOUT = 60;
 const W5500_TRANSMIT_TIMEOUT = 8;
+const W5500_COMMAND_TIMEOUT = 3;
 const W5500_INTERRUPT_POLL_TIME_IDLE = 0.5;
 const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
@@ -1357,8 +1359,10 @@ class W5500.Driver {
     function sendSocketCommand(socket, command) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         writeReg(W5500_SOCKET_COMMAND, bsb, command);
+        local started = hardware.millis();
         while (readReg(W5500_SOCKET_COMMAND, bsb) != 0x00) {
             // Check for timeouts here
+            if (hardware.millis() - started > (W5500_COMMAND_TIMEOUT * 1000)) throw W5500_ERR_COMMAND_TIMEOUT;
             imp.sleep(0.001);
         }
 
