@@ -233,12 +233,14 @@ const W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All c
 const W5500_ERR_CANNOT_CONNECT_TIMEOUT = "Connection timeout";
 const W5500_ERR_TRANSMIT_TIMEOUT = "Transmit timeout";
 const W5500_ERR_RECEIVE_TIMEOUT = "Receive timeout";
+const W5500_ERR_COMMAND_TIMEOUT = "Command timeout";
 const W5500_ERR_NOT_CONNECTED = "Not connected";
 
 
 // Miscellaneous constants
 const W5500_CONNECT_TIMEOUT = 60;
 const W5500_TRANSMIT_TIMEOUT = 8;
+const W5500_COMMAND_TIMEOUT = 3;
 const W5500_INTERRUPT_POLL_TIME_IDLE = 0.5;
 const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
@@ -248,7 +250,7 @@ const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 class W5500 {
 
-    static VERSION = "1.0.0";
+    static VERSION = "1.0.1";
 
     _driver = null;
     _isReady = false; // set to true once the driver is loaded and connection to chip made
@@ -862,8 +864,9 @@ class W5500.Driver {
     //      count - the number of retry attempts (default: 5x)
     // ***************************************************************************
     function setRetries(time = 3000, count = 5) {
-        writeReg(W5500_RETRY_TIME_0, W5500_COMMON_REGISTER, ((time & 0xFF00) >> 8));
-        writeReg(W5500_RETRY_TIME_1, W5500_COMMON_REGISTER, (time & 0x00FF));
+        local time_us = time * 1000 / 100;
+        writeReg(W5500_RETRY_TIME_0, W5500_COMMON_REGISTER, ((time_us & 0xFF00) >> 8));
+        writeReg(W5500_RETRY_TIME_1, W5500_COMMON_REGISTER, (time_us & 0x00FF));
         writeReg(W5500_RETRY_COUNT, W5500_COMMON_REGISTER, count);
         return this;
     }
@@ -1356,6 +1359,13 @@ class W5500.Driver {
     function sendSocketCommand(socket, command) {
         local bsb = _getSocketRegBlockSelectBit(socket);
         writeReg(W5500_SOCKET_COMMAND, bsb, command);
+        local started = hardware.millis();
+        while (readReg(W5500_SOCKET_COMMAND, bsb) != 0x00) {
+            // Check for timeouts here
+            if (hardware.millis() - started > (W5500_COMMAND_TIMEOUT * 1000)) throw W5500_ERR_COMMAND_TIMEOUT;
+            imp.sleep(0.001);
+        }
+
         return this;
     }
 
@@ -1595,7 +1605,7 @@ class W5500.Driver {
     // getSocketInterruptTypeStatus
     // Returns: socket interrupt status table
     // Parameters:
-    //      socket - select the socket using an integer 0-3
+    //      socket - select the socket using an integer 0-7
     // **************************************************************************
     function getSocketInterruptTypeStatus(socket) {
         local bsb = _getSocketRegBlockSelectBit(socket);
@@ -2012,7 +2022,7 @@ class W5500.Connection {
     function open(cb = null) {
 
         // Set the socket mode and open the socket
-        _driver.setRetries(3000, 5); // 3000ms, 5x
+        _driver.setRetries(); // Default: 3000ms, 5x
         _driver.setSocketMode(_socket, _mode);
         _driver.sendSocketCommand(_socket, W5500_SOCKET_OPEN);
 
