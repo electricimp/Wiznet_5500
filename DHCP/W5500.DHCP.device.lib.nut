@@ -143,7 +143,7 @@ enum W5500_DHCP_OPTIONS {
 
 class W5500.DHCP {
 
-    static VERSION = "1.0.0";
+    static VERSION = "2.0.0";
 
     _driver = null;
     _wiz = null;
