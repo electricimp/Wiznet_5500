@@ -4,7 +4,7 @@ This library allows you to communicate with a TCP/IP network (separate from an i
 
 This library supports SPI integration with the W5500.
 
-**To use this library, add** `#require "W5500.device.nut:1.0.1"` **to the top of your device code.**
+**To use this library, add** `#require "W5500.device.lib.nut:2.0.0"` **to the top of your device code.**
 
 ## W5500 Class Usage
 
@@ -79,7 +79,7 @@ Has method has a single, required argument: a callback function. The callback wi
 ```squirrel
 // The callback function will not run until the 5500 has finished initializing
 wiz.onReady(function() {
-    server.log("The Wiznet W5500 is ready");     
+    server.log("The Wiznet W5500 is ready");
 }.bindenv(this));
 ```
 
@@ -316,7 +316,7 @@ connection.onClose(function() {
 
 ### transmit(*transmitData[, callback]*)
 
-This method is called within a connection to transmit the data through the socket.  
+This method is called within a connection to transmit the data through the socket.
 
 | Parameter | Data Type | Required | Default Value | Description |
 | --- | --- | --- | --- | --- |
@@ -345,7 +345,7 @@ This method is an alternative to *onReceive()* and which will temporarily overri
 | *error* | String | An error message if there was a problem or `null` if it was successful |
 | *data* | Blob | The data that was received |
 
-#### Example  
+#### Example
 
 ```squirrel
 connection.receive(function(error, data) {
