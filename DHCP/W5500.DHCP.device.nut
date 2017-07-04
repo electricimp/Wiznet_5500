@@ -1,14 +1,33 @@
-// Copyright (c) 2017 Electric Imp
-// This file is licensed under the MIT License
-// http://opensource.org/licenses/MIT
-
+// MIT License
+//
+// Copyright 2016-2017 Electric Imp
+//
+// SPDX-License-Identifier: MIT
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
 
 // DHCP SETTINGS
 const W5500_DHCP_DEST_IP = "255.255.255.255"
 const W5500_DHCP_DEST_PORT = 67
 const W5500_DHCP_SRC_PORT = 68
 
-// DHCP MESSAGE OP ODE 
+// DHCP MESSAGE OP ODE
 const W5500_DHCP_BOOTREQUEST = 01; // /< Request Message used in op of @ref RIP_MSG
 const W5500_DHCP_BOOTREPLY = 02; // /< Reply Message used i op of @ref RIP_MSG
 
@@ -192,7 +211,7 @@ class W5500.DHCP {
         _nextLoopTime = W5500_DHCP_RESEND;
     }
 
-    // Public Functions 
+    // Public Functions
 
     // ***************************************************************************
     // onLease
@@ -208,7 +227,7 @@ class W5500.DHCP {
     // ***************************************************************************
     // renewLease
     // Returns: none
-    // Parameters:  
+    // Parameters:
     //      timeout - number of seconds to allow for the lease to try before giving up (0 = infinite)
     // ***************************************************************************
     function renewLease(timeout = 0) {
@@ -282,7 +301,7 @@ class W5500.DHCP {
     // ***************************************************************************
     // _renewLease
     // Returns: none
-    // Parameters:  none                 
+    // Parameters:  none
     // ***************************************************************************
     function _renewLease() {
 
@@ -316,7 +335,7 @@ class W5500.DHCP {
     // ***************************************************************************
     // _cancelRenewLease
     // Returns: none
-    // Parameters:  none                 
+    // Parameters:  none
     // ***************************************************************************
     function _cancelRenewLease() {
 
@@ -400,7 +419,7 @@ class W5500.DHCP {
 
                 case W5500_DHCP_STATE_SENDING_REQUEST:
                     if (_resendCount++ < W5500_DHCP_MAX_RESEND) {
-                        // Send the DHCP Request Packet    
+                        // Send the DHCP Request Packet
                         _sendDHCP(W5500_DHCP_MSG_REQUEST, _offeredIP, _serverID);
                         _nextLoopTime = 5;
                     } else {
@@ -433,7 +452,7 @@ class W5500.DHCP {
     // Returns: none
     // Parameters:
     //      err  - error message
-    //      data - blob containing the received packet                    
+    //      data - blob containing the received packet
     // ***************************************************************************
     function _receiveDHCP(err, data) {
         // Callback function for data received
@@ -471,7 +490,7 @@ class W5500.DHCP {
                     _leasedRouterAddress = (W5500_DHCP_OPTIONS.routersOnSubnet in options) ? options[W5500_DHCP_OPTIONS.routersOnSubnet] : null;
                     _leasedDNS = (W5500_DHCP_OPTIONS.dns in options) ? options[W5500_DHCP_OPTIONS.dns] : null;
 
-                    // Give 60 second margin on DHCP lease  
+                    // Give 60 second margin on DHCP lease
                     _leaseTime = _parseLeaseTime(options[W5500_DHCP_OPTIONS.dhcpIPaddrLeaseTime]) - W5500_DHCP_LEASEOFFSET;
 
                     // Close the DHCP connection
@@ -570,7 +589,7 @@ class W5500.DHCP {
 
     // ***************************************************************************
     // _makeXID
-    // Returns: integer containing a random integer from 0 to W5500_DHCP_MAX_INT 
+    // Returns: integer containing a random integer from 0 to W5500_DHCP_MAX_INT
     // Parameters:
     //      none
     // ***************************************************************************
@@ -582,7 +601,7 @@ class W5500.DHCP {
     // ***************************************************************************
     // _incrementXID
     // Returns: none
-    // Parameters:  none                 
+    // Parameters:  none
     // ***************************************************************************
     function _incrementXID() {
         local updatedXID = blob(4);
@@ -599,7 +618,7 @@ class W5500.DHCP {
     //      leasetime - 4 byte blob containing the time when the DHCP lease expires
     // ***************************************************************************
     function _parseLeaseTime(leasetime) {
-        // Swap for Little Endian       
+        // Swap for Little Endian
         leasetime.swap4();
         leasetime.seek(0, 'b');
         local parsedLeaseTime = leasetime.readn('i');
@@ -617,7 +636,7 @@ class W5500.DHCP {
     // Returns: options - array with index being the DHCP Option number
     // Parameters:
     //      optionsData - array of tables with received data
-    //                        
+    //
     // ***************************************************************************
     function _parseOptions(optionsData) {
         local options = {};
@@ -626,7 +645,7 @@ class W5500.DHCP {
 
         optionsData.seek(0, 'b');
         while (!optionsData.eos()) {
-            // Get Option Type        
+            // Get Option Type
             opt = optionsData.readn('b');
 
             if (opt != W5500_DHCP_OPTIONS.endOption) {
@@ -649,9 +668,9 @@ class W5500.DHCP {
 
     // ***************************************************************************
     // _parsePacket
-    // Returns: _structure        
+    // Returns: _structure
     // Parameters:
-    //      packet    - blob containing the packet 
+    //      packet    - blob containing the packet
     //      structure - array of tables, with each table being a field in the packet
     // ***************************************************************************
     function _parsePacket(packet, structure) {

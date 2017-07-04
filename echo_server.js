@@ -35,22 +35,26 @@ function echo(socket) {
     socket.id = cid++;
 
     socket.on('data', function(data) {
-        log("Data[%d]: %s", socket.id, data.toString().trim());
+        log("Data[%d]: %s", socket.id, data.toString('hex').trim());
     });
 
     socket.on('timeout', function() {
+		log("Timeout!");
         socket.destroy();
     });
 
     socket.on('error', function() {
+		log("Error!");
         socket.destroy();
     });
 
     socket.on('end', function() {
+		log("End!");
         socket.destroy();
     });
 
     socket.on('close', function() {
+		log("Close!");
         server.getConnections(function(err, count) {
             log("Disconnection from %s:%d, %d of %d open connections", socket.remoteAddress, socket.remotePort, socket.id, count);
         })
@@ -81,7 +85,7 @@ server.on('listening', function() {
 
 server.on('connection', function(socket) {
     socket.setKeepAlive(true);
-    socket.setTimeout(30000);
+    socket.setTimeout(90000);
 });
 
 server.on('error', function(err) {

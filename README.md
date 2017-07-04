@@ -4,7 +4,7 @@ This library allows you to communicate with a TCP/IP network (separate from an i
 
 This library supports SPI integration with the W5500.
 
-**To use this library, add** `#require "W5500.device.nut:1.0.0"` **to the top of your device code.**
+**To use this library, add** `#require "W5500.device.nut:1.0.1"` **to the top of your device code.**
 
 ## W5500 Class Usage
 
