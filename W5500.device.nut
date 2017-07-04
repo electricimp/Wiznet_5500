@@ -1,6 +1,27 @@
-// Copyright (c) 2016-2017 Electric Imp
-// This file is licensed under the MIT License
-// http://opensource.org/licenses/MIT
+// MIT License
+//
+// Copyright 2016-2017 Electric Imp
+//
+// SPDX-License-Identifier: MIT
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 
 // BLOCK SELECT BITS
 const W5500_COMMON_REGISTER = 0x00;
@@ -273,7 +294,7 @@ class W5500 {
     // ***************************************************************************
     constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false) {
 
-        // Initialise the driver 
+        // Initialise the driver
         _driver = W5500.Driver(interruptPin, spi, csPin, resetPin);
         _driver.init(function() {
 
@@ -295,7 +316,7 @@ class W5500 {
     // ***************************************************************************
     function reset(sw = false) {
 
-        // Initialise the driver 
+        // Initialise the driver
         _isReady = false;
         _driver.reset(sw, function() {
             _driver.init(function() {
@@ -440,7 +461,7 @@ class W5500 {
     // Returns: this
     // Parameters:
     //      sourcePort - the port to listen on
-    //      cb - function to be called when connection successfully established 
+    //      cb - function to be called when connection successfully established
     // ****************************************************************************
     function listen(sourcePort, cb) {
         if (!_isReady) throw "Wiznet driver not ready";
@@ -450,7 +471,7 @@ class W5500 {
     }
 
     // ***************************************************************************
-    // getNumSockets - 
+    // getNumSockets -
     // Returns: returns the total number of sockets available
     // Parameters:
     //      none
@@ -461,7 +482,7 @@ class W5500 {
 
 
     // ***************************************************************************
-    // getNumSocketsFree - 
+    // getNumSocketsFree -
     // Returns: returns the number of unused sockets
     // Parameters:
     //      none
@@ -559,7 +580,7 @@ class W5500.Driver {
         forceCloseAllSockets();
 
         if (cb) {
-            // Asynchronouse reset 
+            // Asynchronouse reset
             if (sw || _resetPin == null) {
                 setMode(W5500_SW_RESET);
                 // Allow things to settle down again
@@ -612,7 +633,7 @@ class W5500.Driver {
     // Returns: nothing
     // Parameters:
     //        cb - callback function
-    //        
+    //
     // ***************************************************************************
     function init(cb) {
 
@@ -670,10 +691,10 @@ class W5500.Driver {
     // Returns: this
     // Parameters:
     //      destIP - the ip address of the destination
-    //      destPort - the port of the destination 
+    //      destPort - the port of the destination
     //      mode - TCP or UDP
     //      sourcePort(optional) - the port to send from
-    //      cb - function to be called when connection successfully established 
+    //      cb - function to be called when connection successfully established
     // ****************************************************************************
     function openConnection(destIP, destPort, mode, sourcePort = null, cb = null) {
 
@@ -705,7 +726,7 @@ class W5500.Driver {
     // Returns: this
     // Parameters:
     //      sourcePort - the port to listen on
-    //      cb - function to be called when connection successfully established 
+    //      cb - function to be called when connection successfully established
     // ****************************************************************************
     function listen(sourcePort, cb) {
 
@@ -924,7 +945,7 @@ class W5500.Driver {
     // setSubnetMask
     // Returns: this
     // Parameters:
-    //      addr - an array of four integers with the subnet mask 
+    //      addr - an array of four integers with the subnet mask
     // **************************************************************************
     function setSubnetMask(addr) {
         local addr = _addrToIP(addr);
@@ -944,7 +965,7 @@ class W5500.Driver {
     // getSubnet
     // Returns: an array of four integers with the subnet address
     // Parameters:
-    //         none 
+    //         none
     // **************************************************************************
     function getSubnetMask() {
         local addr = array(4);
@@ -1054,7 +1075,7 @@ class W5500.Driver {
     // Returns: addr - an array of 4 integers with the IP address for the
     //                 source hardware
     // Parameters:
-    //          none    
+    //          none
     // **************************************************************************
     function getSourceIP() {
         local addr = array(4);
@@ -2074,7 +2095,7 @@ class W5500.Connection {
     // Returns: sets the socket to listen mode
     // Parameters:
     //      cb - function to called when a connection is established
-    //      
+    //
     // **************************************************************************
     function listen(cb) {
 
