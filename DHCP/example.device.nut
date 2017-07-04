@@ -23,8 +23,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 
-#require "W5500.device.nut:1.0.0"
-#require "W5500.DHCP.device.nut:1.0.0"
+#require "W5500.device.lib.nut:2.0.0"
+#require "W5500.DHCP.device.lib.nut:2.0.0"
 
 const ECHO_SERVER_IP = "192.168.201.63";
 const ECHO_SERVER_PORT = 60000;
