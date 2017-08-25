@@ -2308,7 +2308,7 @@ class W5500.Connection {
                     _handlers["transmit"] <- null; // clean the transmit callback as it timed out
 
                     imp.wakeup(0, function() {
-                        _transmitCallback(W5500_ERR_TRANSMIT_TIMEOUT);
+                        _timeoutCallback(W5500_ERR_TRANSMIT_TIMEOUT);
                     }.bindenv(this))
                 } else {
                     // server.error("No timeout handler")
