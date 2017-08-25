@@ -271,7 +271,7 @@ const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 class W5500 {
 
-    static VERSION = "2.0.0";
+    static VERSION = "2.0.1";
 
     _driver = null;
     _isReady = false; // set to true once the driver is loaded and connection to chip made
