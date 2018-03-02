@@ -2308,12 +2308,13 @@ class W5500.Connection {
 
             } else {
 
-                local _transmitCallback = _getHandler("transmit");
+                local _timeoutCallback = _getHandler("timeout");
                 if (_transmitCallback) {
-                    _handlers["transmit"] <- null;
+                    _handlers["timeout"]  <- null;
+                    _handlers["transmit"] <- null; // clean the transmit callback as it timed out
 
                     imp.wakeup(0, function() {
-                        _transmitCallback(W5500_ERR_TRANSMIT_TIMEOUT);
+                        _timeoutCallback(W5500_ERR_TRANSMIT_TIMEOUT);
                     }.bindenv(this))
                 } else {
                     // server.error("No timeout handler")
@@ -2472,6 +2473,7 @@ class W5500.Connection {
             _transmitNextChunk = function(chunk) {
 
                 // Setup the temporary callback
+                _handlers["timeout"]  <-
                 _handlers["transmit"] <-
 
                 function(err) {
