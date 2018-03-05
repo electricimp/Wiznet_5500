@@ -23,7 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 
-#require "W5500.device.lib.nut:2.0.0"
+#require "W5500.device.lib.nut:2.1.0"
 
 
 //================================================

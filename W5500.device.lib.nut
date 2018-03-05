@@ -271,7 +271,7 @@ const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 class W5500 {
 
-    static VERSION = "2.0.1";
+    static VERSION = "2.1.0";
 
     _driver = null;
     _isReady = false; // set to true once the driver is loaded and connection to chip made
@@ -291,11 +291,12 @@ class W5500 {
     //      csPin(optional) -  chip select pin, pass in if not using imp005
     //      resetPin(optional) - reset pin
     //      autoRetry(optional) - not implemented yet.
+    //      setMac(optional) - set the MAC address of the chip to the imp's MAC
     // ***************************************************************************
-    constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false) {
+    constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false, setMac = true) {
 
         // Initialise the driver
-        _driver = W5500.Driver(interruptPin, spi, csPin, resetPin);
+        _driver = W5500.Driver(interruptPin, spi, csPin, resetPin, setMac);
         _driver.init(function() {
 
             // Let the caller know the device is ready
@@ -511,6 +512,7 @@ class W5500.Driver {
     _spi = null;
     _cs = null;
     _resetPin = null;
+    _setMac = null;
 
     _connections = null; // open connections
     _availableSockets = null; // array of sockets available
@@ -526,13 +528,15 @@ class W5500.Driver {
     //      spi - configured spi, W5500 supports spi mode 0 or 3
     //      cs(optional) - configured chip select pin
     //      reset(optional) - configured reset pin
+    //      setMac(optional) - set the MAC address of the chip to the imp's MAC
     // ***************************************************************************
-    constructor(interruptPin, spi, cs = null, resetPin = null) {
+    constructor(interruptPin, spi, cs = null, resetPin = null, setMac = true) {
 
         _interruptPin = interruptPin;
         _spi = spi;
         _cs = cs;
         _resetPin = resetPin;
+        _setMac = setMac;
         _connections = {};
         _availableSockets = [];
 
@@ -644,7 +648,9 @@ class W5500.Driver {
         _interruptPin.configure(DIGITAL_IN_PULLUP, handleInterrupt.bindenv(this));
 
         // Set the default mac address
-        setSourceHWAddr(imp.getmacaddress(), true);
+        if (_setMac){
+            setSourceHWAddr(imp.getmacaddress(), true);
+        }
 
         // Set the defaults
         setNumberOfAvailableSockets(TOTAL_SUPPORTED_SOCKETS);
