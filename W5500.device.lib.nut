@@ -530,7 +530,7 @@ class W5500.Driver {
     //      reset(optional) - configured reset pin
     //      setMac(optional) - set the MAC address of the chip to the imp's MAC
     // ***************************************************************************
-    constructor(interruptPin, spi, cs = null, resetPin = null, setMac = false) {
+    constructor(interruptPin, spi, cs = null, resetPin = null, setMac = true) {
 
         _interruptPin = interruptPin;
         _spi = spi;
