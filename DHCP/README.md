@@ -122,7 +122,7 @@ This method returns an array of DNS entries, each of which is an an array of fou
 ```squirrel
 local dns = dhcp.getDNS();
 foreach (index, server in dns) {
-  server.log(format("DNS #%D address = %d.%d.%d.%d", (index + 1), server[0], server[1], server[2], server[3]));
+  server.log(format("DNS #%d address = %d.%d.%d.%d", (index + 1), server[0], server[1], server[2], server[3]));
 }
 ```
 
