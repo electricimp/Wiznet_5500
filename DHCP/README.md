@@ -30,7 +30,7 @@ dhcp <- W5500.DHCP(wiz);
 
 ### onLease(*callback*) ###
 
-This method sets the function to be called when an IP address is leased. It can be used before or after *dhcp.init()* is called. The callback function, which is not optional, has an *error* parameter which informs the user of timeouts and errors.
+This method sets the function to be called when an IP address is leased. It can be used before or after *dhcp.init()* is called. The callback function, which is not optional, has an *error* parameter which informs the user of timeouts and errors, or will be `null`.
 
 #### Error Messages ####
 
