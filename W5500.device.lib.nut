@@ -291,7 +291,8 @@ class W5500 {
     //      csPin(optional) -  chip select pin, pass in if not using imp005
     //      resetPin(optional) - reset pin
     //      autoRetry(optional) - not implemented yet.
-    //      setMac(optional) - set the MAC address of the chip to the imp's MAC
+    //      setMac(optional) - set the MAC address of the chip to the imp's own
+    //                         MAC, with the last bit flipped.
     // ***************************************************************************
     constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false, setMac = true) {
 
@@ -528,7 +529,8 @@ class W5500.Driver {
     //      spi - configured spi, W5500 supports spi mode 0 or 3
     //      cs(optional) - configured chip select pin
     //      reset(optional) - configured reset pin
-    //      setMac(optional) - set the MAC address of the chip to the imp's MAC
+    //      setMac(optional) - set the MAC address of the chip to the imp's own
+    //                         MAC, with the last bit flipped.
     // ***************************************************************************
     constructor(interruptPin, spi, cs = null, resetPin = null, setMac = true) {
 
