@@ -17,7 +17,7 @@ This library supports SPI integration with the W5500.
 | *csPin* | imp **pin** object | No | `null` | The pin represents a physical pin on the imp and is used to select the SPI bus. On the imp005 if you do not pass a pin into *csPin* you must configure the SPI with the *USE_CS_L* constant |
 | *resetPin* | imp **pin** object | No | N/A | The pin represents a physical pin on the imp and is used for sending a hard reset signal to the W5500 chip |
 | *autoRetry* | Boolean | No | `false` | Whether the library should automatically retry to open a connection should one fail. **Note** Not yet implemented |
-| *setMac* | Boolean | No | `true` | Whether the library should set the MAC address of the chip to the imp’s own MAC. This should be set to `false` when using a Wiznet Wiz550io board, since it has its own MAC address |
+| *setMac* | Boolean | No | `true` | Whether the library should set the MAC address of the chip to the imp’s own MAC (with the last bit flipped). This should be set to `false` when using a Wiznet Wiz550io board, since it has its own MAC address |
  
 #### Examples ####
 
