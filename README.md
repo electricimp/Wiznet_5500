@@ -1,12 +1,12 @@
-# Wiznet W5500
+# Wiznet W5500 #
 
 This library allows you to communicate with a TCP/IP network (separate from an imp’s connection to the network) using the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. The W5500 is used by the [impAccelerator&trade; Fieldbus Gateway](https://developer.electricimp.com/hardware/resources/reference-designs/fieldbusgateway).
 
 This library supports SPI integration with the W5500.
 
-**To use this library, add** `#require "W5500.device.lib.nut:2.1.0"` **to the top of your device code.**
+**To use this library, add** `#require "W5500.device.lib.nut:2.1.0"` **to the top of your device code**
 
-## W5500 Class Usage
+## W5500 Class Usage ##
 
 ### Constructor: W5500(*interruptPin, spi[, csPin][, resetPin][, autoRetry][, setMac]*) ###
 
@@ -59,7 +59,7 @@ This method takes the network information and sets the data into the relevant re
 | *gatewayIP* | String or an array of four integers | No | `null` | The IP address of the gateway or router. For example, the address 192.168.1.1 can be passed in as an array, `[192, 168, 1, 1]`, or as a string `"192.168.1.1"` |
 | *mac* | String or an array of six integers | No | A function that will return the MAC address of the Wiznet | The MAC address to assign to the Wiznet adapter. It is easiest to let the MAC address be set automatically by leaving this as `null`. You can manually enter the address 0c:2a:69:09:76:64 by passing it into an array, `[0x0c, 0x2a, 0x69, 0x09, 0x76, 0x64]`, or as a string `"0c2a69097664"` |
 
-#### Example
+#### Example ####
 
 ```squirrel
 // Configured using strings
@@ -71,11 +71,11 @@ wiz.configureNetworkSettings("192.168.1.37", "255.255.255.0", "192.168.1.1");
 wiz.configureNetworkSettings([192,168,1,37], [255,255,255,0], [192,168,1,1]);
 ```
 
-### onReady(*callback*)
+### onReady(*callback*) ###
 
-Has method has a single, required argument: a callback function. The callback will be executed when the initialization of the W5500 has completed successfully. It will be called immediately if the initialization has already been completed. The callback takes no parameters.
+Has method has a single, required parameter which takes a callback function as its argument. The callback will be executed when the initialization of the W5500 has completed successfully. It will be called immediately if the initialization has already been completed. The callback has no parameters.
 
-#### Example
+#### Example ####
 
 ```squirrel
 // The callback function will not run until the 5500 has finished initializing
@@ -84,9 +84,9 @@ wiz.onReady(function() {
 }.bindenv(this));
 ```
 
-### openConnection(*ip, port[, mode][, callback]*)
+### openConnection(*ip, port[, mode][, callback]*) ###
 
-This method finds a socket that is not in use and initializes a connection for the socket. It takes the following parameters:
+This method finds a socket that is not in use and initializes a connection for the socket. It has the following parameters:
 
 | Parameter | Data Type | Required | Default Value | Description |
 | --- | --- | --- | --- | --- |
@@ -136,7 +136,7 @@ wiz.openConnection(destIp, destPort, function(error, connection) {
 
 ### listen(*port, callback*) ###
 
-This method function finds a socket that is not in use and sets up a TCP server. It has the following parameters:
+This method finds a socket that is not in use and sets up a TCP server. It has the following parameters:
 
 | Parameter | Data Type | Required | Default Value | Description |
 | --- | --- | --- | --- | --- |
@@ -167,7 +167,7 @@ wiz.listen(port, function(error, connection) {
 
 This method causes the Wiznet chip to undergo a reset. It is recommended that your use hardware resets (the default behaviour) and to wait for the *onReady()* callback to be triggered before proceeding after a reset.
 
-The single parameter, *softReset*, is a Boolean value: pass `true` to trigger a soft reset, or `false` (the default) for a hard reset.
+The method’s single, optional parameter, *softReset*, is a Boolean value: pass `true` to trigger a soft reset, or `false` (the default) for a hard reset.
 
 #### Examples ####
 
@@ -241,7 +241,7 @@ This method opens a socket then sets up the connection. It is called as part of 
 
 ### close(*[callback]*) ###
 
-This method closes the connection on a socket then fires the supplied callback on completion of all stages of disconnection. This callback takes no parameters.
+This method closes the connection on a socket then fires the supplied callback on completion of all stages of disconnection. This callback has no parameters.
 
 #### Example ####
 
