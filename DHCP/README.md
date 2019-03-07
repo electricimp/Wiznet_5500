@@ -2,7 +2,7 @@
 
 This library class enables Dynamic Host Configuration Protocol (DHCP) functionality for the Wiznet W5500 chip [W5500](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It also requires the Wiznet W5500 driver.
 
-**To add this code to your project, add** `#require W5500.DHCP.device.lib.nut:2.0.0` **after** `#require W5500.device.lib.nut:2.1.0` **at the top of your device code**
+**To add this code to your project, add** `#require W5500.DHCP.device.lib.nut:2.0.0` **after** `#require W5500.device.lib.nut:2.1.1` **at the top of your device code**
 
 ## Class W5500.DHCP ##
 
