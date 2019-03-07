@@ -2311,7 +2311,7 @@ class W5500.Connection {
             } else {
 
                 local _timeoutCallback = _getHandler("timeout");
-                if (_transmitCallback) {
+                if (_timeoutCallback) {
                     _handlers["timeout"]  <- null;
                     _handlers["transmit"] <- null; // clean the transmit callback as it timed out
 
