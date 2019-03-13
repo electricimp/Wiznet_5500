@@ -271,7 +271,7 @@ const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 class W5500 {
 
-    static VERSION = "2.1.0";
+    static VERSION = "2.1.1";
 
     _driver = null;
     _isReady = false; // set to true once the driver is loaded and connection to chip made
@@ -2311,7 +2311,7 @@ class W5500.Connection {
             } else {
 
                 local _timeoutCallback = _getHandler("timeout");
-                if (_transmitCallback) {
+                if (_timeoutCallback) {
                     _handlers["timeout"]  <- null;
                     _handlers["transmit"] <- null; // clean the transmit callback as it timed out
 
