@@ -22,5 +22,5 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include "../W5500.device.lib.nut"
-#include "../DHCP/W5500.DHCP.device.lib.nut"
+@include "../W5500.device.lib.nut"
+@include "../DHCP/W5500.DHCP.device.lib.nut"

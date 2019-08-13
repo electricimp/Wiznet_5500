@@ -22,8 +22,6 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-// #require "W5500.device.lib.nut:2.1.1"
-
 // echo server address and port
 const SOURCE_IP = "192.168.201.185";
 const SUBNET_MASK = "255.255.255.0";

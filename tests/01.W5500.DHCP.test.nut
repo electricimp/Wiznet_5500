@@ -22,8 +22,6 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-// #require "W5500.DHCP.device.lib.nut:2.0.0"
-
 // echo server address and port
 const ECHO_SERVER_IP = "192.168.201.63";
 const ECHO_SERVER_PORT = 60000;
