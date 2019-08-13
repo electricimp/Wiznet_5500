@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2017 Electric Imp
+// Copyright 2016-2019 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -25,22 +25,25 @@
 
 #require "W5500.device.lib.nut:2.1.1"
 
-
 //================================================
-// RUN
+// Define functions
 //================================================
 
 function readyCb() {
 
     // Connection settings
-    local destIP   = "192.168.1.42";
+    local destIP   = "192.168.201.3";
     local destPort = 4242;
+
+    local sourceIP = "192.168.201.2";
+    local subnet_mask = "255.255.255.0";
+    local gatewayIP = "192.168.201.1";
 
     local started = hardware.millis();
 
     server.log("Attemping to connect...");
     server.log(server.log("isReady "+ wiz._isReady))
-    wiz.configureNetworkSettings("192.168.1.2", "255.255.255.0", "192.168.1.1");
+    wiz.configureNetworkSettings(sourceIP, subnet_mask, gatewayIP);
     wiz.openConnection(destIP, destPort, function(err, connection) {
 
         local dur = hardware.millis() - started;
@@ -94,18 +97,25 @@ function disconnectCb(err) {
     })
 }
 
+//================================================
+// Configure Hardware for imp005 Fieldbus Gateway
+//================================================
 
-// Initialise SPI port
+// Configure pins 
 interruptPin <- hardware.pinXC;
 resetPin     <- hardware.pinXA;
+// Initialize SPI 
 spiSpeed     <- 1000;
 spi          <- hardware.spi0;
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
 
-started <- hardware.millis();
-
-// Initialise Wiznet
+// Initialize Wiznet
 wiz <- W5500(interruptPin, spi, null, resetPin);
+
+//================================================
+// RUN
+//================================================
+started <- hardware.millis();
 
 // Wait for Wiznet to be ready before opening connections
 server.log("Waiting for Wiznet to be ready ...");

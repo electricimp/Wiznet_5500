@@ -22,25 +22,29 @@ This library supports SPI integration with the W5500.
 #### Examples ####
 
 ```squirrel
-// Setup for an imp005
-speed <- 4000;
-spi <- hardware.spi0;
-spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, speed);
+// Setup for an imp005 Fieldbus Gateway
 
-resetPin <- hardware.pinN;
-interruptPin <- hardware.pinXA;
+// Configure pins 
+interruptPin <- hardware.pinXC;
+resetPin     <- hardware.pinXA;
 
+// Initialize SPI 
+spiSpeed     <- 1000;
+spi          <- hardware.spi0;
+spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
+
+// Initialize Wiznet
 wiz <- W5500(interruptPin, spi, null, resetPin);
 ```
 
 ```squirrel
-// Setup for an imp001
-speed <- 4000;
-spi <- hardware.spi257
+// Setup for an imp001 
+speed        <- 1000;
+spi          <- hardware.spi257
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
 
-cs <- hardware.pin8;
-resetPin <- hardware.pin9;
+cs           <- hardware.pin8;
+resetPin     <- hardware.pin9;
 interruptPin <- hardware.pin1;
 
 wiz <- W5500(interruptPin, spi, cs, resetPin);
