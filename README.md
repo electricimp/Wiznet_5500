@@ -1,10 +1,14 @@
 # Wiznet W5500 #
 
-This library allows you to communicate with a TCP/IP network (separate from an imp’s connection to the network) using the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. The W5500 is used by the [impAccelerator&trade; Fieldbus Gateway](https://developer.electricimp.com/hardware/resources/reference-designs/fieldbusgateway).
+The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. We have two libraries for use with the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). 
 
-This library supports SPI integration with the W5500.
+The base library allows you to communicate with a TCP/IP network (separate from an imp’s connection to the network). This library supports SPI integration with the W5500. See documentation [below](#w5500-class-usage). 
 
-**To include this library in your project, add** `#require "W5500.device.lib.nut:2.1.1"` **at the top of your device code**
+In addition we have a W5500.DHCP library that enables Dynamic Host Configuration Protocol (DHCP) functionality for the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). Documentation and source code can be found in the [DHCP directory](./DHCP).
+
+The W5500 is used by the [impAccelerator&trade; Fieldbus Gateway](https://developer.electricimp.com/hardware/resources/reference-designs/fieldbusgateway).
+
+**To include the base library in your project, add** `#require "W5500.device.lib.nut:2.1.1"` **at the top of your device code**
 
 ## W5500 Class Usage ##
 

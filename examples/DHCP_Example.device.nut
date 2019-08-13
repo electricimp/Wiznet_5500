@@ -26,19 +26,19 @@
 #require "W5500.device.lib.nut:2.0.0"
 #require "W5500.DHCP.device.lib.nut:2.0.0"
 
-const ECHO_SERVER_IP = "192.168.201.63";
+const ECHO_SERVER_IP   = "192.168.201.63";
 const ECHO_SERVER_PORT = 60000;
 
 // Initialise SPI port
 interruptPin <- hardware.pinXC;
-resetPin <- hardware.pinXA;
-spiSpeed <- 1000;
-spi <- hardware.spi0;
+resetPin     <- hardware.pinXA;
+spiSpeed     <- 1000;
+spi          <- hardware.spi0;
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
 
 // Initialise Wiznet and DHCP
-wiz <- W5500(interruptPin, spi, null, resetPin);
-dhcp <- W5500.DHCP(wiz);
+wiz      <- W5500(interruptPin, spi, null, resetPin);
+dhcp     <- W5500.DHCP(wiz);
 next_cid <- 0;
 
 // Wait for Wiznet to be ready
