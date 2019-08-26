@@ -8,11 +8,13 @@ In addition we have a W5500.DHCP library that enables Dynamic Host Configuration
 
 The W5500 is used by the [impAccelerator&trade; Fieldbus Gateway](https://developer.electricimp.com/hardware/resources/reference-designs/fieldbusgateway).
 
-**To include the base library in your project, add** `#require "W5500.device.lib.nut:2.1.1"` **at the top of your device code**
+**To include the base library in your project, add** `#require "W5500.device.lib.nut:2.2.0"` **at the top of your device code**
 
 ## W5500 Class Usage ##
 
 ### Constructor: W5500(*interruptPin, spi[, csPin][, resetPin][, autoRetry][, setMac]*) ###
+
+The constructor initializes the Wiznet driver. The initialization process runs asynchronously, so be sure to register an [onReady callback](#onreadycallback) before opening a connection or listener.  
 
 | Parameter | Data&nbsp;Type | Required? | Description |
 | --- | --- | --- | --- |
@@ -21,7 +23,7 @@ The W5500 is used by the [impAccelerator&trade; Fieldbus Gateway](https://develo
 | *csPin* | imp **pin** object | No | The pin represents a physical pin on the imp and is used to select the SPI bus. On the imp005 if you do not pass a pin into *csPin* you must configure the SPI with the *USE_CS_L* constant, Default: `null` |
 | *resetPin* | imp **pin** object | No | The pin represents a physical pin on the imp and is used for sending a hard reset signal to the W5500 chip |
 | *autoRetry* | Boolean | No | Whether the library should automatically retry to open a connection should one fail. Default: `false`. **Note** Not yet implemented |
-| *setMac* | Boolean | No | Whether the library should set the MAC address of the chip to the imp’s own MAC (with the last bit flipped). This should be set to `false` when using a Wiznet Wiz550io board, since it has its own MAC address. Default: `true` |
+| *setMac* | Boolean | No | Whether the library should set the MAC address of the chip to the imp’s own MAC (with the locally administered bit flipped). This should be set to `false` when using a Wiznet Wiz550io board, since it has its own MAC address. Default: `true` |
  
 #### Examples ####
 
@@ -39,6 +41,23 @@ spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
 
 // Initialize Wiznet
 wiz <- W5500(interruptPin, spi, null, resetPin);
+```
+
+```squirrel
+// Setup for an impC001 
+speed        <- 1000;
+spi          <- hardware.spiPQRS;
+spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
+
+cs           <- hardware.pinS;
+resetPin     <- hardware.pinYC;
+// Note: This is not the default interrupt pin for the mikroBus.
+// The default pin YD doesn't allow for a state change callback.
+// Apply solder bridge to W4 on back of breakout board to connect
+// interrupt to pin YL.
+interruptPin <- hardware.pinYL;
+
+wiz <- W5500(interruptPin, spi, cs, resetPin);
 ```
 
 ```squirrel
@@ -87,7 +106,7 @@ wiz.configureNetworkSettings([192,168,1,37], [255,255,255,0], [192,168,1,1]);
 
 ### onReady(*callback*) ###
 
-This method is used to register a callback function that will be triggered to notify you that the W5500 is ready for use. 
+This method registers a callback function that will be triggered when the W5500 initialization is completed and the chip is ready for use. 
 
 #### Parameters ####
 
@@ -110,7 +129,7 @@ wiz.onReady(function() {
 
 ### openConnection(*ip, port[, mode][, callback]*) ###
 
-This method finds a socket that is not in use and initializes a connection for the socket.
+This method finds a socket that is not in use and initializes a connection for the socket. Initialization must be complete before this method is called or an error will be thrown.
 
 #### Parameters ####
 
@@ -169,7 +188,7 @@ wiz.openConnection(destIp, destPort, function(error, connection) {
 
 ### listen(*port, callback*) ###
 
-This method finds a socket that is not in use and sets up a TCP server.
+This method finds a socket that is not in use and sets up a TCP server. Initialization must be complete before this method is called or an error will be thrown.
 
 #### Parameters ####
 
@@ -204,7 +223,7 @@ wiz.listen(port, function(error, connection) {
 
 ### reset(*[softReset]*) ###
 
-This method causes the Wiznet chip to undergo a reset. It is recommended that you use hardware resets (the default behavior) and to wait for the [callback registered with *onready()*](#onreadycallback) to be triggered before proceeding after a reset.
+This method causes the Wiznet chip to undergo a reset, and then performs an initailiztion. It is recommended that you use hardware resets (the default behavior) and to wait for the [callback registered with *onready()*](#onreadycallback) to be triggered before proceeding after a reset.
 
 #### Parameters ####
 

@@ -25,40 +25,40 @@
 
 // BLOCK SELECT BITS
 const W5500_COMMON_REGISTER = 0x00;
-const W5500_S0_REGISTER = 0x08;
-const W5500_S0_TX_BUFFER = 0x10;
-const W5500_S0_RX_BUFFER = 0x18;
-const W5500_S1_REGISTER = 0x28;
-const W5500_S1_TX_BUFFER = 0x30;
-const W5500_S1_RX_BUFFER = 0x38;
-const W5500_S2_REGISTER = 0x48;
-const W5500_S2_TX_BUFFER = 0x50;
-const W5500_S2_RX_BUFFER = 0x58;
-const W5500_S3_REGISTER = 0x68;
-const W5500_S3_TX_BUFFER = 0x70;
-const W5500_S3_RX_BUFFER = 0x78;
-const W5500_S4_REGISTER = 0x88;
-const W5500_S4_TX_BUFFER = 0x90;
-const W5500_S4_RX_BUFFER = 0x98;
-const W5500_S5_REGISTER = 0xA8;
-const W5500_S5_TX_BUFFER = 0xB0;
-const W5500_S5_RX_BUFFER = 0xB8;
-const W5500_S6_REGISTER = 0xC8;
-const W5500_S6_TX_BUFFER = 0xD0;
-const W5500_S6_RX_BUFFER = 0xD8;
-const W5500_S7_REGISTER = 0xE8;
-const W5500_S7_TX_BUFFER = 0xF0;
-const W5500_S7_RX_BUFFER = 0xF8;
+const W5500_S0_REGISTER     = 0x08;
+const W5500_S0_TX_BUFFER    = 0x10;
+const W5500_S0_RX_BUFFER    = 0x18;
+const W5500_S1_REGISTER     = 0x28;
+const W5500_S1_TX_BUFFER    = 0x30;
+const W5500_S1_RX_BUFFER    = 0x38;
+const W5500_S2_REGISTER     = 0x48;
+const W5500_S2_TX_BUFFER    = 0x50;
+const W5500_S2_RX_BUFFER    = 0x58;
+const W5500_S3_REGISTER     = 0x68;
+const W5500_S3_TX_BUFFER    = 0x70;
+const W5500_S3_RX_BUFFER    = 0x78;
+const W5500_S4_REGISTER     = 0x88;
+const W5500_S4_TX_BUFFER    = 0x90;
+const W5500_S4_RX_BUFFER    = 0x98;
+const W5500_S5_REGISTER     = 0xA8;
+const W5500_S5_TX_BUFFER    = 0xB0;
+const W5500_S5_RX_BUFFER    = 0xB8;
+const W5500_S6_REGISTER     = 0xC8;
+const W5500_S6_TX_BUFFER    = 0xD0;
+const W5500_S6_RX_BUFFER    = 0xD8;
+const W5500_S7_REGISTER     = 0xE8;
+const W5500_S7_TX_BUFFER    = 0xF0;
+const W5500_S7_RX_BUFFER    = 0xF8;
 
 // READ/WRITE BIT
-const W5500_READ_COMMAND = 0x00;
+const W5500_READ_COMMAND  = 0x00;
 const W5500_WRITE_COMMAND = 0x04;
 
 // SPI OPPERATION MODE
 const W5500_VARIABLE_DATA_LENGTH = 0x00;
-const W5500_FIXED_DATA_LENGTH_1 = 0x01;
-const W5500_FIXED_DATA_LENGTH_2 = 0x02;
-const W5500_FIXED_DATA_LENGTH_4 = 0x03;
+const W5500_FIXED_DATA_LENGTH_1  = 0x01;
+const W5500_FIXED_DATA_LENGTH_2  = 0x02;
+const W5500_FIXED_DATA_LENGTH_4  = 0x03;
 
 // COMMON REGISTERS OFFSET ADDRESSES
 // MR
@@ -107,6 +107,7 @@ const W5500_SOCKET_INTERRUPT_MASK = 0x0018;
 // RTR
 const W5500_RETRY_TIME_0 = 0x0019;
 const W5500_RETRY_TIME_1 = 0x001A;
+
 // RCR
 const W5500_RETRY_COUNT = 0x001B;
 
@@ -116,15 +117,14 @@ const W5500_PHYSICAL_CONFIG = 0x002E;
 // VERSION
 const W5500_CHIP_VERSION = 0x0039;
 
-
 // SOCKET REGISTER OFFSET ADDRESSES
-const W5500_SOCKET_MODE = 0x0000;
-const W5500_SOCKET_COMMAND = 0x0001;
-const W5500_SOCKET_N_INTERRUPT = 0x0002;
-const W5500_SOCKET_STATUS = 0x0003;
+const W5500_SOCKET_MODE           = 0x0000;
+const W5500_SOCKET_COMMAND        = 0x0001;
+const W5500_SOCKET_N_INTERRUPT    = 0x0002;
+const W5500_SOCKET_STATUS         = 0x0003;
 
-const W5500_SOCKET_SOURCE_PORT_0 = 0x0004;
-const W5500_SOCKET_SOURCE_PORT_1 = 0x0005;
+const W5500_SOCKET_SOURCE_PORT_0  = 0x0004;
+const W5500_SOCKET_SOURCE_PORT_1  = 0x0005;
 
 const W5500_SOCKET_DEST_HW_ADDR_0 = 0x0006;
 const W5500_SOCKET_DEST_HW_ADDR_1 = 0x0007;
@@ -138,8 +138,8 @@ const W5500_SOCKET_DEST_IP_ADDR_1 = 0x000D;
 const W5500_SOCKET_DEST_IP_ADDR_2 = 0x000E;
 const W5500_SOCKET_DEST_IP_ADDR_3 = 0x000F;
 
-const W5500_SOCKET_DEST_PORT_0 = 0x0010;
-const W5500_SOCKET_DEST_PORT_1 = 0x0011;
+const W5500_SOCKET_DEST_PORT_0    = 0x0010;
+const W5500_SOCKET_DEST_PORT_1    = 0x0011;
 
 const W5500_SOCKET_RX_BUFFER_SIZE = 0x001E;
 const W5500_SOCKET_TX_BUFFER_SIZE = 0x001F;
@@ -168,55 +168,55 @@ const W5500_SOCKET_RX_RP_R2 = 0x0029;
 const W5500_SOCKET_N_INTERRUPT_MASK = 0x002C;
 
 // MODES
-const W5500_SW_RESET = 0x80;
-const W5500_WAKE_ON_LAN = 0x20;
-const W5500_PING_BLOCK = 0x10;
-const W5500_PPPoE = 0x08;
-const W5500_FORCE_ARP = 0x01;
+const W5500_SW_RESET     = 0x80;
+const W5500_WAKE_ON_LAN  = 0x20;
+const W5500_PING_BLOCK   = 0x10;
+const W5500_PPPoE        = 0x08;
+const W5500_FORCE_ARP    = 0x01;
 const W5500_DEFAULT_MODE = 0x00;
 
 // SOCKET MODES (Sn_MR)
-const W5500_SOCKET_MODE_MULTI = 0x80;
+const W5500_SOCKET_MODE_MULTI              = 0x80;
 const W5500_SOCKET_MODE_BROADCAST_BLOCKING = 0x40;
-const W5500_SOCKET_MODE_NO_DELAY_ACK = 0x20;
-const W5500_SOCKET_MODE_UNICAST_BLOCKING = 0x10;
-const W5500_SOCKET_MODE_CLOSED = 0x00;
-const W5500_SOCKET_MODE_TCP = 0x01;
-const W5500_SOCKET_MODE_UDP = 0x02;
-const W5500_SOCKET_MODE_MACRAW = 0x03;
+const W5500_SOCKET_MODE_NO_DELAY_ACK       = 0x20;
+const W5500_SOCKET_MODE_UNICAST_BLOCKING   = 0x10;
+const W5500_SOCKET_MODE_CLOSED             = 0x00;
+const W5500_SOCKET_MODE_TCP                = 0x01;
+const W5500_SOCKET_MODE_UDP                = 0x02;
+const W5500_SOCKET_MODE_MACRAW             = 0x03;
 
 // SOCKET COMMANDS (Sn_CR)
-const W5500_SOCKET_OPEN = 0x01;
-const W5500_SOCKET_LISTEN = 0x02;
-const W5500_SOCKET_CONNECT = 0x04;
+const W5500_SOCKET_OPEN       = 0x01;
+const W5500_SOCKET_LISTEN     = 0x02;
+const W5500_SOCKET_CONNECT    = 0x04;
 const W5500_SOCKET_DISCONNECT = 0x08;
-const W5500_SOCKET_CLOSE = 0x10;
-const W5500_SOCKET_SEND = 0x20;
-const W5500_SOCKET_SEND_MAC = 0x21;
-const W5500_SOCKET_SEND_KEEP = 0x22;
-const W5500_SOCKET_RECEIVE = 0x40;
+const W5500_SOCKET_CLOSE      = 0x10;
+const W5500_SOCKET_SEND       = 0x20;
+const W5500_SOCKET_SEND_MAC   = 0x21;
+const W5500_SOCKET_SEND_KEEP  = 0x22;
+const W5500_SOCKET_RECEIVE    = 0x40;
 
 // SOCKET STATUS (Sn_SR)
-const W5500_SOCKET_STATUS_CLOSED = 0x00;
-const W5500_SOCKET_STATUS_INIT = 0x13;
-const W5500_SOCKET_STATUS_LISTEN = 0x14;
+const W5500_SOCKET_STATUS_CLOSED      = 0x00;
+const W5500_SOCKET_STATUS_INIT        = 0x13;
+const W5500_SOCKET_STATUS_LISTEN      = 0x14;
 const W5500_SOCKET_STATUS_ESTABLISHED = 0x17;
-const W5500_SOCKET_STATUS_CLOSE_WAIT = 0x1C;
-const W5500_SOCKET_STATUS_UDP = 0x22;
-const W5500_SOCKET_STATUS_MACRAW = 0x42;
-const W5500_SOCKET_STATUS_SYNSENT = 0x15;
-const W5500_SOCKET_STATUS_SYNRECV = 0x16;
-const W5500_SOCKET_STATUS_FIN_WAIT = 0x18;
-const W5500_SOCKET_STATUS_CLOSING = 0x1A;
-const W5500_SOCKET_STATUS_TIME_WAIT = 0x1B;
-const W5500_SOCKET_STATUS_LAST_ACK = 0x1D;
+const W5500_SOCKET_STATUS_CLOSE_WAIT  = 0x1C;
+const W5500_SOCKET_STATUS_UDP         = 0x22;
+const W5500_SOCKET_STATUS_MACRAW      = 0x42;
+const W5500_SOCKET_STATUS_SYNSENT     = 0x15;
+const W5500_SOCKET_STATUS_SYNRECV     = 0x16;
+const W5500_SOCKET_STATUS_FIN_WAIT    = 0x18;
+const W5500_SOCKET_STATUS_CLOSING     = 0x1A;
+const W5500_SOCKET_STATUS_TIME_WAIT   = 0x1B;
+const W5500_SOCKET_STATUS_LAST_ACK    = 0x1D;
 
 // INTERRUPT TYPES
 const W5500_CONFLICT_INT_TYPE = 0x80;
-const W5500_UNREACH_INT_TYPE = 0x40;
-const W5500_PPPoE_INT_TYPE = 0x20;
+const W5500_UNREACH_INT_TYPE  = 0x40;
+const W5500_PPPoE_INT_TYPE    = 0x20;
 const W5500_MAGIC_PACKET_TYPE = 0x10;
-const W5500_NONE_INT_TYPE = 0x00;
+const W5500_NONE_INT_TYPE     = 0x00;
 
 // SOCKET INTERRUPTS
 const W5500_DISABLE_SOCKET_INTERRUPTS = 0x00;
@@ -231,11 +231,11 @@ const W5500_S7_INTERRUPT = 0x80;
 
 // SOCKET INTERRUPT TYPES
 const W5500_SEND_COMPLETE_INT_TYPE = 0x10;
-const W5500_TIMEOUT_INT_TYPE = 0x08;
+const W5500_TIMEOUT_INT_TYPE       = 0x08;
 const W5500_DATA_RECEIVED_INT_TYPE = 0x04;
-const W5500_DISCONNECTED_INT_TYPE = 0x02;
-const W5500_CONNECTED_INT_TYPE = 0x01;
-const W5500_ALL_INT_TYPES = 0x1F;
+const W5500_DISCONNECTED_INT_TYPE  = 0x02;
+const W5500_CONNECTED_INT_TYPE     = 0x01;
+const W5500_ALL_INT_TYPES          = 0x1F;
 
 // Socket states
 enum W5500_SOCKET_STATES {
@@ -248,21 +248,20 @@ enum W5500_SOCKET_STATES {
 }
 
 // Error messages
-const W5500_ERR_INVALID_PARAMETERS = "Provide 'ip', 'port', 'mode' and a callback";
+const W5500_ERR_INVALID_PARAMETERS            = "Provide 'ip', 'port', 'mode' and a callback";
 const W5500_ERR_CANNOT_CONNECT_STILL_CLEANING = "Cannot open a connection. Still cleaning up";
 const W5500_ERR_CANNOT_CONNECT_SOCKETS_IN_USE = "Cannot open a connection. All connection sockets in use";
-const W5500_ERR_CANNOT_CONNECT_TIMEOUT = "Connection timeout";
-const W5500_ERR_TRANSMIT_TIMEOUT = "Transmit timeout";
-const W5500_ERR_RECEIVE_TIMEOUT = "Receive timeout";
-const W5500_ERR_COMMAND_TIMEOUT = "Command timeout";
-const W5500_ERR_NOT_CONNECTED = "Not connected";
-
+const W5500_ERR_CANNOT_CONNECT_TIMEOUT        = "Connection timeout";
+const W5500_ERR_TRANSMIT_TIMEOUT              = "Transmit timeout";
+const W5500_ERR_RECEIVE_TIMEOUT               = "Receive timeout";
+const W5500_ERR_COMMAND_TIMEOUT               = "Command timeout";
+const W5500_ERR_NOT_CONNECTED                 = "Not connected";
 
 // Miscellaneous constants
-const W5500_CONNECT_TIMEOUT = 60;
-const W5500_TRANSMIT_TIMEOUT = 8;
-const W5500_COMMAND_TIMEOUT = 3;
-const W5500_INTERRUPT_POLL_TIME_IDLE = 0.5;
+const W5500_CONNECT_TIMEOUT            = 60;
+const W5500_TRANSMIT_TIMEOUT           = 8;
+const W5500_COMMAND_TIMEOUT            = 3;
+const W5500_INTERRUPT_POLL_TIME_IDLE   = 0.5;
 const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 // ==============================================================================
@@ -271,16 +270,17 @@ const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 class W5500 {
 
-    static VERSION = "2.1.1";
+    static VERSION   = "2.2.0";
 
-    _driver = null;
-    _isReady = false; // set to true once the driver is loaded and connection to chip made
-    _readyCb = null; // callback for when isReady becomes true
+    _driver          = null;
+    // Set to true once the driver is loaded and connection to chip made
+    _isReady         = false;
+    // Callback for when isReady becomes true
+    _readyCb         = null; 
     _networkSettings = null;
 
     // TODO: implement this
-    _autoRetry = false;
-
+    _autoRetry       = false;
 
     // ***************************************************************************
     // Constructor
@@ -292,21 +292,13 @@ class W5500 {
     //      resetPin(optional) - reset pin
     //      autoRetry(optional) - not implemented yet.
     //      setMac(optional) - set the MAC address of the chip to the imp's own
-    //                         MAC, with the last bit flipped.
+    //                         MAC, with the locally administered bit flipped.
     // ***************************************************************************
     constructor(interruptPin, spi, csPin = null, resetPin = null, autoRetry = false, setMac = true) {
-
         // Initialise the driver
         _driver = W5500.Driver(interruptPin, spi, csPin, resetPin, setMac);
-        _driver.init(function() {
-
-            // Let the caller know the device is ready
-            _isReady = true;
-            if (_readyCb) imp.wakeup(0, _readyCb);
-
-        }.bindenv(this));
+        _driver.init(_onDriverInitDone.bindenv(this));
     }
-
 
     // ***************************************************************************
     // reset, note this is blocking for 0.2s
@@ -317,21 +309,12 @@ class W5500 {
     //                 on the W5500.
     // ***************************************************************************
     function reset(sw = false) {
-
         // Initialise the driver
         _isReady = false;
         _driver.reset(sw, function() {
-            _driver.init(function() {
-
-                // Let the caller know the device is ready
-                _isReady = true;
-                if (_readyCb) imp.wakeup(0, _readyCb);
-
-            }.bindenv(this));
+            _driver.init(_onDriverInitDone.bindenv(this));
         }.bindenv(this));
     }
-
-
 
     // ***************************************************************************
     // onReady
@@ -340,25 +323,27 @@ class W5500 {
     //      cb - function to be called when the Wiznet device is initialised
     // ***************************************************************************
     function onReady(cb) {
-
-        local _cb = cb;
-        if (_networkSettings != null) {
-            // Slip the network settings into the _cb
-            _cb = function() {
+        // Create a callback that sets any pending network settings, then triggers user's callback
+        _readyCb = function() {
+            // If network settings have not been stored in chip yet, set them
+            if (_networkSettings != null) {
                 if ("availableSockets" in _networkSettings) {
                     _driver.setNumberOfAvailableSockets(_networkSettings.availableSockets);
                 }
                 if ("sourceIP" in _networkSettings) {
                     configureNetworkSettings(_networkSettings.sourceIP, _networkSettings.subnetMask, _networkSettings.gatewayIP, _networkSettings.mac);
                 }
+                // Settings have been stored to chip, no need to store them locally
                 _networkSettings = null;
-                cb();
-            }.bindenv(this);
-        }
+            }
 
-        if (_isReady) imp.wakeup(0, _cb);
-        else _readyCb = _cb;
+            // Trigger user set callback
+            cb();
+        }.bindenv(this)
 
+        // Trigger callback immediately if driver initialization has already completed
+        if (_isReady) imp.wakeup(0, _readyCb);
+    
         return this;
     }
 
@@ -374,13 +359,10 @@ class W5500 {
         if (_isReady) {
             return _driver.setNumberOfAvailableSockets(numSockets);
         } else {
-            if (_networkSettings == null) {
-                _networkSettings = {};
-            }
+            if (_networkSettings == null) _networkSettings = {};
             _networkSettings.availableSockets <- numSockets;
         }
     }
-
 
     // ***************************************************************************
     // isPhysicallyConnected
@@ -392,7 +374,6 @@ class W5500 {
         return _driver.getPhysicalLinkStatus();
     }
 
-
     // ***************************************************************************
     // forceCloseAllSockets
     // Returns: nothing
@@ -402,7 +383,6 @@ class W5500 {
     function forceCloseAllSockets() {
         return _driver.forceCloseAllSockets();
     }
-
 
     // ***************************************************************************
     // configureNetworkSettings
@@ -416,10 +396,9 @@ class W5500 {
     function configureNetworkSettings(sourceIP, subnetMask = null, gatewayIP = null, mac = null) {
         if (_isReady) {
             if (gatewayIP) _driver.setGatewayAddr(gatewayIP);
-            if (mac) _driver.setSourceHWAddr(mac);
-            else _driver.setSourceHWAddr(imp.getmacaddress(), true);
             if (subnetMask) _driver.setSubnetMask(subnetMask);
             if (sourceIP) _driver.setSourceIP(sourceIP);
+            _driver.setSourceHWAddr(mac);
             _networkSettings = null;
         } else {
             if (_networkSettings == null) _networkSettings = {};
@@ -446,9 +425,7 @@ class W5500 {
         if (!_isReady) throw "Wiznet driver not ready";
 
         if ((mode == null && cb == null) || (typeof mode != "function" && cb == null)) {
-            if (cb) cb(W5500_ERR_INVALID_PARAMETERS, null);
-            else throw W5500_ERR_INVALID_PARAMETERS;
-            return;
+            throw W5500_ERR_INVALID_PARAMETERS;
         } else if (typeof mode == "function") {
             cb = mode;
             mode = W5500_SOCKET_MODE_TCP;
@@ -482,7 +459,6 @@ class W5500 {
         return _driver._noOfSockets;
     }
 
-
     // ***************************************************************************
     // getNumSocketsFree -
     // Returns: returns the number of unused sockets
@@ -493,6 +469,12 @@ class W5500 {
         return _driver._noOfSockets - _driver._connections.len();
     }
 
+    function _onDriverInitDone() {
+        // Set ready flag to true
+        _isReady = true;
+        // Let the caller know the device is ready
+        if (_readyCb) imp.wakeup(0, _readyCb);
+    }
 
 }
 
@@ -530,7 +512,7 @@ class W5500.Driver {
     //      cs(optional) - configured chip select pin
     //      reset(optional) - configured reset pin
     //      setMac(optional) - set the MAC address of the chip to the imp's own
-    //                         MAC, with the last bit flipped.
+    //                         MAC, with the locally administered bit flipped.
     // ***************************************************************************
     constructor(interruptPin, spi, cs = null, resetPin = null, setMac = true) {
 
@@ -545,8 +527,7 @@ class W5500.Driver {
         // Check the pins
         if (resetPin) _resetPin.configure(DIGITAL_OUT, 1);
 
-        // TODO: When imp.info() is available, change this code.
-        local imp005 = ("spi0" in hardware);
+        local imp005 = (imp.info().type == "imp005");
         if (_cs != null) {
             _cs.configure(DIGITAL_OUT, 1);
         } else if (!imp005) {
@@ -651,7 +632,7 @@ class W5500.Driver {
 
         // Set the default mac address
         if (_setMac){
-            setSourceHWAddr(imp.getmacaddress(), true);
+            setSourceHWAddr(null);
         }
 
         // Set the defaults
@@ -989,10 +970,17 @@ class W5500.Driver {
     // setSourceHWAddr
     // Returns: this
     // Parameters:
-    //      addr - an array of 6 integers with the mac address for the
-    //             source hardware
+    //      addr - an array of 6 integers or a string with the mac address for the
+    //             source hardware, or `null` if we should used the imp's mac  
+    //             address to create a mac for the Wiznet
     // **************************************************************************
-    function setSourceHWAddr(addr, flip_public_bit = false) {
+    function setSourceHWAddr(addr) {
+        local flip_public_bit = false;
+
+        if (addr == null) {
+            flip_public_bit = true;
+            addr = _getMac();
+        }
 
         if (typeof addr == "string") {
             // Convert from a string
@@ -1701,10 +1689,29 @@ class W5500.Driver {
         (_cs) ? _cs.write(1): _spi.chipselect(0);
     }
 
-
-
     // PRIVATE FUNCTIONS
     // ---------------------------------------------
+
+    // ***************************************************************************
+    // _getMac
+    // Returns: a string, the imp's WiFi mac address, or mac address based on the 
+    //          device id
+    // Parameters: none
+    // **************************************************************************
+    function _getMac() {
+        local netInfo = imp.net.info();
+
+        // Get the WiFi mac address (mac returned by depricated imp.getmacaddress method)
+        foreach(interface in netInfo.interface) {
+            if (interface.type == "wifi" && "macaddress" in interface) {
+                return interface.macaddress;
+            }
+        }
+        
+        // Unable to determine WiFi mac address, use device id
+        local devId = hardware.getdeviceid();
+        return devId.slice(-12);
+    }
 
     // ***************************************************************************
     // _hexToInt
@@ -1771,7 +1778,6 @@ class W5500.Driver {
 
     }
 
-
     // ***************************************************************************
     // _addrToIP
     // Returns: an array of four numbers representing an ip address or false if it is a string for the DNS
@@ -1802,7 +1808,6 @@ class W5500.Driver {
         }
     }
 
-
     // ***************************************************************************
     // _areObjectsEqual
     // Returns: true if the two objects are identical. Currently only checks the one node deep
@@ -1825,7 +1830,6 @@ class W5500.Driver {
             return obj1 == obj2;
         }
     }
-
 
     // ***************************************************************************
     // _getSocketRegBlockSelectBit
@@ -1911,7 +1915,6 @@ class W5500.Driver {
         return null;
     }
 
-
     // ***************************************************************************
     // _setMemDefaults, sets locally stored default socket memory info
     // Returns: null
@@ -1923,7 +1926,6 @@ class W5500.Driver {
             "tx": [2048, 2048, 2048, 2048, 2048, 2048, 2048, 2048]
         }
     }
-
 
     // ***************************************************************************
     // _writeData, writes data to transmit memory buffer
