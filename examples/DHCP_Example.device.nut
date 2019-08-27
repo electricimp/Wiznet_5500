@@ -22,12 +22,16 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// DHCP Example
+// Hardware: imp005 Fieldbus Gateway
 
-#require "W5500.device.lib.nut:2.0.0"
+// Include Libraries
+#require "W5500.device.lib.nut:2.2.0"
 #require "W5500.DHCP.device.lib.nut:2.0.0"
 
-const ECHO_SERVER_IP   = "192.168.201.63";
-const ECHO_SERVER_PORT = 60000;
+// Configure Echo Server Settings
+const ECHO_SERVER_IP   = "192.168.201.3";
+const ECHO_SERVER_PORT = 4242;
 
 // Initialise SPI port
 interruptPin <- hardware.pinXC;
@@ -115,14 +119,16 @@ wiz.onReady(function() {
 
     // Log the number of free sockets whenever it changes
     local sockets_free = wiz.getNumSocketsFree();
-    function log() {
+    
+    local log;
+    log = function() {
         local new_sockets_free = wiz.getNumSocketsFree();
         if (new_sockets_free != sockets_free) {
             server.log(format("sockets free: %d of %d", new_sockets_free, wiz.getNumSockets()));
             sockets_free = new_sockets_free;
         }
-        imp.wakeup(1, log)
-    }
+        imp.wakeup(1, log.bindenv(this))
+    }.bindenv(this);
     log();
 
 });

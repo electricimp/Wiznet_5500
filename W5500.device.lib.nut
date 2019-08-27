@@ -535,6 +535,7 @@ class W5500.Driver {
         }
 
         // Reset the hardware
+        // NOTE: This is a blocking reset
         reset();
 
     }
@@ -564,6 +565,8 @@ class W5500.Driver {
         _availableSockets = [];
 
         // Force disconnect/close all ports
+        // Note: Blocks for 1+ sec for each socket  
+        // that needs to be closed
         forceCloseAllSockets();
 
         if (cb) {

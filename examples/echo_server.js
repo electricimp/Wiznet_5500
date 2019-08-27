@@ -5,7 +5,7 @@
  *
  */
 
-const DEFAULT_PORT = 60000;
+const DEFAULT_PORT = 4242;
 var net = require('net');
 var cid = 1;
 var started = new Date().getTime() / 1000;
