@@ -14,7 +14,7 @@ The W5500 is used by the [impAccelerator&trade; Fieldbus Gateway](https://develo
 
 ### Constructor: W5500(*interruptPin, spi[, csPin][, resetPin][, autoRetry][, setMac]*) ###
 
-The constructor initializes the Wiznet driver. The initialization process runs asynchronously, so be sure to register an [onReady callback](#onreadycallback) before opening a connection or listener.  
+The constructor configures, resets then initializes the Wiznet chip. The reset process is blocking and can take a number of seconds. The initialization process then runs asynchronously, so be sure to register an [onReady callback](#onreadycallback) before opening a connection or listener.
 
 | Parameter | Data&nbsp;Type | Required? | Description |
 | --- | --- | --- | --- |
@@ -223,7 +223,7 @@ wiz.listen(port, function(error, connection) {
 
 ### reset(*[softReset]*) ###
 
-This method causes the Wiznet chip to undergo a reset, and then performs an initailiztion. It is recommended that you use hardware resets (the default behavior) and to wait for the [callback registered with *onready()*](#onreadycallback) to be triggered before proceeding after a reset.
+This method causes the Wiznet chip to undergo a reset and re-initialization. The reset is a blocking operation that will take 1+ seconds to close each socket that is in use, as well as 1+ second for the actual chip reset. When the reset operation is complete an asynchronous initialization is performed. When initialization is complete the [callback registered with *onReady()*](#onreadycallback) is triggered. It is recommended that you use the *onReady* callback to reconfigure and continue Wiznet operation. The data sheet for the Wiznet chip recommends a hardware reset (the default behavior), however no reset pin is configured the optional parameter can be used to perform a software reset.
 
 #### Parameters ####
 
