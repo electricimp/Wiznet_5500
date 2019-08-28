@@ -54,26 +54,35 @@ impt auth login --lk <login_key_id>]
 
 ### Run tests ###
 
-To run all tests specified in the `.impt.test` config file:
+To run tests 00 & 02:
 
 ```
 impt test run 
 ```
 
-To select a specific test file to run, ie override the tests specified in the `.impt.test` config file, select one of the following commands: 
+To select a specific test file to run. Update the `.impt.test` config file to include all tests by updating the "testFiles" value to the following:
 
 ```
-impt test run --tests "00.W5500.device.test.nut"
+    "testFiles": [
+        "*.test.nut",
+        "tests/**/*.test.nut"
+    ],
+```
+
+Then select one of the following commands to run the tests in that file: 
+
+```
+impt test run --tests "tests/00.W5500.device.test.nut"
 ```
 
 ```
-impt test run --tests "01.W5500.DHCP.device.test.nut"
+impt test run --tests "tests/01.W5500.DHCP.device.test.nut"
 ```
 
 ```
-impt test run --tests "02.W5500.MicrotechIII.device.test.nut"
+impt test run --tests "tests/02.W5500.MicroTechIII.device.test.nut"
 ```
 
 ```
-impt test run --tests "03.W5500.Listener.device.test.nut"
+impt test run --tests "tests/03.W5500.Listener.device.test.nut"
 ```
