@@ -22,68 +22,62 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-// echo server address and port
-const ECHO_SERVER_IP = "192.168.201.63";
-const ECHO_SERVER_PORT = 60000;
-const ECHO_MESSAGE = "Hello, world!";
+// ==============================================================================
+// TEST: 01.W5500.DHCP Basic Tests for W5500.DHCP Library 
+// ==============================================================================
+
+// Include Network settings for test Echo Server
+@include __PATH__ + "/EchoNetworkSettings.device.nut"
+
+const LEASE_RENEWAL_TIMEOUT_SEC = 50;
 
 class W5500_DHCP_TestCase extends ImpTestCase {
 
-    wiz = null;
+    wiz  = null;
     dhcp = null;
-    resetPin = hardware.pinXA;
-    interruptPin = hardware.pinXC;
-    spiSpeed = 1000;
-    spi = hardware.spi0;
-
 
     // setup function needed to run others. Instantiates the wiznet driver.
     function setUp() {
-        spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
-        wiz = W5500(interruptPin, spi, null, resetPin);
+        wiz = W5500(INTERRUPT_PIN, WIZNET_SPI, null, RESET_PIN);
         dhcp = W5500.DHCP(wiz);
     }
 
     function testGetIPWithoutInit() {
-        this.assertTrue(typeof dhcp.getIP() == "null", "getIP failed to return null");
+        assertTrue(typeof dhcp.getIP() == "null", "getIP failed to return null");
     }
 
     function testGetSubnetMaskWithoutInit() {
-        this.assertTrue(typeof dhcp.getSubnetMask() == "null", "getSubnetMask failed to return null");
+        assertTrue(typeof dhcp.getSubnetMask() == "null", "getSubnetMask failed to return null");
     }
 
     function testGetDNSWithoutInit() {
-        this.assertTrue(typeof dhcp.getDNS() == "null", "getDNS failed to return null");
+        assertTrue(typeof dhcp.getDNS() == "null", "getDNS failed to return null");
     }
 
     function testGetLeaseTimeWithoutInit() {
-        this.assertTrue(typeof dhcp.getLeaseTime() == "null", "getLeaseTime failed to return null");
+        assertTrue(typeof dhcp.getLeaseTime() == "null", "getLeaseTime failed to return null");
     }
 
     function testGetRouterAddressWithoutInit() {
-        this.assertTrue(typeof dhcp.getRouterAddress() == "null", "getRouterAddress failed to return null");
+        assertTrue(typeof dhcp.getRouterAddress() == "null", "getRouterAddress failed to return null");
     }
-
 
     function testOnLease() {
         return Promise(function(resolve, reject) {
-
             dhcp.onLease(function(err) {
-
                 if (err) return reject(format("onLease failed: %s", err.tostring()));
 
                 local source_ip = dhcp.getIP();
                 local subnet_mask = dhcp.getSubnetMask();
                 local router = dhcp.getRouterAddress();
                 local log = format("%s / %s via %s", source_ip, subnet_mask, router);
-                resolve("Lease obtained: " + log);
+                return resolve("Lease obtained: " + log);
 
                 dhcp._isLeased = false;
             }.bindenv(this));
 
-            // Request the lease renewal with a 20s timeout
-            dhcp.renewLease(50);
-
+            // Request the lease renewal specified timeout
+            dhcp.renewLease(LEASE_RENEWAL_TIMEOUT_SEC);
         }.bindenv(this));
     }
 
@@ -100,7 +94,7 @@ class W5500_DHCP_TestCase extends ImpTestCase {
                 local subnet_mask = dhcp.getSubnetMask();
                 local router = dhcp.getRouterAddress();
                 local log = format("%s / %s via %s", source_ip, subnet_mask, router);
-                this.info("Lease obtained: " + log);
+                info("Lease obtained: " + log);
 
                 wiz.configureNetworkSettings(source_ip, subnet_mask, router);
                 wiz.openConnection(ECHO_SERVER_IP, ECHO_SERVER_PORT, function(err, connection) {
@@ -118,11 +112,15 @@ class W5500_DHCP_TestCase extends ImpTestCase {
 
             }.bindenv(this));
 
-            // Request the lease renewal with a 20s timeout
-            dhcp.renewLease(50);
+            // Request the lease renewal specified timeout
+            dhcp.renewLease(LEASE_RENEWAL_TIMEOUT_SEC);
 
         }.bindenv(this));
     }
 
+    function tearDown() {
+        wiz = null;
+        imp.enableblinkup(true);
+    }
 
 }

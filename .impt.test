@@ -1,0 +1,12 @@
+{
+  "deviceGroupId": "9202e663-db1a-705d-95e1-63269327cdca",
+  "timeout": 60,
+  "stopOnFail": false,
+  "allowDisconnect": false,
+  "builderCache": false,
+  "testFiles": [
+    "tests/00.W5500.device.test.nut",
+    "tests/00.W5500.DHCP.device.test.nut"
+  ],
+  "deviceFile": "tests/BaseIncludes.device.nut"
+}
