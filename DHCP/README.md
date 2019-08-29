@@ -166,7 +166,7 @@ foreach (index, server in dns) {
 
 ## Extended Example For imp005 ##
 
-Please see [example.device.nut](example.device.nut) for an extended example.
+Please see the examples directory [DHCP Example](../examples#dhcp-example) for an extended example.
 
 ## License ##
 
