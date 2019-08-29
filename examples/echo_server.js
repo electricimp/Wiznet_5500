@@ -6,20 +6,13 @@
  */
 
 const DEFAULT_PORT = 4242;
+const DEFAULT_HOST = "192.168.201.3";
+
 var net = require('net');
 var cid = 1;
 var started = new Date().getTime() / 1000;
 var port = parseInt(process.argv[2]);
 if (port <= 1024 || isNaN(port)) port = DEFAULT_PORT;
-
-
-function log2(who, what) {
-    return function() {
-        var args = Array.prototype.slice.call(arguments);
-        // log('[%s on %s]', who, what, args);
-    };
-};
-
 
 function log() {
     var now = new Date().getTime() / 1000;
@@ -76,7 +69,7 @@ function echo(socket) {
  *  methods: listen, address, getConnections,  
  */
 var server = net.createServer(echo);
-server.listen({ host: "0.0.0.0", port: port });
+server.listen({ host: DEFAULT_HOST, port: port });
 
 server.on('listening', function() {
     var ad = server.address();
