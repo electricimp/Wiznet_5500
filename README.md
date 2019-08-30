@@ -30,7 +30,6 @@ The constructor configures, resets then initializes the Wiznet chip. The reset p
 ```squirrel
 // Setup for an imp005 Fieldbus Gateway
 
-// Configure pins 
 interruptPin <- hardware.pinXC;
 resetPin     <- hardware.pinXA;
 
@@ -45,10 +44,8 @@ wiz <- W5500(interruptPin, spi, null, resetPin);
 
 ```squirrel
 // Setup for an impC001 
-speed        <- 1000;
-spi          <- hardware.spiPQRS;
-spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
 
+// Configure pins 
 cs           <- hardware.pinS;
 resetPin     <- hardware.pinYC;
 // Note: This is not the default interrupt pin for the mikroBus.
@@ -57,19 +54,29 @@ resetPin     <- hardware.pinYC;
 // interrupt to pin YL.
 interruptPin <- hardware.pinYL;
 
+// Initialize SPI 
+speed        <- 1000;
+spi          <- hardware.spiPQRS;
+spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
+
+// Initialize Wiznet
 wiz <- W5500(interruptPin, spi, cs, resetPin);
 ```
 
 ```squirrel
 // Setup for an imp001 
-speed        <- 1000;
-spi          <- hardware.spi257
-spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
 
+// Configure pins 
 cs           <- hardware.pin8;
 resetPin     <- hardware.pin9;
 interruptPin <- hardware.pin1;
 
+// Initialize SPI 
+speed        <- 1000;
+spi          <- hardware.spi257
+spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
+
+// Initialize Wiznet
 wiz <- W5500(interruptPin, spi, cs, resetPin);
 ```
 
@@ -354,7 +361,7 @@ Nothing.
 #### Example ####
 
 ```squirrel
-connection.close(function(){
+connection.close(function() {
     server.log("Connection closed");
 }.bindenv(this));
 ```
