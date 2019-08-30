@@ -28,10 +28,10 @@
 // ==============================================================================
 
 // Test Echo Server Network Settings 
-const SOURCE_IP        = "192.168.201.2";
+const SOURCE_IP        = "192.168.42.2";
 const SUBNET_MASK      = "255.255.255.0";
-const GATEWAY_IP       = "192.168.201.1";
-const ECHO_SERVER_IP   = "192.168.201.3";
-const ECHO_SERVER_PORT = 4242;
+const GATEWAY_IP       = "192.168.42.1";
+const ECHO_SERVER_IP   = "192.168.42.3";
+const ECHO_SERVER_PORT = 6800;
 
 const ECHO_MESSAGE     = "Hello, world!";

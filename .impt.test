@@ -6,7 +6,7 @@
   "builderCache": false,
   "testFiles": [
     "tests/00.W5500.device.test.nut",
-    "tests/00.W5500.DHCP.device.test.nut"
+    "tests/01.W5500.DHCP.device.test.nut"
   ],
   "deviceFile": "tests/BaseIncludes.device.nut"
 }

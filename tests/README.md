@@ -2,6 +2,8 @@
 
 All tests are configured for an imp005 Fieldbus Gateway. If a different imp device is used please update HardwareConfig.device.nut file taking care not to rename any of the constants or variables.
 
+Test require an Echo Server and a Network configuration that contains a device that can issue a DHCP lease. Please see examples documentation for the [echo server](../examples/README.md#echo-server) and [network setting](../examples/README.md#dhcp-example) setup.
+
 ## Supporting Test Files ##
 
 ### BaseLibIncludes.device.nut ###
@@ -14,11 +16,11 @@ Defines hardware pin variables and configures spi bus for all tests.
 
 ### EchoNetworkSettings.device.nut ###
 
-Source and echo server network settings. Used for test files 00.W5500, 01.W5500.DHCP.
+Source and echo server network settings. Used for test files 00.W5500, 01.W5500.DHCP, and 03.W5500.Listener.
 
 ### MicroTechIIISettings.device.nut ###
 
-Source, router, and MTIII network settings. Used for test files 02.W5500.MicrotechIII, 03.W5500.Listener.
+Source, router, and MTIII network settings. Used for test files 02.W5500.MicrotechIII.
 
 ## Test Setup ##
 
@@ -30,15 +32,18 @@ Configure an Echo server with network settings matching those in the EchoNetwork
 
 ### 02.W5500.MicrotechIII ###
 
-Setup directions TBD. 
+This is very specific hardware, and not intended for general library testing.
+Leaving out of .impt.test config file, so will not run the the suite of tests. Setup directions TBD. 
 
 ### 03.W5500.Listener ###
+
+As of  8/30/19 - Have not successfully opened a connection to the Source IP from the Source IP, so this test currently does NOT pass tests as written. Leaving out of .impt.test config file, so will not run the the suite of tests.
 
 Setup directions TBD. 
 
 ## Running Tests  ##
 
-All test are run on the command line using impt test commands. Tests 00 & 01 have a similar setup and contain basic test coverage for the W5500 and W5500.DHCP libraries, so the current `.impt.test` config file is set up to run only these 2 test files.  
+All tests are run on the command line using impt test commands. Tests 00 & 01 have a similar setup and contain basic test coverage for the W5500 and W5500.DHCP libraries, so the current `.impt.test` config file is configured to run only these 2 test files.  
 
 ### Log into you account ###
 

@@ -30,10 +30,10 @@
 #require "W5500.DHCP.device.lib.nut:2.0.0"
 
 // Configure Echo Server Settings
-const ECHO_SERVER_IP   = "192.168.201.3";
-const ECHO_SERVER_PORT = 4242;
+const ECHO_SERVER_IP   = "192.168.42.3";
+const ECHO_SERVER_PORT = 6800;
 
-// Initialise SPI port
+// Configure Hardware
 interruptPin <- hardware.pinXC;
 resetPin     <- hardware.pinXA;
 spiSpeed     <- 1000;

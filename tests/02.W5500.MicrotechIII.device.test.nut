@@ -24,6 +24,9 @@
 
 // ==============================================================================
 // TEST: 02.W5500 MicrotechIII Tests for W5500 Library 
+// 
+// NOTE: This is very secific hardware, and not needed for general testing. 
+// 8/30/19 - Leaving out of .impt.test config file 
 // ==============================================================================
 
 // Include Network settings for test Echo Server

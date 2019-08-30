@@ -24,20 +24,30 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-/**
- *  echo server
- *
- */
 
-const DEFAULT_PORT = 4242;
-const DEFAULT_HOST = "192.168.201.3";
+//================================================
+// Echo Server
+//================================================
 
-var net = require('net');
-var cid = 1;
+
+//================================================
+// Define Settings
+//================================================
+
+// Network Settings
+const DEFAULT_PORT = 6800;
+const DEFAULT_HOST = "192.168.42.3";
+
+// Application Variables
+var net     = require('net');
+var cid     = 1;
 var started = new Date().getTime() / 1000;
-var port = parseInt(process.argv[2]);
+var port    = parseInt(process.argv[2]);
 if (port <= 1024 || isNaN(port)) port = DEFAULT_PORT;
 
+//================================================
+// Define Application Functions
+//================================================
 function log() {
     var now = new Date().getTime() / 1000;
     var time = parseInt((now - started) % 10000);
@@ -45,7 +55,7 @@ function log() {
     args[0] = "[%d] " + args[0];
     args.splice(1, 0, time);
     console.log.apply(null, args);
-}
+};
 
 function echo(socket) {
 
@@ -86,12 +96,12 @@ function echo(socket) {
     });
 };
 
-
-/**
- *  net.Server (http://nodejs.org/api/net.html#net_class_net_server)
- *  events: listening, connections, close, err
- *  methods: listen, address, getConnections,  
- */
+//================================================
+// Create Server
+//  net.Server (http://nodejs.org/api/net.html#net_class_net_server)
+//  events: listening, connections, close, err
+//  methods: listen, address, getConnections
+//================================================
 var server = net.createServer(echo);
 server.listen({ host: DEFAULT_HOST, port: port });
 

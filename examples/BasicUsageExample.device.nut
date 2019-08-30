@@ -29,11 +29,11 @@
 //================================================
 
 // Network Settings
-const DEST_IP       = "192.168.201.3";
-const DEST_PORT     = 4242;
-const SOURCE_IP     = "192.168.201.2";
+const DEST_IP       = "192.168.42.3";
+const DEST_PORT     = 6800;
+const SOURCE_IP     = "192.168.42.2";
 const SUBNET_MASK   = "255.255.255.0";
-const GATEWAY_IP    = "192.168.201.1";
+const GATEWAY_IP    = "192.168.42.1";
 
 // Application Settings
 const SEND_LOOP_SEC = 10;
