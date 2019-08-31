@@ -4,3 +4,4 @@
 .build_api_key.json*
 .imptest*
 settings.wrench*
+.impt.auth

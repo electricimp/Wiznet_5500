@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2017 Electric Imp
+// Copyright 2016-2019 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -22,23 +22,27 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// DHCP Example
+// Hardware: imp005 Fieldbus Gateway
 
-#require "W5500.device.lib.nut:2.0.0"
+// Include Libraries
+#require "W5500.device.lib.nut:2.2.0"
 #require "W5500.DHCP.device.lib.nut:2.0.0"
 
-const ECHO_SERVER_IP = "192.168.201.63";
-const ECHO_SERVER_PORT = 60000;
+// Configure Echo Server Settings
+const ECHO_SERVER_IP   = "192.168.42.3";
+const ECHO_SERVER_PORT = 6800;
 
-// Initialise SPI port
+// Configure Hardware
 interruptPin <- hardware.pinXC;
-resetPin <- hardware.pinXA;
-spiSpeed <- 1000;
-spi <- hardware.spi0;
+resetPin     <- hardware.pinXA;
+spiSpeed     <- 1000;
+spi          <- hardware.spi0;
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
 
 // Initialise Wiznet and DHCP
-wiz <- W5500(interruptPin, spi, null, resetPin);
-dhcp <- W5500.DHCP(wiz);
+wiz      <- W5500(interruptPin, spi, null, resetPin);
+dhcp     <- W5500.DHCP(wiz);
 next_cid <- 0;
 
 // Wait for Wiznet to be ready
@@ -115,14 +119,16 @@ wiz.onReady(function() {
 
     // Log the number of free sockets whenever it changes
     local sockets_free = wiz.getNumSocketsFree();
-    function log() {
+    
+    local log;
+    log = function() {
         local new_sockets_free = wiz.getNumSocketsFree();
         if (new_sockets_free != sockets_free) {
             server.log(format("sockets free: %d of %d", new_sockets_free, wiz.getNumSockets()));
             sockets_free = new_sockets_free;
         }
-        imp.wakeup(1, log)
-    }
+        imp.wakeup(1, log.bindenv(this))
+    }.bindenv(this);
     log();
 
 });

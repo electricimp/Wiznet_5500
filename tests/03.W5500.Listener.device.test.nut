@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2017 Electric Imp
+// Copyright 2016-2019 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -22,31 +22,32 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-// echo server address and port
-const SOURCE_IP = "192.168.1.185";
-const SUBNET_MASK = "255.255.255.0";
-const ROUTER = "192.168.1.1";
+// ==============================================================================
+// TEST: 03.W5500 Listener Tests for W5500 Library 
+//
+// NOTE: Cannot successfully open a connection to the Source IP, so I have 
+// not gotten this test to pass. 
+// 8/30/19 - Leaving out of .impt.test config file 
+// ==============================================================================
+
+// Include Network settings for test Echo Server
+@include __PATH__ + "/EchoNetworkSettings.device.nut"
+
 const LISTEN_PORT = 80;
 
 class W5500_Listener_TestCase extends ImpTestCase {
 
     wiz = null;
-    dhcp = null;
-    resetPin = hardware.pinXA;
-    interruptPin = hardware.pinXC;
-    spiSpeed = 1000;
-    spi = hardware.spi0;
-
 
     // setup function needed to run others. Instantiates the wiznet driver.
     function setUp() {
-        spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
-        wiz = W5500(interruptPin, spi, null, resetPin);
-        wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, ROUTER);
-        wiz.setNumberOfAvailableSockets(3);
-        this.info("Configured IP address to " + SOURCE_IP);
-    }
+        // Initialize Wiznet
+        wiz = W5500(INTERRUPT_PIN, WIZNET_SPI, null, RESET_PIN);
 
+        wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, GATEWAY_IP);
+        wiz.setNumberOfAvailableSockets(3);
+        info("Configured IP address to " + SOURCE_IP);
+    }
 
     // Tests the Wiznet's ability to listen on a socket and take connections
     function testOneListener() {
@@ -55,7 +56,7 @@ class W5500_Listener_TestCase extends ImpTestCase {
             wiz.onReady(function() {
 
                 // Setup the listener waiting for a connection
-                this.info(format("Listening on %s:%d", SOURCE_IP, LISTEN_PORT));
+                info(format("Listening on %s:%d", SOURCE_IP, LISTEN_PORT));
                 wiz.listen(LISTEN_PORT, function(err, conn1) {
 
                     if (err) return reject(format("Failed to listen on port %d: ", LISTEN_PORT, err.tostring()));
@@ -64,7 +65,6 @@ class W5500_Listener_TestCase extends ImpTestCase {
                     this.info(format("Connection established from %d.%d.%d.%d:%d", ip[0], ip[1], ip[2], ip[3], port));
 
                     local data_collected = false;
-                    conn1.transmit("Hello!\r\n");
 
                     conn1.onReceive(function(err, data) {
                         this.info("Data: " + data.len() + " bytes");
@@ -76,14 +76,19 @@ class W5500_Listener_TestCase extends ImpTestCase {
                         else reject("No data collected");
                     }.bindenv(this));
 
+                    info("transmitting Hello! on conn1...")
+                    conn1.transmit("Hello!\r\n");
+
                 }.bindenv(this));
 
 
+                info("Opening up a connection to myself...");
                 // Setup the client to make a connection
                 wiz.openConnection(SOURCE_IP, LISTEN_PORT, function(err, conn2) {
 
                     if (err) return reject(format("Connection failed to %s:%d: %s", SOURCE_IP, LISTEN_PORT, err.tostring()));
-                    this.info(format("Connection to listener successful"));
+                    
+                    info(format("Connection to listener successful. Transmitting message..."));
                     conn2.transmit("Hello to you!", function(err) {
                         conn2.close();
                     }.bindenv(this))

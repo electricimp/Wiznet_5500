@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2017 Electric Imp
+// Copyright 2016-2019 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -22,14 +22,19 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-// echo server address and port
-const SOURCE_IP = "192.168.1.185";
-const SUBNET_MASK = "255.255.255.0";
-const ROUTER = "192.168.1.1";
-const MTIII_SERVER_IP = "192.168.1.42";
-const MTIII_SERVER_PORT = 4242;
-const MTIII_CONNECT_ATTEMPTS = 5;
-const MTIII_RESPONSE_TIMEOUT = 2; // seconds
+// ==============================================================================
+// TEST: 02.W5500 MicrotechIII Tests for W5500 Library 
+// 
+// NOTE: This is very secific hardware, and not needed for general testing. 
+// 8/30/19 - Leaving out of .impt.test config file 
+// ==============================================================================
+
+// Include Network settings for test Echo Server
+@include __PATH__ + "/MicroTechIIINetworkSettings.device.nut"
+
+// MTIII Settings
+const MTIII_CONNECT_ATTEMPTS     = 5;
+const MTIII_RESPONSE_TIMEOUT_SEC = 2;
 
 MTIII_SEQUENCE <- [
     // Init
@@ -57,22 +62,16 @@ MTIII_SEQUENCE <- [
 class W5500_MicrotechIII_TestCase extends ImpTestCase {
 
     wiz = null;
-    dhcp = null;
-    resetPin = hardware.pinXA;
-    interruptPin = hardware.pinXC;
-    spiSpeed = 1000;
-    spi = hardware.spi0;
 
-
-    // setup function needed to run others. Instantiates the wiznet driver.
+    // Setup function needed to run others. Instantiates the wiznet driver.
     function setUp() {
-        spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
-        wiz = W5500(interruptPin, spi, null, resetPin);
+        // Initialize Wiznet
+        wiz = W5500(INTERRUPT_PIN, WIZNET_SPI, null, RESET_PIN);
+        
         wiz.configureNetworkSettings(SOURCE_IP, SUBNET_MASK, ROUTER);
         wiz.setNumberOfAvailableSockets(2);
-        this.info("Configured IP address to " + SOURCE_IP);
+        info("Configured IP address to " + SOURCE_IP);
     }
-
 
     // Tests the ability of the wiznet to open and close multiple times cleanly
     // Failure to cleanly close the connection leads to the MTIII rejecting new connections
@@ -132,7 +131,7 @@ class W5500_MicrotechIII_TestCase extends ImpTestCase {
                             if (err) return done(err, send, null);
                             this.info("Received: " + data.len() + " bytes");
                             done(err, send, data);
-                        }.bindenv(this), MTIII_RESPONSE_TIMEOUT);
+                        }.bindenv(this), MTIII_RESPONSE_TIMEOUT_SEC);
 
                     }
 

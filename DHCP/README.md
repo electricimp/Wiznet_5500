@@ -1,14 +1,27 @@
 # Wiznet 5500 DHCP #
 
-This library class enables Dynamic Host Configuration Protocol (DHCP) functionality for the Wiznet W5500 chip [W5500](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It also requires the Wiznet W5500 driver.
+This library class enables Dynamic Host Configuration Protocol (DHCP) functionality for the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It depends on the Wiznet W5500 library, so be sure to include the DHCP library after the W5500 library.
 
-**To add this code to your project, add** `#require W5500.DHCP.device.lib.nut:2.0.0` **after** `#require W5500.device.lib.nut:2.1.1` **at the top of your device code**
+**To include this library in your project, add the following to the top of your device code** 
 
-## Class W5500.DHCP ##
+```
+#require "W5500.device.lib.nut:2.1.1"
+#require "W5500.DHCP.device.lib.nut:2.0.0"
+```
+
+## Class Usage ##
 
 ### Constructor: W5500.DHCP(*wiz*) ###
 
-Instantiates a new W5500.DHCP object and passes in the main Wiznet driver.
+Instantiates a new W5500.DHCP object using the main Wiznet driver.
+
+| Parameter | Data&nbsp;Type | Required? | Description |
+| --- | --- | --- | --- |
+| *wiz* | Wiznet driver | Yes | The driver controlling the W5500 |
+
+#### Returns ####
+
+The instance.
 
 #### Example ####
 
@@ -30,40 +43,56 @@ dhcp <- W5500.DHCP(wiz);
 
 ### onLease(*callback*) ###
 
-This method sets the function to be called when an IP address is leased. The callback function, which is not optional, has an *error* parameter which informs the user of timeouts and errors, or will be `null`.
+This method registers the function that will be called when an IP address is leased.
+
+#### Parameters ####
+
+| Parameter | Data&nbsp;Type | Required? | Description |
+| --- | --- | --- | --- |
+| *callback* | Function | Yes | The callback has one parameter of its own, *error*, which informs the user of timeouts and errors, or will be `null` |
 
 #### Error Messages ####
 
-| Error Message | Description |
+| Error&nbsp;Message | Description |
 | --- | --- |
-| Offer Timeout | Discovery message sent with no response |
-| Ack Timeout | Request message sent with no response |
-| Renewal Timeout | Max Renewal attempts reached before a restart |
-| Renewal Failed | Lease renewal failed |
-| Request Declined | Requested IP not able to be leased |
-| IP in use | Offered IP is currently in use |
-| All connections in use | All Wiznet sockets are in use |
+| `"Offer Timeout"` | Discovery message sent with no response |
+| `"Ack Timeout`" | Request message sent with no response |
+| `"Renewal Timeout"` | Maximum Renewal attempts reached before a restart |
+| `"Renewal Failed"` | Lease renewal failed |
+| `"Request Declined"` | Requested IP not able to be leased |
+| `"IP in use"` | Offered IP is currently in use |
+| `"All connections in use"` | All Wiznet sockets are in use |
 
 #### Example ####
 
 ```squirrel
 dhcp.onLease(function(error) {
-  if (error) return server.error(error);
-  server.log("DHCP lease obtained");
+    if (error) return server.error(error);
+    server.log("DHCP lease obtained");
 });
 ```
 
-### renewLease() ###
+### renewLease(*[timeout]*) ###
 
-This method renews the lease or requests a new lease. When this is complete, the *onLease()* callback will be executed.
+This method renews the lease or requests a new lease. When this is complete, the callback function registered with [*onLease()*](#onleasecallback) will be executed.
+
+#### Parameters ####
+
+| Parameter | Data&nbsp;Type | Required? | Description |
+| --- | --- | --- | --- |
+| *timeout* | Integer | No | The number of seconds to allow for the lease to try before giving up, if set to 0 the timeout will be infinite. Default: 0 |
+
+#### Returns ####
+
+The instance (*this*).
 
 #### Example ####
 
 ```squirrel
 dhcp.onLease(function(error) {
-  // Run this code when IP address is obtained
-  if (error) return server.error(error);
-  server.log("DHCP lease obtained");
+    // Run this code when IP address is obtained
+    if (error) return server.error(error);
+    server.log("DHCP lease obtained");
 });
 
 dhcp.renewLease();
@@ -71,7 +100,11 @@ dhcp.renewLease();
 
 ### getIP() ###
 
-This method returns the leased IP address as an array of four integers.
+This method retrieves the leased IP address.
+
+#### Returns ####
+
+Array &mdash; The leased IP address as four integers.
 
 #### Example ####
 
@@ -82,18 +115,26 @@ server.log(format("IP address = %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]));
 
 ### getSubnetMask() ###
 
-This method returns the subnet mask as an array of four integers.
+This method retrieves the network subnet mask.
+
+#### Returns ####
+
+Array &mdash; The subnet mask as four integers.
 
 #### Example ####
 
 ```squirrel
-local subnet_mask = dhcp.getSubnetMask();
-server.log(format("Subnet mask = %d.%d.%d.%d", subnet_mask[0], subnet_mask[1], subnet_mask[2], subnet_mask[3]));
+local subnetMask = dhcp.getSubnetMask();
+server.log(format("Subnet mask = %d.%d.%d.%d", subnetMask[0], subnetMask[1], subnetMask[2], subnetMask[3]));
 ```
 
 ### getRouterAddress() ###
 
-This method returns the gateway address as an array of four integers.
+This method retrieves the network gateway address.
+
+#### Returns ####
+
+Array &mdash; The gateway address as four integers.
 
 #### Example ####
 
@@ -104,31 +145,39 @@ server.log(format("Router IP address = %d.%d.%d.%d", router[0], router[1], route
 
 ### getLeaseTime() ###
 
-This method returns the lease duration, in seconds, as an integer.
+This method retrieves the lease duration in seconds.
 
-#### Example Code:
+#### Returns ####
+
+Integer &mdash; the lease duration (seconds).
+
+#### Example ####
 
 ```squirrel
 local leaseTime = dhcp.getLeaseTime();
-server.log("IP address lease time: " + leaseTime);
+server.log("IP address lease time: " + leaseTime + "s");
 ```
 
 ### getDNS() ###
 
-This method returns an array of DNS entries, each of which is an an array of four integers.
+This method retrieves a set of DNS entries.
+
+#### Returns ####
+
+Array &mdash; The DNS entries, each of which is an array of four integers.
 
 #### Example ####
 
 ```squirrel
 local dns = dhcp.getDNS();
 foreach (index, server in dns) {
-  server.log(format("DNS #%d address = %d.%d.%d.%d", (index + 1), server[0], server[1], server[2], server[3]));
+    server.log(format("DNS #%d address = %d.%d.%d.%d", (index + 1), server[0], server[1], server[2], server[3]));
 }
 ```
 
 ## Extended Example For imp005 ##
 
-Please see [example.device.nut](example.device.nut) for an extended example.
+Please see the examples directory [DHCP Example](../examples#dhcp-example) for an extended example.
 
 ## License ##
 

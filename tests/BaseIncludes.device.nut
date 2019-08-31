@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2017 Electric Imp
+// Copyright 2016-2019 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -22,5 +22,12 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include "../W5500.device.lib.nut"
-#include "../DHCP/W5500.DHCP.device.lib.nut"
+
+// ==============================================================================
+// Include W5500 & DHCP Library Code Files
+// ==============================================================================
+
+@include "W5500.device.lib.nut"
+@include "DHCP/W5500.DHCP.device.lib.nut"
+
+@include __PATH__ + "/HardwareConfig.device.nut"
