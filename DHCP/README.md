@@ -1,6 +1,6 @@
 # Wiznet 5500 DHCP #
 
-This library class enables Dynamic Host Configuration Protocol (DHCP) functionality for the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It depends on the Wiznet W5500 library, so be sure to include the DHCP library after the base W5500.
+This library class enables Dynamic Host Configuration Protocol (DHCP) functionality for the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It depends on the Wiznet W5500 library, so be sure to include the DHCP library after the W5500 library.
 
 **To include this library in your project, add the following to the top of your device code** 
 
