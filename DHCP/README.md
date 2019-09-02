@@ -1,11 +1,11 @@
-# Wiznet 5500 DHCP #
+# Wiznet 5500 DHCP 2.0.0 #
 
 This library class enables Dynamic Host Configuration Protocol (DHCP) functionality for the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It depends on the Wiznet W5500 library, so be sure to include the DHCP library after the W5500 library.
 
-**To include this library in your project, add the following to the top of your device code** 
+**To include this library in your project, add the following at the top of your device code:**
 
-```
-#require "W5500.device.lib.nut:2.1.1"
+```squirrel
+#require "W5500.device.lib.nut:2.2.0"
 #require "W5500.DHCP.device.lib.nut:2.0.0"
 ```
 
@@ -80,7 +80,7 @@ This method renews the lease or requests a new lease. When this is complete, the
 
 | Parameter | Data&nbsp;Type | Required? | Description |
 | --- | --- | --- | --- |
-| *timeout* | Integer | No | The number of seconds to allow for the lease to try before giving up, if set to 0 the timeout will be infinite. Default: 0 |
+| *timeout* | Integer | No | The number of seconds to allow for the lease to try to be renewed before giving up. If set to 0, the timeout will be infinite. Default: 0 |
 
 #### Returns ####
 
