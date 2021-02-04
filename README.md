@@ -1,8 +1,8 @@
-# Wiznet W5500 #
+# Wiznet W5500 2.2.0 #
 
-The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. We have two libraries for use with the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). 
+The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. We have two libraries for use with the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf).
 
-The base library allows you to communicate with a TCP/IP network (separate from an imp’s connection to the network). This library supports SPI integration with the W5500. See documentation [below](#w5500-class-usage). 
+The base library allows you to communicate with a TCP/IP network (separate from an imp’s connection to the network). This library supports SPI integration with the W5500. See documentation [below](#w5500-class-usage).
 
 In addition we have a W5500.DHCP library that enables Dynamic Host Configuration Protocol (DHCP) functionality for the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). Documentation and source code can be found in the [DHCP directory](./DHCP).
 
@@ -24,7 +24,7 @@ The constructor configures, resets then initializes the Wiznet chip. The reset p
 | *resetPin* | imp **pin** object | No | The pin represents a physical pin on the imp and is used for sending a hard reset signal to the W5500 chip |
 | *autoRetry* | Boolean | No | Whether the library should automatically retry to open a connection should one fail. Default: `false`. **Note** Not yet implemented |
 | *setMac* | Boolean | No | Whether the library should set the MAC address of the chip to the imp’s own MAC (with the locally administered bit flipped). This should be set to `false` when using a Wiznet Wiz550io board, since it has its own MAC address. Default: `true` |
- 
+
 #### Examples ####
 
 ```squirrel
@@ -33,7 +33,7 @@ The constructor configures, resets then initializes the Wiznet chip. The reset p
 interruptPin <- hardware.pinXC;
 resetPin     <- hardware.pinXA;
 
-// Initialize SPI 
+// Initialize SPI
 spiSpeed     <- 1000;
 spi          <- hardware.spi0;
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST | USE_CS_L, spiSpeed);
@@ -43,9 +43,9 @@ wiz <- W5500(interruptPin, spi, null, resetPin);
 ```
 
 ```squirrel
-// Setup for an impC001 
+// Setup for an impC001
 
-// Configure pins 
+// Configure pins
 cs           <- hardware.pinS;
 resetPin     <- hardware.pinYC;
 // Note: This is not the default interrupt pin for the mikroBus.
@@ -54,7 +54,7 @@ resetPin     <- hardware.pinYC;
 // interrupt to pin YL.
 interruptPin <- hardware.pinYL;
 
-// Initialize SPI 
+// Initialize SPI
 speed        <- 1000;
 spi          <- hardware.spiPQRS;
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
@@ -64,14 +64,14 @@ wiz <- W5500(interruptPin, spi, cs, resetPin);
 ```
 
 ```squirrel
-// Setup for an imp001 
+// Setup for an imp001
 
-// Configure pins 
+// Configure pins
 cs           <- hardware.pin8;
 resetPin     <- hardware.pin9;
 interruptPin <- hardware.pin1;
 
-// Initialize SPI 
+// Initialize SPI
 speed        <- 1000;
 spi          <- hardware.spi257
 spi.configure(CLOCK_IDLE_LOW | MSB_FIRST, speed);
@@ -113,7 +113,7 @@ wiz.configureNetworkSettings([192,168,1,37], [255,255,255,0], [192,168,1,1]);
 
 ### onReady(*callback*) ###
 
-This method registers a callback function that will be triggered when the W5500 initialization is completed and the chip is ready for use. 
+This method registers a callback function that will be triggered when the W5500 initialization is completed and the W5500 is ready for use.
 
 #### Parameters ####
 
@@ -203,6 +203,8 @@ This method finds a socket that is not in use and sets up a TCP server. Initiali
 | --- | --- | --- | --- |
 | *port* | An integer | Yes | The port to listen on for connections |
 | *callback* | Function | Yes | A callback function that is passed an error message, or the established remote connection is established. The table below lists its parameters |
+
+&nbsp;
 
 | Callback Parameter | Data&nbsp;Type | Description |
 | --- | --- | --- |
@@ -346,7 +348,7 @@ The instance (*this*).
 
 ### close(*[callback]*) ###
 
-This method closes a connection via the W5500. 
+This method closes a connection via the W5500.
 
 #### Parameters ####
 
@@ -404,6 +406,8 @@ This method registers a callback function that will be triggered when data is re
 | --- | --- | --- | --- |
 | *callback* | Function | No | A function to be called when data is received. Its parameters are listed below |
 
+&nbsp;
+
 | Parameter | Data&nbsp;Type | Description|
 | --- | --- | --- |
 | *error* | String | An error message if there was a problem, or `null` if it was successful |
@@ -434,6 +438,8 @@ This method registers a callback function that will be triggered when the connec
 | Parameter | Data&nbsp;Type | Required? | Description |
 | --- | --- | --- | --- |
 | *callback* | Function | No | A function to be called when the W5500 is disconnects. Its parameters are listed below |
+
+&nbsp;
 
 | Callback&nbsp;Parameter | Data&nbsp;Type | Description|
 | --- | --- | --- |
@@ -485,6 +491,8 @@ This method is called within a connection to transmit the data through the socke
 | *data* | Blob or string | Yes | The data to be transmitted |
 | *callback* | Function | No | The callback triggered when data was sent successfully or a timeout occurred. Its parameters are listed below |
 
+&nbsp;
+
 | Callback&nbsp;Parameter | Data&nbsp;Type | Description|
 | --- | --- | --- |
 | *error* | String | An error message if there was a problem, or `null` if it was successful |
@@ -515,6 +523,8 @@ This method is an alternative to [*onReceive()*](#onreceivecallback) and which w
 | Parameter | Data&nbsp;Type | Required? | Description |
 | --- | --- | --- | --- |
 | *callback* | Function | No | The callback triggered when data was received. Its parameters are listed below |
+
+&nbsp;
 
 | Callback&nbsp;Parameters | Data&nbsp;Type | Description|
 | --- | --- | --- |

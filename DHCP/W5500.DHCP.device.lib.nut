@@ -143,7 +143,7 @@ enum W5500_DHCP_OPTIONS {
 
 class W5500.DHCP {
 
-    static VERSION = "2.0.0";
+    static VERSION = "2.0.1";
 
     _driver = null;
     _wiz = null;
@@ -751,6 +751,7 @@ class W5500.DHCP {
         for (local i = 0; i < _mac.len(); i++) {
             mac.writen(_mac[i], 'b');
         }
+        mac.seek(0, 'b');
 
         // OPTIONS
         // Client identifier
@@ -760,7 +761,7 @@ class W5500.DHCP {
         // Type
         options.writen(0x01, 'b');
         // Writes Mac Address
-        options.writeblob(mac);
+        options.writeblob(mac.readblob(6));
 
         // Host Name
         options.writen(W5500_DHCP_OPTIONS.hostName, 'b');

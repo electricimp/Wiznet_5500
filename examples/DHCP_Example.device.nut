@@ -27,7 +27,7 @@
 
 // Include Libraries
 #require "W5500.device.lib.nut:2.2.0"
-#require "W5500.DHCP.device.lib.nut:2.0.0"
+#require "W5500.DHCP.device.lib.nut:2.0.1"
 
 // Configure Echo Server Settings
 const ECHO_SERVER_IP   = "192.168.42.3";
