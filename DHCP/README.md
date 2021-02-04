@@ -1,4 +1,4 @@
-# Wiznet 5500 DHCP 2.0.0 #
+# Wiznet 5500 DHCP 2.0.1 #
 
 This library class enables Dynamic Host Configuration Protocol (DHCP) functionality for the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf). It depends on the Wiznet W5500 library, so be sure to include the DHCP library after the W5500 library.
 
@@ -6,7 +6,7 @@ This library class enables Dynamic Host Configuration Protocol (DHCP) functional
 
 ```squirrel
 #require "W5500.device.lib.nut:2.2.0"
-#require "W5500.DHCP.device.lib.nut:2.0.0"
+#require "W5500.DHCP.device.lib.nut:2.0.1"
 ```
 
 ## Class Usage ##
