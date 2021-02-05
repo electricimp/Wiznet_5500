@@ -2151,6 +2151,7 @@ class W5500.Connection {
         _driver.closeConnection(_socket, _getHandler("close"));
         _handlers = {};
         if (_interrupt_timer) imp.cancelwakeup(_interrupt_timer);
+       _interrupt_timer = null;
     }
 
 
@@ -2266,6 +2267,7 @@ class W5500.Connection {
     // Parameters: socket the interrupt occurred on
     // **************************************************************************
     function handleInterrupt(skip_timer = false) {
+        _interrupt_timer = null;
 
         local status = _driver.getSocketInterruptTypeStatus(_socket);
 
