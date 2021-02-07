@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2019 Electric Imp
+// Copyright 2016-2021 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -270,7 +270,7 @@ const W5500_INTERRUPT_POLL_TIME_ACTIVE = 0.01;
 
 class W5500 {
 
-    static VERSION   = "2.2.0";
+    static VERSION   = "2.2.1";
 
     _driver          = null;
     // Set to true once the driver is loaded and connection to chip made
@@ -2267,6 +2267,7 @@ class W5500.Connection {
     // Parameters: socket the interrupt occurred on
     // **************************************************************************
     function handleInterrupt(skip_timer = false) {
+        if (_interrupt_timer) imp.cancelwakeup(_interrupt_timer);
         _interrupt_timer = null;
 
         local status = _driver.getSocketInterruptTypeStatus(_socket);
@@ -2395,7 +2396,6 @@ class W5500.Connection {
         }
 
         // Scan the interrupt again very soon
-        if (_interrupt_timer) imp.cancelwakeup(_interrupt_timer);
         if (_socket in _driver._connections) {
             local timer_time = ("receive" in _handlers) ? W5500_INTERRUPT_POLL_TIME_ACTIVE : W5500_INTERRUPT_POLL_TIME_IDLE;
             _interrupt_timer = imp.wakeup(timer_time, handleInterrupt.bindenv(this))
