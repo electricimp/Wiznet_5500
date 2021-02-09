@@ -1,4 +1,4 @@
-# Wiznet W5500 2.2.0 #
+# Wiznet W5500 2.2.1 #
 
 The W5500 chip is a hardwired TCP/IP embedded Ethernet controller. We have two libraries for use with the [Wiznet W5500 chip](http://wizwiki.net/wiki/lib/exe/fetch.php?media=products:w5500:w5500_ds_v106e_141230.pdf).
 
@@ -8,7 +8,7 @@ In addition we have a W5500.DHCP library that enables Dynamic Host Configuration
 
 The W5500 is used by the [impAccelerator&trade; Fieldbus Gateway](https://developer.electricimp.com/hardware/resources/reference-designs/fieldbusgateway).
 
-**To include the base library in your project, add** `#require "W5500.device.lib.nut:2.2.0"` **at the top of your device code**
+**To include the base library in your project, add** `#require "W5500.device.lib.nut:2.2.1"` **at the top of your device code**
 
 ## W5500 Class Usage ##
 

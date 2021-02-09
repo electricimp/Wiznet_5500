@@ -5,7 +5,7 @@ This library class enables Dynamic Host Configuration Protocol (DHCP) functional
 **To include this library in your project, add the following at the top of your device code:**
 
 ```squirrel
-#require "W5500.device.lib.nut:2.2.0"
+#require "W5500.device.lib.nut:2.2.1"
 #require "W5500.DHCP.device.lib.nut:2.0.1"
 ```
 

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2019 Electric Imp
+// Copyright 2016-2021 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -26,7 +26,7 @@
 // Hardware: imp005 Fieldbus Gateway
 
 // Include Libraries
-#require "W5500.device.lib.nut:2.2.0"
+#require "W5500.device.lib.nut:2.2.1"
 #require "W5500.DHCP.device.lib.nut:2.0.1"
 
 // Configure Echo Server Settings

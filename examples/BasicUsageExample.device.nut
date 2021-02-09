@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright 2016-2019 Electric Imp
+// Copyright 2016-2021 Electric Imp
 //
 // SPDX-License-Identifier: MIT
 //
@@ -22,7 +22,7 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#require "W5500.device.lib.nut:2.2.0"
+#require "W5500.device.lib.nut:2.2.1"
 
 //================================================
 // Define Settings
